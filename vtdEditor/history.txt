@@ -1,0 +1,5 @@
+25 Aug. 2010 vx.x.x   fixed; apply trans & filt on spectrum
+20 Aug. 2010 vx.x.x   add stretching transform mode
+19 Aug. 2010 vx.x.x   add drawing filter mode
+17 Aug. 2010 vx.x.x   import spectrum / save vtd are done.
+                      begin developping vtd Editor for v.Connect

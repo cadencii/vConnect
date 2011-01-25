@@ -1,0 +1,5 @@
+v.Connect-STAND v.2.0
+
+ToDo:
+-texture 周りの実装
+-v.Connect用設定ファイルの形式の決定

@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vConnect", "stand\stand.vcproj", "{27136176-C542-471B-802F-31BE8096AA3A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vtdEditor", "vtdEditor\vtdEditor.vcproj", "{659CDD5F-12D7-40DF-9B3A-69939C487885}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27136176-C542-471B-802F-31BE8096AA3A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{27136176-C542-471B-802F-31BE8096AA3A}.Debug|Win32.Build.0 = Debug|Win32
+		{27136176-C542-471B-802F-31BE8096AA3A}.Release|Win32.ActiveCfg = Release|Win32
+		{27136176-C542-471B-802F-31BE8096AA3A}.Release|Win32.Build.0 = Release|Win32
+		{659CDD5F-12D7-40DF-9B3A-69939C487885}.Debug|Win32.ActiveCfg = Debug|Win32
+		{659CDD5F-12D7-40DF-9B3A-69939C487885}.Debug|Win32.Build.0 = Debug|Win32
+		{659CDD5F-12D7-40DF-9B3A-69939C487885}.Release|Win32.ActiveCfg = Release|Win32
+		{659CDD5F-12D7-40DF-9B3A-69939C487885}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

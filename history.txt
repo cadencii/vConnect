@@ -1,0 +1,54 @@
+﻿15 Jan. 2011 v1.2.1   fixed; bugs perhaps in WORLD 0.0.4 synthesis.
+10 Jan. 2011 v1.2.0   added; support WORLD 0.0.4
+04 Jan. 2011 v1.1.2   added; smooth time stretching function
+                      optimized source code
+                      fixed; support compile with gcc
+31 Dec. 2010 v1.1.1   fixed; BRE parameter
+28 Dec. 2010 ------   optimized for multithread
+27 Dec. 2010 ------   optimized specgram calculation
+27 Dec. 2010 v1.1.0?  added; multithread on Win32
+                           ; this version may not be compilable on g++
+24 Dec. 2010 v1.0.3   fixed; volume normalization before analysis
+07 Dec. 2010 v1.0.2   fixed; bugs in explicit rest
+                             improve amplitude normalization
+30 Nov. 2010 v1.0.1   added; lyric 'R' as an explicit rest
+29 Nov. 2010 v1.0.0   added; brightness as f0 adaptive filter
+02 Nov. 2010 ------   freeze; voice texturing
+                      fixed; transient rule
+                      replace; volume normalization
+                               ->normalization before analysis
+09 Oct. 2010 ------   fixed; bugs in dynamics at the end of notes contour.
+17 Sep. 2010 v0.3.0   fixed; vtd becomes available
+08 Sep. 2010 v0.2.2   add; multi-singer mode.
+04 Sep. 2010 ------   add; copyrights on files.
+02 Sep. 2010 v0.2.1   fixed; with WORLD v.0.0.1,
+                             aperiodicity[0] & [1] cannot be changed.
+01 Sep. 2010 v0.2.1   fixed; GEN Parameter and some bugs
+25 Aug. 2010 v0.2.1   BRI/CLE
+20 Aug. 2010 v0.2.0   add options; -nvn -nf0
+17 Aug. 2010 v0.2.0   add; vtd Editor
+13 Aug. 2010 v0.2.0   add; matching function between two spectra
+09 Aug. 2010 v0.2.0   fix; unexpected volume change
+                           bug-fix in choice of spectrum
+09 Aug. 2010 v0.2.0   fix; zero clear is important, i guess..orz 
+                      add; attack & decay. 50 is default.
+08 Aug. 2010 v0.1.1   fix; more stable normalization and estimation
+                      add; volume normalization from estimation
+                      fix; incorrect portamento length
+                      add; volume estimation. 
+                      v0.2 will support attack and decay.
+07 Aug. 2010 v0.1.1   preparation; support for attack and decay
+                      synthesis is devided into synthesis function & write function
+06 Aug. 2010 v0.1.1   fix for vibrato length
+05 Aug. 2010 v0.1.1   bugfix in test-code (void mb_test(void)@mb_test.cpp)
+05 Aug. 2010 v0.1.1   add test-code for reading multibyte texts
+04 Aug. 2010 v0.1.1   fix for crash by non-initialized vsqEventEx->portamentoDepth etc.;
+                      fix mistakes about app. arguments -i and -o;
+                      support compile with gcc (round -> c_round)
+01 Aug. 2010 v0.1.1   changes for WORLD v0.0.3
+                      don't care about compile with gcc
+30 Jul. 2010 v0.1.1   fopen(..., "r") changed to fopen(..., "rb") for
+                      c_getline(...) function
+30 Jul. 2010 v0.1.1   replace Windows-dependent codes;
+                      support compile with gcc
+29 Jul. 2010 v0.1.0a  implement singing synthesis on WORLD

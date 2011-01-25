@@ -1,0 +1,102 @@
+============================================================
+
+■音声分析合成系 WORLD を使用した歌声合成ツール
+　　　　　　　　　　　　　 v.Connect STAND  by HAL@修羅場P
+                                            ver 0.1.2a
+
+============================================================
+
+○概要
+　VSQ メタテキストファイルと UTAU 用音源から WORLD を使用し
+歌声を合成するツールです。Cadencii 上からの動作を前提としてい
+ます。実体は拡張 vsq メタテキストと出力ファイルを与えると波形
+を返すコマンドラインアプリケーションです。
+
+　分析・合成に使用している技術は WORLD とよばれる Vocoder ベー
+スの技術です。 WORLD については以下の URL を参照してください。
+ただし、 v.Connect について下記 URL でお尋ねすることはご遠慮下
+さい。
+
+音声合成分析システム「WORLD」
+http://www.aspl.is.ritsumei.ac.jp/morise/world/
+
+○開発環境
+WindowsXP ProfessionalSP2 Core2Quad 2.83Ghz 2GB RAM
+実行には FFTW が必要です。FFTW は以下から入手してください。
+
+FFTW Home Page
+http://www.fftw.org/
+
+○使い方
+　コマンドライン上から vConnect.exe を実行すると詳しいヘルプが
+表示されます。拡張 vsq メタテキストには UTAU 音源を合成するため
+のシーケンスが含まれます。
+
+○ライセンス
+　このツールは GPL ライセンスに準拠しております。v.ConnectSTAND
+はオープンソースですが、v.ConnectSTAND のソースコードを使用した
+プログラムを公開する場合、それらも GPL ライセンスとなることに注
+意してください。
+
+○免責事項
+　このソフトを使用したことで発生したいかなる損害についても、作者
+は責任を一切負いません。
+
+○著作権等
+　このツール自体の著作権は放棄しません。
+
+○連絡先
+メール：harunyann@hotmail.com
+Blog：http://hal-the-cat.seesaa.net/
+
+
+--履歴
+31 Dec. 2010 v1.1.1   fixed; BRE parameter
+28 Dec. 2010 ------   optimized for multithread
+27 Dec. 2010 ------   optimized specgram calculation
+27 Dec. 2010 v1.1.0?  added; multithread on Win32
+                           ; this version may not be compilable on g++
+24 Dec. 2010 v1.0.3   fixed; volume normalization before analysis
+07 Dec. 2010 v1.0.2   fixed; bugs in explicit rest
+                             improve amplitude normalization
+30 Nov. 2010 v1.0.1   added; lyric 'R' as an explicit rest
+29 Nov. 2010 v1.0.0   add; brightness as f0 adaptive filter
+02 Nov. 2010 ------   freeze; voice texturing
+                      fixed; transient rule
+                      replace; volume normalization
+                               ->normalization before analysis
+09 Oct. 2010 ------   fixed; bugs in dynamics at the end of notes contour.
+17 Sep. 2010 v0.3.0   fixed; vtd becomes available
+08 Sep. 2010 v0.2.2   add; multi-singer mode.
+04 Sep. 2010 ------   add; copyrights on files.
+02 Sep. 2010 v0.2.1   fixed; with WORLD v.0.0.1,
+                             aperiodicity[0] & [1] cannot be changed.
+01 Sep. 2010 v0.2.1   fixed; GEN Parameter and some bugs
+25 Aug. 2010 v0.2.1   BRI/CLE
+20 Aug. 2010 v0.2.0   add options; -nvn -nf0
+17 Aug. 2010 v0.2.0   add; vtd Editor
+13 Aug. 2010 v0.2.0   add; matching function between two spectra
+09 Aug. 2010 v0.2.0   fix; unexpected volume change
+                           bug-fix in choice of spectrum
+09 Aug. 2010 v0.2.0   fix; zero clear is important, i guess..orz 
+                      add; attack & decay. 50 is default.
+08 Aug. 2010 v0.1.1   fix; more stable normalization and estimation
+                      add; volume normalization from estimation
+                      fix; incorrect portamento length
+                      add; volume estimation. 
+                      v0.2 will support attack and decay.
+07 Aug. 2010 v0.1.1   preparation; support for attack and decay
+                      synthesis is devided into synthesis function & write function
+06 Aug. 2010 v0.1.1   fix for vibrato length
+05 Aug. 2010 v0.1.1   bugfix in test-code (void mb_test(void)@mb_test.cpp)
+05 Aug. 2010 v0.1.1   add test-code for reading multibyte texts
+04 Aug. 2010 v0.1.1   fix for crash by non-initialized vsqEventEx->portamentoDepth etc.;
+                      fix mistakes about app. arguments -i and -o;
+                      support compile with gcc (round -> c_round)
+01 Aug. 2010 v0.1.1   changes for WORLD v0.0.3
+                      don't care about compile with gcc
+30 Jul. 2010 v0.1.1   fopen(..., "r") changed to fopen(..., "rb") for
+                      c_getline(...) function
+30 Jul. 2010 v0.1.1   replace Windows-dependent codes;
+                      support compile with gcc
+29 Jul. 2010 v0.1.0a  implement singing synthesis on WORLD
