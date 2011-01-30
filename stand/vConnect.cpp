@@ -534,7 +534,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 if(present->enableExtention && next->enableExtention){
                     stretchToMelScale(melSpectrum, spectrum, fftLength / 2 + 1, fs / 2);
                     for(int k = 0; k <= fftLength / 2; k++){
-                        melSpectrum[k][0] = log(melSpectrum[k][0] + 1.0e-17) / (double)(fftLength / 2);
+                        melSpectrum[k][0] = log(melSpectrum[k][0] + 1.0e-17) / (double)(fftLength);
                         melSpectrum[k][1] = 0.0;
                     }
                     for(int k = fftLength / 2 + 1; k < fftLength; k++){
@@ -549,7 +549,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                             melCepstrum[k][1] = melCepstrum[k][1] * briRate + (1.0 - briRate) * (thisMel[k].im * (1.0 - morphRate) + nextMel[k].im);
                         }
                     }else{
-                        for(int k = 1; k < thisMelLen; k++){
+                        for(int k = 0; k < thisMelLen; k++){
                             melCepstrum[k][0] = melCepstrum[k][0] * briRate + (1.0 - briRate) * thisMel[k].re;
                             melCepstrum[k][1] = melCepstrum[k][1] * briRate + (1.0 - briRate) * thisMel[k].im;
                         }
@@ -559,8 +559,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                         melCepstrum[fftLength-k][1] = -melCepstrum[k][1];
                     }
                     fftw_execute(forwardFFT);
-                    stretchFromMelScale(spectrum, melSpectrum, fftLength / 2, fs / 2);
-                    for(int k = 0; k < fftLength / 2; k++){
+                    stretchFromMelScale(spectrum, melSpectrum, fftLength / 2 + 1, fs / 2);
+                    for(int k = 0; k <= fftLength / 2; k++){
                         spectrum[k] = exp(spectrum[k]);
                     }
                 }else{

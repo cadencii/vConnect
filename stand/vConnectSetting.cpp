@@ -13,12 +13,12 @@ bool librarySetting::readSetting(string_t left, string_t right)
 {
     bool ret = true;
     if(left.compare(_T("Enable"))==0){
-        enabled = (right.compare(_T("0")) == 0);
-    }else if(left.compare(_T("Brightness"))){
+        enabled = (right.compare(_T("0")) == 1);
+    }else if(left.compare(_T("Brightness")) == 0){
         brightness = atoi(right.c_str());
-    }else if(left.compare(_T("NoteNumber"))){
+    }else if(left.compare(_T("NoteNumber")) == 0){
         noteNumber = atoi(right.c_str());
-    }else if(left.compare(_T("Directory"))){
+    }else if(left.compare(_T("Directory")) == 0){
         path += right;
     }else{
         ret = false;
