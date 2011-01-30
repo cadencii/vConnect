@@ -17,7 +17,7 @@
 corpusManager::~corpusManager()
 {
     map_t<string_t, standData*>::iterator i;
-    map_t<string_t, standTexture*>::iterator j;
+    map_t<string_t, standMelCepstrum*>::iterator j;
     for( i = objectMap.begin(); i != objectMap.end(); i++ ){
         SAFE_DELETE( (i->second)->specgram );
         SAFE_DELETE( i->second );
@@ -32,7 +32,7 @@ standData* corpusManager::getStandData( string_t lyric, runtimeOptions& options)
 {
     standData *ret = NULL;
     map_t<string_t, standData*>::iterator i;
-    map_t<string_t, standTexture*>::iterator j;
+    map_t<string_t, standMelCepstrum*>::iterator j;
     string_t alphabet, vtd_path;
     bool fast = options.fast;
 
@@ -85,7 +85,7 @@ standData* corpusManager::getStandData( string_t lyric, runtimeOptions& options)
 
         if(voiceDB->getUtauParameters( parameters, lyric )){
             target->specgram = new standSpecgram;
-            target->texture.readTexture(voicePath + parameters.lyric + "s.stt");
+            target->melCepstrum.readMelCepstrum(voicePath + parameters.lyric + "s.stt");
             if(target->specgram->computeWaveFile( voicePath + parameters.fileName, parameters, fast )){
                 target->isValid = true;
                 ret = target;

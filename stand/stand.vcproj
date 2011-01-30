@@ -318,19 +318,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\standMelCepstrum.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\standMelCepstrum.h"
+				>
+			</File>
+			<File
 				RelativePath=".\standSpecgram.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\standSpecgram.h"
-				>
-			</File>
-			<File
-				RelativePath=".\standTexture.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\standTexture.h"
 				>
 			</File>
 		</Filter>

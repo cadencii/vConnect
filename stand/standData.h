@@ -35,7 +35,7 @@ public:
     }
 #endif
     standSpecgram *specgram;
-    standTexture texture;
+    standMelCepstrum melCepstrum;
     bool        isProcessing;
     bool        isValid;
 #ifdef STND_MULTI_THREAD

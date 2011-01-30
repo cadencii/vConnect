@@ -16,7 +16,7 @@
 #define __corpusManager_h__
 
 #include "standSpecgram.h"
-#include "standTexture.h"
+#include "standMelCepstrum.h"
 #include "vowelTable.h"
 #include "utauVoiceDB/utauVoiceDataBase.h"
 #include "standData.h"
@@ -29,7 +29,7 @@ public:
     standData* getStandData( string_t lyric, runtimeOptions& options);
 private:
     map_t<string_t, standData*> objectMap;
-    map_t<string_t, standTexture*> textureMap;
+    map_t<string_t, standMelCepstrum*> textureMap;
     utauVoiceDataBase* voiceDB;
     string_t voicePath;
     vowelTable vowels;

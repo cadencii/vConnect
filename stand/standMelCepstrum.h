@@ -1,10 +1,10 @@
 /*
  *
- *    standTexture.h
+ *    standMelCepstrum.h
  *                              (c) HAL 2010-           
  *
  *  This file is a part of STAND Library.
- * standTexture is a structure that contains
+ * standMelCepstrum is a structure that contains
  * frequency transform functions and spectral filter.
  *
  * These files are distributed in the hope that it will be useful,
@@ -12,19 +12,19 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
-#ifndef __standTexture_h__
-#define __standTexture_h__
+#ifndef __standMelCepstrum_h__
+#define __standMelCepstrum_h__
 
 #include "stand.h"
 #include "runtimeOptions.h"
 
-class standTexture{
+class standMelCepstrum{
 public:
-    standTexture();
-    ~standTexture();
+    standMelCepstrum();
+    ~standMelCepstrum();
 
-    bool readTexture(string_t input);
-    bool writeTexture(string_t output);
+    bool readMelCepstrum(string_t input);
+    bool writeMelCepstrum(string_t output);
 
     //! @brief 与えられたスペクトルをメルケプストラムへ変換し自身のバッファへ格納する．
     void calculateMelCepstrum(int cepstrumLength, const double *f0, const double **sourceSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency);

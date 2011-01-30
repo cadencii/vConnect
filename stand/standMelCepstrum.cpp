@@ -1,10 +1,10 @@
 /*
  *
- *    standTexture.cpp
+ *    standMelCepstrum.cpp
  *                              (c) HAL 2010-           
  *
  *  This file is a part of STAND Library.
- * standTexture is a structure that contains
+ * standMelCepstrum is a structure that contains
  * frequency transform functions and spectral filter.
  *
  * These files are distributed in the hope that it will be useful,
@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
-#include "standTexture.h"
+#include "standMelCepstrum.h"
 
 double  getMelScale(double freq){
     double ret = 1127.01048 * log(1 + freq / 700);
@@ -25,7 +25,7 @@ double  getFrequency(double mel){
 }
 
 
-standTexture::standTexture()
+standMelCepstrum::standMelCepstrum()
 {
     this->f0 = NULL;
     this->cepstrumLength = 0;
@@ -34,12 +34,12 @@ standTexture::standTexture()
     this->framePeriod = framePeriod;
 }
 
-standTexture::~standTexture()
+standMelCepstrum::~standMelCepstrum()
 {
     this->destroy();
 }
 
-void standTexture::destroy()
+void standMelCepstrum::destroy()
 {
     this->cepstrumLength = 0;
     if(this->melCepstrum){
@@ -53,7 +53,7 @@ void standTexture::destroy()
     SAFE_DELETE_ARRAY(this->f0);
 }
 
-bool standTexture::writeTexture(string_t output)
+bool standMelCepstrum::writeMelCepstrum(string_t output)
 {
     if(!this->melCepstrum) return false;
 
@@ -76,7 +76,7 @@ bool standTexture::writeTexture(string_t output)
     return ret;
 }
 
-bool standTexture::readTexture(string_t input)
+bool standMelCepstrum::readMelCepstrum(string_t input)
 {
     bool ret = false;
     string input_s = input;
@@ -133,7 +133,7 @@ void stretchFromMelScale(double *spectrum, const double *melSpectrum, int spectr
     }
 }
 
-void standTexture::calculateMelCepstrum(int cepstrumLength, const double *f0, const double **sourceSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency)
+void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0, const double **sourceSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency)
 {
     // ケプストラムの最大長はエルミート対称性を考えてスペクトル長の半分を超えない．
     if(!f0 || !sourceSpecgram || cepstrumLength <= 0 || spectrumLength <= 0 || spectrumNumber <= 0 || cepstrumLength > spectrumLength / 2){
@@ -193,7 +193,7 @@ void standTexture::calculateMelCepstrum(int cepstrumLength, const double *f0, co
     SAFE_DELETE_ARRAY(tmpCepstrum);
 }
 
-standComplex *standTexture::getMelCepstrum(double msTime, int *length)
+standComplex *standMelCepstrum::getMelCepstrum(double msTime, int *length)
 {
     standComplex *ret = NULL;
     *length = 0;

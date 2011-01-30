@@ -445,7 +445,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             }
 
             present->specgram->getFramePointer( position, presentFrame );
-            thisMel = present->texture.getMelCepstrum(position * framePeriod, &thisMelLen);
+            thisMel = present->melCepstrum.getMelCepstrum(position * framePeriod, &thisMelLen);
 
             // 現在注目しているフレームが無声音の場合それを優先する．
             if( *(presentFrame.f0) == 0.0 ){
@@ -464,7 +464,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     position = calculatePhoneticTime(itemNext->utauSetting.msFixedLength, next->specgram->getTimeLength(), position - nextConsonantEndFrame, options.fast);
                 }
                 next->specgram->getFramePointer( position, nextFrame );
-                nextMel = next->texture.getMelCepstrum(position * framePeriod, &nextMelLen);
+                nextMel = next->melCepstrum.getMelCepstrum(position * framePeriod, &nextMelLen);
 
                 morphRate = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
                 morphRate = 0.5 - 0.5 * cos( ST_PI * morphRate );
@@ -532,7 +532,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 if(options.fast && thisMel){
                     stretchToMelScale(melSpectrum, spectrum, fftLength / 2, fs / 2);
                     for(int k = 0; k < fftLength / 2; k++){
-                        melSpectrum[k] = log(spectrum[k]) / 1024.0;// log(melSpectrum[k]) / 1024.0;
+                        melSpectrum[k] = log(melSpectrum[k]) / (double)(fftLength / 2);
                     }
                     fftw_execute(inverseFFT);
                     if(morphRate > 0 && nextMel){
