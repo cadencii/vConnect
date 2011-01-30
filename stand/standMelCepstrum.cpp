@@ -179,7 +179,7 @@ void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0
                 melSpectrum[i][1] = 0.0;
             }
             for(int i = spectrumLength / 2 + 1; i < spectrumLength; i++){
-                melSpectrum[i][0] = melSpectrum[spectrumLength-1][0];
+                melSpectrum[i][0] = melSpectrum[spectrumLength-i][0];
                 melSpectrum[i][1] = 0.0;
             }
             // log とって IDFT というか DFT．
