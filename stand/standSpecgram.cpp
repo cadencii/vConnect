@@ -201,12 +201,10 @@ int standSpecgram::computeWaveFile( string_t input, utauParameters& parameters, 
         }
         // 大きい方が正規化のための音量．
         sum1 = max(sum1, sum2);
-        sum1 = VOL_NORMALIZE / sqrt( ( sum1 / 2048.0 ) );
+        sum1 = VOL_NORMALIZE / sqrt( ( sum1 / (double)fftl ) );
 
         // WORLD 0.0.4 使用時，音量はfftl倍されてしまう．2^11 倍程度なので 16bit Audio なら許容範囲だろうか．
-        if(!isFast){
-            sum1 *= 1 / (double)fftl;
-        }
+        sum1 *= 1 / (double)fftl;
 
         for( int i = 0; i < length; i++ ){
             tmp[i] *= sum1;

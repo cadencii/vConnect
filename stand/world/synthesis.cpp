@@ -231,7 +231,11 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
         // ここは，将来リリースでの調整が必須です．
         for(i = 0;i < fftl;i++)
         {
-            response[i] = (periodicResponse[i]*sqrt((double)noiseSize) + aperiodicResponse[i])*1.633/(double)fftl*12.0/sqrt((double)noiseSize);
+            //response[i] = (periodicResponse[i]*sqrt((double)noiseSize) + aperiodicResponse[i])*1.633/(double)fftl*12.0/sqrt((double)noiseSize);
+
+            // IFFT->FFT の係数による補正は入力波形の正規化の段階で行っている． byHAL
+            response[i] = (periodicResponse[i]*sqrt((double)noiseSize) + aperiodicResponse[i])*1.633*12.0/sqrt((double)noiseSize);
+
 //            response[i] = (periodicResponse[i]/sqrt((double)noiseSize))*1.633/(double)fftl*12.0;
 //                aperiodicResponse[i]/(double)noiseSize;
 //            response[i] = aperiodicResponse[i]/(double)fftl/sqrt((double)noiseSize);
