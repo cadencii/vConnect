@@ -15,6 +15,8 @@
 #define __standData_h__
 
 #include "stand.h"
+#include "standSpecgram.h"
+#include "standMelCepstrum.h"
 
 class standData{
 public:
@@ -34,6 +36,8 @@ public:
         }
     }
 #endif
+
+    void getMelCepstrum(int frame, standComplex *dst, int length, double freq, double briRate);
     standSpecgram *specgram;
     standMelCepstrum melCepstrum;
     bool        isProcessing;

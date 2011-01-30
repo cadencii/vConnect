@@ -350,7 +350,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     briIndex = breIndex = cleIndex = genIndex = opeIndex = 0;
 
     fftw_plan inverseFFT, forwardFFT;
-    double *melSpectrum = new double[fftLength/2];
+    fftw_complex *melSpectrum = new fftw_complex[fftLength/2];
     fftw_complex *melCepstrum = new fftw_complex[fftLength/2];
 
     standComplex *thisMel, *nextMel;
@@ -359,8 +359,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     if(hFFTWMutex)
         stnd_mutex_lock(hFFTWMutex);
 #endif
-    inverseFFT = fftw_plan_dft_r2c_1d(fftLength / 2, melSpectrum, melCepstrum, FFTW_ESTIMATE);
-    forwardFFT = fftw_plan_dft_c2r_1d(fftLength / 2, melCepstrum, melSpectrum, FFTW_ESTIMATE);
+    inverseFFT = fftw_plan_dft_1d(fftLength, melSpectrum, melCepstrum, FFTW_BACKWARD, FFTW_ESTIMATE);
+    forwardFFT = fftw_plan_dft_1d(fftLength, melCepstrum, melSpectrum, FFTW_FORWARD, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if(hFFTWMutex)
         stnd_mutex_unlock(hFFTWMutex);
@@ -530,9 +530,9 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 }
 
                 if(options.fast && thisMel){
-                    stretchToMelScale(melSpectrum, spectrum, fftLength / 2, fs / 2);
-                    for(int k = 0; k < fftLength / 2; k++){
-                        melSpectrum[k] = log(melSpectrum[k]) / (double)(fftLength / 2);
+                    stretchToMelScale(melSpectrum, spectrum, fftLength / 2 + 1, fs / 2);
+                    for(int k = 0; k <= fftLength / 2; k++){
+                        melSpectrum[k][0] = log(melSpectrum[k][0] + 1.0e-17) / (double)(fftLength / 2);
                     }
                     fftw_execute(inverseFFT);
                     if(morphRate > 0 && nextMel){

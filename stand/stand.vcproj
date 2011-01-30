@@ -446,6 +446,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\standData.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\standData.h"
 				>
 			</File>
@@ -455,6 +459,14 @@
 			</File>
 			<File
 				RelativePath=".\vConnect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectSetting.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectSetting.h"
 				>
 			</File>
 			<File

@@ -45,9 +45,9 @@ extern double interpolateArray( double x, const double *p );
 extern void applyStretching( double *T, double *target, int length );
 
 //! @brief スペクトルの横軸を周波数からメル尺度へ変形する．
-void stretchToMelScale(double *melSpectrum, const double *spectrum, int spectrumLength, int maxFrequency);
+void stretchToMelScale(fftw_complex *melSpectrum, const double *spectrum, int spectrumLength, int maxFrequency);
 //! @brief スペクトルの横軸をメル尺度から周波数へ変形する．
-void stretchFromMelScale(double *spectrum, const double *melSpectrum, int spectrumLength, int maxFrequency);
+void stretchFromMelScale(double *spectrum, const fftw_complex *melSpectrum, int spectrumLength, int maxFrequency);
 
 //! @brief 周波数をメルスケールへ変換する．
 double  getMelScale(double freq);

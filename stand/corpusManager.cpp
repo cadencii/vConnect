@@ -116,6 +116,8 @@ void corpusManager::setVoiceDB( utauVoiceDataBase* p, runtimeOptions& options )
     if(p){
         p->getVoicePath( voicePath );
     }
-    tmp = voicePath + _T("vowelTable.txt");
-    vowels.readVowelTable( tmp, options );
+    tmp = voicePath + _T("vConnect.ini");
+    setting.readSetting(voicePath, options.encodingOtoIni.c_str()); // 暫定処置
+    //tmp = voicePath + _T("vowelTable.txt");
+    //vowels.readVowelTable( tmp, options );
 }

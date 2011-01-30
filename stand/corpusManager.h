@@ -20,6 +20,7 @@
 #include "vowelTable.h"
 #include "utauVoiceDB/utauVoiceDataBase.h"
 #include "standData.h"
+#include "vConnectSetting.h"
 
 class corpusManager {
 public:
@@ -33,6 +34,8 @@ private:
     utauVoiceDataBase* voiceDB;
     string_t voicePath;
     vowelTable vowels;
+
+    vConnectSetting setting;
 };
 
 #endif // __corpusManager_h__

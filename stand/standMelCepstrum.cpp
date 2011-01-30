@@ -105,32 +105,37 @@ bool standMelCepstrum::readMelCepstrum(string_t input)
     return ret;
 }
 
-void stretchToMelScale(double *melSpectrum, const double *spectrum, int spectrumLength, int maxFrequency)
+void stretchToMelScale(fftw_complex *melSpectrum, const double *spectrum, int spectrumLength, int maxFrequency)
 {
     double tmp = getMelScale(maxFrequency);
     for(int i = 0; i < spectrumLength; i++)
     {
         double dIndex = getFrequency((double)i / (double)spectrumLength * tmp) / (double)maxFrequency * (double)spectrumLength;
         if(dIndex <= spectrumLength-1.0){
-            melSpectrum[i] = interpolateArray(dIndex, spectrum);
+            melSpectrum[i][0] = interpolateArray(dIndex, spectrum);
         }else{
-            melSpectrum[i] = spectrum[spectrumLength - 1];
+            melSpectrum[i][0] = spectrum[spectrumLength - 1];
         }
     }
 }
 
-void stretchFromMelScale(double *spectrum, const double *melSpectrum, int spectrumLength, int maxFrequency)
+void stretchFromMelScale(double *spectrum, const fftw_complex *melSpectrum, int spectrumLength, int maxFrequency)
 {
     double tmp = getMelScale(maxFrequency);
+    double *tempArray = new double[spectrumLength];
+    for(int i = 0; i < spectrumLength; i++){
+        tempArray[i] = melSpectrum[i][0];
+    }
     for(int i = 0; i < spectrumLength; i++)
     {
         double dIndex = getMelScale((double)i / (double)spectrumLength * (double)maxFrequency) / tmp * (double)spectrumLength;
         if(dIndex <= spectrumLength-1.0){
-            spectrum[i] = interpolateArray(dIndex, melSpectrum);
+            spectrum[i] = interpolateArray(dIndex, tempArray);
         }else{
-            spectrum[i] = melSpectrum[spectrumLength - 1];
+            spectrum[i] = melSpectrum[spectrumLength - 1][0];
         }
     }
+    delete[] tempArray;
 }
 
 void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0, const double **sourceSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency)
@@ -139,7 +144,7 @@ void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0
     if(!f0 || !sourceSpecgram || cepstrumLength <= 0 || spectrumLength <= 0 || spectrumNumber <= 0 || cepstrumLength > spectrumLength / 2){
         return;
     }
-    double *melSpectrum = new double[spectrumLength];
+    fftw_complex *melSpectrum = new fftw_complex[spectrumLength];
     fftw_complex *tmpCepstrum = new fftw_complex[spectrumLength];
 
     if(melSpectrum && tmpCepstrum){
@@ -156,7 +161,7 @@ void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0
         if(hFFTWMutex)
             stnd_mutex_lock(hFFTWMutex);
 #endif
-        inverseFFT = fftw_plan_dft_r2c_1d(spectrumLength, melSpectrum, tmpCepstrum, FFTW_ESTIMATE);
+        inverseFFT = fftw_plan_dft_1d(spectrumLength, melSpectrum, tmpCepstrum, FFTW_BACKWARD, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
         if(hFFTWMutex)
             stnd_mutex_unlock(hFFTWMutex);
@@ -164,10 +169,15 @@ void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0
         // メルスケールへ展開
         for(int j = 0; j < spectrumNumber; j++){
             this->f0[j] = f0[j];
-            stretchToMelScale(melSpectrum, sourceSpecgram[j], spectrumLength, maxFrequency);
+            stretchToMelScale(melSpectrum, sourceSpecgram[j], spectrumLength / 2 + 1, maxFrequency / 2);
             // FFTW は N 点の DFT, IDFT 後は N 倍された値が格納されるので先に割ってしまう．
-            for(int i = 0; i < spectrumLength; i++){
-                melSpectrum[i] = log(melSpectrum[i]) / (double)spectrumLength;
+            for(int i = 0; i <= spectrumLength / 2; i++){
+                melSpectrum[i][0] = log(melSpectrum[i][0]) / (double)spectrumLength;
+                melSpectrum[i][1] = 0.0;
+            }
+            for(int i = spectrumLength / 2 + 1; i < spectrumLength; i++){
+                melSpectrum[i][0] = melSpectrum[spectrumLength-1][0];
+                melSpectrum[i][1] = 0.0;
             }
             // log とって IDFT というか DFT．
             fftw_execute(inverseFFT);
