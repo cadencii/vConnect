@@ -36,6 +36,7 @@ private:
     vowelTable vowels;
 
     vConnectSetting setting;
+    bool            enableExtention;
 };
 
 #endif // __corpusManager_h__

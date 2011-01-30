@@ -57,7 +57,9 @@ bool standMelCepstrum::writeMelCepstrum(string_t output)
 {
     if(!this->melCepstrum) return false;
 
-    string output_s = output;
+    string output_s;
+    mb_conv(output, output_s);
+
     bool ret = false;
     FILE *fp = fopen(output_s.c_str(), "wb");
     if(fp){
@@ -79,7 +81,8 @@ bool standMelCepstrum::writeMelCepstrum(string_t output)
 bool standMelCepstrum::readMelCepstrum(string_t input)
 {
     bool ret = false;
-    string input_s = input;
+    string input_s;
+    mb_conv(input, input_s);
     FILE *fp = fopen(input_s.c_str(), "rb");
     if(fp){
         size_t c = 0;

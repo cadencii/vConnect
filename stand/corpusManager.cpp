@@ -85,25 +85,21 @@ standData* corpusManager::getStandData( string_t lyric, runtimeOptions& options)
 
         if(voiceDB->getUtauParameters( parameters, lyric )){
             target->specgram = new standSpecgram;
-            target->melCepstrum.readMelCepstrum(voicePath + parameters.lyric + "s.stt");
             if(target->specgram->computeWaveFile( voicePath + parameters.fileName, parameters, fast )){
                 target->isValid = true;
                 ret = target;
+            }
+            // 設定が読み込めていてかつ拡張ライブラリを一つでも読み込めた場合は拡張を有効化する．
+            if(this->enableExtention){
+                target->enableExtention = target->readMelCepstrum(setting, lyric);
             }
         }
         target->isProcessing = false;
 
 #ifdef STND_MULTI_THREAD
-        /*mutex_t handle = target->waitHandle;
-        if( handle ){
-            stnd_mutex_unlock( handle );
-            stnd_mutex_destroy( handle );
-        }
-        target->waitHandle = NULL;*/
         if( target->waitHandle ){
             stnd_mutex_unlock( target->waitHandle );
         }
-        //SetEvent(target->waitHandle);       // 寝てる子がいたら起こす．
 #endif
     }
     return ret;
@@ -116,8 +112,8 @@ void corpusManager::setVoiceDB( utauVoiceDataBase* p, runtimeOptions& options )
     if(p){
         p->getVoicePath( voicePath );
     }
-    tmp = voicePath + _T("vConnect.ini");
-    setting.readSetting(voicePath, options.encodingOtoIni.c_str()); // 暫定処置
+    tmp = _T("vConnect.ini");
+    enableExtention = setting.readSetting(voicePath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
     //tmp = voicePath + _T("vowelTable.txt");
     //vowels.readVowelTable( tmp, options );
 }

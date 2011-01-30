@@ -9,24 +9,17 @@ const string_t settingName[] = {
     "[HiLibrary]",
 };
 
-enum{
-    SETTING_BASE = 0,
-    SETTING_BRIGHTNESS = 1,
-    SETTING_LOW =2,
-    SETTING_HI =3,
-};
-
-bool librarySetting::readSetting(string left, string right)
+bool librarySetting::readSetting(string_t left, string_t right)
 {
     bool ret = true;
-    if(left.compare("Enable")==0){
-        enabled = (right.compare("0") == 0);
-    }else if(left.compare("Brightness")){
+    if(left.compare(_T("Enable"))==0){
+        enabled = (right.compare(_T("0")) == 0);
+    }else if(left.compare(_T("Brightness"))){
         brightness = atoi(right.c_str());
-    }else if(left.compare("NoteNumber")){
+    }else if(left.compare(_T("NoteNumber"))){
         noteNumber = atoi(right.c_str());
-    }else if(left.compare("Directory")){
-        path = right;
+    }else if(left.compare(_T("Directory"))){
+        path += right;
     }else{
         ret = false;
     }
@@ -35,25 +28,39 @@ bool librarySetting::readSetting(string left, string right)
 
 vConnectSetting::vConnectSetting()
 {
-    libraryMap.insert(make_pair(settingName[SETTING_BASE], &base));
-    libraryMap.insert(make_pair(settingName[SETTING_BRIGHTNESS], &brightness));
-    libraryMap.insert(make_pair(settingName[SETTING_LOW], &low));
-    libraryMap.insert(make_pair(settingName[SETTING_HI], &hi));
+    libraryArray.resize(SETTING_END);
+    for(int i = 0; i < SETTING_END; i++){
+        libraryArray[i] = new librarySetting;
+        libraryMap.insert(make_pair(settingName[i], libraryArray[i]));
+    }
 }
 
-bool vConnectSetting::readSetting(string_t path, const char *code)
+vConnectSetting::~vConnectSetting()
+{
+    for(map_t<string_t, librarySetting*>::iterator i = libraryMap.begin(); i != libraryMap.end(); i++){
+        delete i->second;
+    }
+}
+
+bool vConnectSetting::readSetting(string_t path, string_t fileName, const char *code)
 {
     bool ret = false;
+    string_t iniName = path + fileName;
     string pathString;
     MB_FILE *fp;
-    mb_conv(path, pathString);
+    mb_conv(iniName, pathString);
     fp = mb_fopen(pathString, code);
+
+    this->path = path;
 
     if(fp){
         string_t tmp;
         string left, right;
         map_t<string_t, librarySetting*>::iterator currentParse = libraryMap.end();
         int index;
+        for(int i = 0; i < SETTING_END; i++){
+            libraryArray[i]->path = this->path;
+        }
         while(mb_fgets(tmp, fp)){
             if(tmp.find(_T("[")) != string_t::npos){
                 currentParse = libraryMap.find(tmp);
@@ -61,11 +68,11 @@ bool vConnectSetting::readSetting(string_t path, const char *code)
             }
             index = tmp.find(_T("="));
             if(index != string_t::npos){
-                mb_conv(tmp.substr(0, index), left);
-                mb_conv(tmp.substr(index+1), right);
+                left = tmp.substr(0, index);
+                right = tmp.substr(index + 1);
             }else{
-                mb_conv(tmp, left);
-                right = "";
+                left = tmp;
+                right = _T("");
             }
             if(currentParse != libraryMap.end()){
                 currentParse->second->readSetting(left, right);

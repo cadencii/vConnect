@@ -350,10 +350,11 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     briIndex = breIndex = cleIndex = genIndex = opeIndex = 0;
 
     fftw_plan inverseFFT, forwardFFT;
-    fftw_complex *melSpectrum = new fftw_complex[fftLength/2];
-    fftw_complex *melCepstrum = new fftw_complex[fftLength/2];
+    fftw_complex *melSpectrum = new fftw_complex[fftLength];
+    fftw_complex *melCepstrum = new fftw_complex[fftLength];
 
-    standComplex *thisMel, *nextMel;
+    standComplex *thisMel = new standComplex[fftLength];
+    standComplex *nextMel = new standComplex[fftLength];
     int thisMelLen, nextMelLen;
 #ifdef STND_MULTI_THREAD
     if(hFFTWMutex)
@@ -434,7 +435,20 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             specgram->getFramePointer( index, target );
             spectrum = target.spectrum;
             aperiodicity = target.aperiodicity;
-            nextMel = NULL;
+
+            // コントロールトラックのインデックスを進める
+            while( index + beginFrame > (*controlCurves)[BRETHINESS][breIndex].frameTime ){ breIndex++; }
+            while( index + beginFrame > (*controlCurves)[CLEARNESS][cleIndex].frameTime ){ cleIndex++; }
+            while( index + beginFrame > (*controlCurves)[GENDER][genIndex].frameTime ){ genIndex++; }
+            while( index + beginFrame > (*controlCurves)[BRIGHTNESS][briIndex].frameTime ){ briIndex++; }
+
+            // いまはまだはやい
+            // transform_F0( temp_texture, spectrum, *(target.f0), *(presentFrame.f0), fftLength, 1.0 );
+
+            /* BRE / BRI / CLE */
+            breRate = (double)(*controlCurves)[BRETHINESS][breIndex].value / 128.0;
+            briRate = (double)((*controlCurves)[BRIGHTNESS][briIndex].value - 64 ) / 64.0;
+            cleRate = (double)(*controlCurves)[CLEARNESS][cleIndex].value / 128.0;
 
             position = index - itemThis->beginFrame + beginFrame;
 
@@ -445,7 +459,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             }
 
             present->specgram->getFramePointer( position, presentFrame );
-            thisMel = present->melCepstrum.getMelCepstrum(position * framePeriod, &thisMelLen);
+            present->getMelCepstrum(position, thisMel, &thisMelLen, *(target.f0), briRate);
+            nextMelLen = thisMelLen;
 
             // 現在注目しているフレームが無声音の場合それを優先する．
             if( *(presentFrame.f0) == 0.0 ){
@@ -464,7 +479,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     position = calculatePhoneticTime(itemNext->utauSetting.msFixedLength, next->specgram->getTimeLength(), position - nextConsonantEndFrame, options.fast);
                 }
                 next->specgram->getFramePointer( position, nextFrame );
-                nextMel = next->melCepstrum.getMelCepstrum(position * framePeriod, &nextMelLen);
+                next->getMelCepstrum(position, nextMel, &nextMelLen, *(target.f0), briRate);
 
                 morphRate = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
                 morphRate = 0.5 - 0.5 * cos( ST_PI * morphRate );
@@ -490,19 +505,6 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             /* ここに周波数変換 */
             if( *(target.f0) ){                // 無声音の場合とりあえず何もしない
 
-                // 表情系のコントロールはここにまとめておこう．
-                while( index + beginFrame > (*controlCurves)[BRIGHTNESS][briIndex].frameTime ){ briIndex++; }
-                while( index + beginFrame > (*controlCurves)[BRETHINESS][breIndex].frameTime ){ breIndex++; }
-                while( index + beginFrame > (*controlCurves)[CLEARNESS][cleIndex].frameTime ){ cleIndex++; }
-                while( index + beginFrame > (*controlCurves)[GENDER][genIndex].frameTime ){ genIndex++; }
-
-                // いまはまだはやい
-                // transform_F0( temp_texture, spectrum, *(target.f0), *(presentFrame.f0), fftLength, 1.0 );
-
-                /* BRE / BRI / CLE */
-                breRate = (double)(*controlCurves)[BRETHINESS][breIndex].value / 128.0;
-                briRate = (double)((*controlCurves)[BRIGHTNESS][briIndex].value - 64 ) / 64.0;
-                cleRate = (double)(*controlCurves)[CLEARNESS][cleIndex].value / 128.0;
                 if( options.fast ){
                     // WORLD 0.0.1 における非周期性パラメタはシグモイド関数のパラメタであり，
                     // それぞれ以下のパラメタを決定する．
@@ -529,26 +531,32 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     }
                 }
 
-                if(options.fast && thisMel){
+                if(present->enableExtention && next->enableExtention){
                     stretchToMelScale(melSpectrum, spectrum, fftLength / 2 + 1, fs / 2);
                     for(int k = 0; k <= fftLength / 2; k++){
                         melSpectrum[k][0] = log(melSpectrum[k][0] + 1.0e-17) / (double)(fftLength / 2);
+                        melSpectrum[k][1] = 0.0;
+                    }
+                    for(int k = fftLength / 2 + 1; k < fftLength; k++){
+                        melSpectrum[k][0] = melSpectrum[fftLength - k][0];
+                        melSpectrum[k][1] = 0.0;
                     }
                     fftw_execute(inverseFFT);
-                    if(morphRate > 0 && nextMel){
+                    thisMelLen = min(thisMelLen, nextMelLen);
+                    if(morphRate > 0){
                         for(int k = 0; k < thisMelLen; k++){
                             melCepstrum[k][0] = melCepstrum[k][0] * briRate + (1.0 - briRate) * (thisMel[k].re * (1.0 - morphRate) + nextMel[k].re);
                             melCepstrum[k][1] = melCepstrum[k][1] * briRate + (1.0 - briRate) * (thisMel[k].im * (1.0 - morphRate) + nextMel[k].im);
-                            melCepstrum[fftLength/2-k-1][0] = melCepstrum[k][0];
-                            melCepstrum[fftLength/2-k-1][1] = -melCepstrum[k][1];
                         }
                     }else{
-                        for(int k = 0; k < thisMelLen; k++){
+                        for(int k = 1; k < thisMelLen; k++){
                             melCepstrum[k][0] = melCepstrum[k][0] * briRate + (1.0 - briRate) * thisMel[k].re;
                             melCepstrum[k][1] = melCepstrum[k][1] * briRate + (1.0 - briRate) * thisMel[k].im;
-                            melCepstrum[fftLength/2-k-1][0] = melCepstrum[k][0];
-                            melCepstrum[fftLength/2-k-1][1] = -melCepstrum[k][1];
                         }
+                    }
+                    for(int k = 1; k < thisMelLen; k++){
+                        melCepstrum[fftLength-k][0] = melCepstrum[k][0];
+                        melCepstrum[fftLength-k][1] = -melCepstrum[k][1];
                     }
                     fftw_execute(forwardFFT);
                     stretchFromMelScale(spectrum, melSpectrum, fftLength / 2, fs / 2);
@@ -593,6 +601,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     SAFE_DELETE_ARRAY( melCepstrum );
     SAFE_DELETE_ARRAY( temporary );
     SAFE_DELETE_ARRAY( trans );
+    SAFE_DELETE_ARRAY( thisMel );
+    SAFE_DELETE_ARRAY( nextMel );
 
 #ifdef STND_MULTI_THREAD
 #ifndef USE_PTHREADS

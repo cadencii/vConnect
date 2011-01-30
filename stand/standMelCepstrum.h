@@ -31,6 +31,7 @@ public:
 
     void destroy(void);
     standComplex *getMelCepstrum(double msTime, int *length);
+    int getMelCepstrumLength(void){return cepstrumLength;}
 
 private:
     standComplex    **melCepstrum; //! @brief 内部的には Mel Cepstrum をテクスチャとして使用する．

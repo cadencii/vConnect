@@ -17,6 +17,7 @@
 #include "stand.h"
 #include "standSpecgram.h"
 #include "standMelCepstrum.h"
+#include "vConnectSetting.h"
 
 class standData{
 public:
@@ -37,14 +38,20 @@ public:
     }
 #endif
 
-    void getMelCepstrum(int frame, standComplex *dst, int length, double freq, double briRate);
+    void getMelCepstrum(int frame, standComplex *dst, int *length, double freq, double briRate);
+    bool readMelCepstrum(vConnectSetting &setting, string_t alias);
     standSpecgram *specgram;
-    standMelCepstrum melCepstrum;
     bool        isProcessing;
     bool        isValid;
+    int         cepstrumLength;
+
+    bool        enableExtention;
 #ifdef STND_MULTI_THREAD
     mutex_t     waitHandle;
 #endif
+
+private:
+    standMelCepstrum melCepstrum;
 };
 
 #endif // __standData_h__
