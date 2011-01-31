@@ -2,6 +2,7 @@
 #define __vConnectSetting_h__
 
 #include "stand.h"
+#include "vsqMetaText/vsqBase.h"
 
 enum vConnectSettingList{
     SETTING_BASE = 0,
@@ -22,6 +23,7 @@ public:
     string_t path;
     int brightness;
     int noteNumber;
+    double frequency;
 };
 
 class vConnectSetting{

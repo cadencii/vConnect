@@ -442,6 +442,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\phoneticTranscriber.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\phoneticTranscriber.h"
+				>
+			</File>
+			<File
 				RelativePath=".\runtimeOptions.h"
 				>
 			</File>

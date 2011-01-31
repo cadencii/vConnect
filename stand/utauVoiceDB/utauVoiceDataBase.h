@@ -38,10 +38,10 @@ public:
         return settingMap.empty();
     }
 protected:
-private:
     string_t voicePath;
     map_t<string_t, utauParameters*>    settingMap;
     list<utauParameters*>    settingList;
+private:
 };
 
 #endif

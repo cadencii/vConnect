@@ -18,6 +18,7 @@ bool librarySetting::readSetting(string_t left, string_t right)
         brightness = atoi(right.c_str());
     }else if(left.compare(_T("NoteNumber")) == 0){
         noteNumber = atoi(right.c_str());
+        frequency = A4_PITCH * pow( 2.0, (double)( noteNumber - A4_NOTE ) / 12.0 );
     }else if(left.compare(_T("Directory")) == 0){
         path += right;
     }else{

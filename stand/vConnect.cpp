@@ -353,9 +353,13 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     fftw_complex *melSpectrum = new fftw_complex[fftLength];
     fftw_complex *melCepstrum = new fftw_complex[fftLength];
 
-    standComplex *thisMel = new standComplex[fftLength];
-    standComplex *nextMel = new standComplex[fftLength];
-    int thisMelLen, nextMelLen;
+    standComplex *thisBrightnessMel = new standComplex[fftLength];
+    standComplex *nextBrightnessMel = new standComplex[fftLength];
+    standComplex *thisFreqMel = new standComplex[fftLength];
+    standComplex *nextFreqMel = new standComplex[fftLength];
+    int thisBrightnessMelLen, nextBrightnessMelLen;
+    int thisFreqMelLen, nextFreqMelLen;
+    double thisFreqMixRate, nextFreqMixRate;
 #ifdef STND_MULTI_THREAD
     if(hFFTWMutex)
         stnd_mutex_lock(hFFTWMutex);
@@ -385,6 +389,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     for( int i = beginItemNumber; i < num_events && index < frameLength; i++ ){
         vsqEventEx *itemThis = itemNext;
         int morphBeginFrame = INT_MAX;
+        bool enableBrightness = true, enablePitchChange = true;
         if( i + 1 < num_events ){
             itemNext = vsq->events.eventList[i + 1];
         }
@@ -459,8 +464,10 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             }
 
             present->specgram->getFramePointer( position, presentFrame );
-            present->getMelCepstrum(position, thisMel, &thisMelLen, *(target.f0), briRate);
-            nextMelLen = thisMelLen;
+            enableBrightness &= present->getBrightness(position, thisBrightnessMel, &thisBrightnessMelLen, *(target.f0), briRate);
+            enablePitchChange &= present->getFreqInterp(position, thisFreqMel, &thisFreqMelLen, *(presentFrame.f0), briRate, &thisFreqMixRate);
+            nextBrightnessMelLen = thisBrightnessMelLen;
+            nextFreqMelLen = thisFreqMelLen;
 
             // 現在注目しているフレームが無声音の場合それを優先する．
             if( *(presentFrame.f0) == 0.0 ){
@@ -479,7 +486,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     position = calculatePhoneticTime(itemNext->utauSetting.msFixedLength, next->specgram->getTimeLength(), position - nextConsonantEndFrame, options.fast);
                 }
                 next->specgram->getFramePointer( position, nextFrame );
-                next->getMelCepstrum(position, nextMel, &nextMelLen, *(target.f0), briRate);
+                enableBrightness &= next->getBrightness(position, nextBrightnessMel, &nextBrightnessMelLen, *(target.f0), briRate);
+                enablePitchChange &= next->getFreqInterp(position, nextFreqMel, &nextFreqMelLen, *(nextFrame.f0), briRate, &nextFreqMixRate);
 
                 morphRate = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
                 morphRate = 0.5 - 0.5 * cos( ST_PI * morphRate );
@@ -531,7 +539,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     }
                 }
 
-                if(present->enableExtention && next->enableExtention){
+                if(enableBrightness || enablePitchChange){
                     stretchToMelScale(melSpectrum, spectrum, fftLength / 2 + 1, fs / 2);
                     for(int k = 0; k <= fftLength / 2; k++){
                         melSpectrum[k][0] = log(melSpectrum[k][0] + 1.0e-17) / (double)(fftLength);
@@ -542,20 +550,41 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                         melSpectrum[k][1] = 0.0;
                     }
                     fftw_execute(inverseFFT);
-                    thisMelLen = min(thisMelLen, nextMelLen);
-                    briRate = 0.5;
-                    if(morphRate > 0){
-                        for(int k = 0; k < thisMelLen; k++){
-                            melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - briRate) + briRate * (thisMel[k].re * (1.0 - morphRate) + nextMel[k].re * morphRate);
-                            melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - briRate) + briRate * (thisMel[k].im * (1.0 - morphRate) + nextMel[k].im * morphRate);
+
+                    if(enablePitchChange){
+                        double thisF0 = *(target.f0);
+                        double mixRate = (thisFreqMixRate + nextFreqMixRate) / 2.0;
+                        thisFreqMelLen = min(thisFreqMelLen, nextFreqMelLen);
+                        for(int k = 0; k < thisFreqMelLen; k++){
+                        if(morphRate > 0){
+                            for(int k = 0; k < thisFreqMelLen; k++){
+                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - mixRate) + mixRate * (thisFreqMel[k].re * (1.0 - morphRate) + nextFreqMel[k].re * morphRate);
+                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - mixRate) + mixRate * (thisFreqMel[k].im * (1.0 - morphRate) + nextFreqMel[k].im * morphRate);
+                            }
+                        }else{
+                            for(int k = 0; k < thisFreqMelLen; k++){
+                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - mixRate) + mixRate * thisFreqMel[k].re;
+                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - mixRate) + mixRate * thisFreqMel[k].im;
+                            }
                         }
-                    }else{
-                        for(int k = 0; k < thisMelLen; k++){
-                            melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - briRate) + briRate * thisMel[k].re;
-                            melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - briRate) + briRate * thisMel[k].im;
                         }
                     }
-                    for(int k = 1; k < thisMelLen; k++){
+
+                    if(enableBrightness){
+                        thisBrightnessMelLen = min(thisBrightnessMelLen, nextBrightnessMelLen);
+                        if(morphRate > 0){
+                            for(int k = 0; k < thisBrightnessMelLen; k++){
+                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - briRate) + briRate * (thisBrightnessMel[k].re * (1.0 - morphRate) + nextBrightnessMel[k].re * morphRate);
+                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - briRate) + briRate * (thisBrightnessMel[k].im * (1.0 - morphRate) + nextBrightnessMel[k].im * morphRate);
+                            }
+                        }else{
+                            for(int k = 0; k < thisBrightnessMelLen; k++){
+                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - briRate) + briRate * thisBrightnessMel[k].re;
+                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - briRate) + briRate * thisBrightnessMel[k].im;
+                            }
+                        }
+                    }
+                    for(int k = 1; k < thisBrightnessMelLen; k++){
                         melCepstrum[fftLength-k][0] = melCepstrum[k][0];
                         melCepstrum[fftLength-k][1] = -melCepstrum[k][1];
                     }
@@ -602,8 +631,10 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     SAFE_DELETE_ARRAY( melCepstrum );
     SAFE_DELETE_ARRAY( temporary );
     SAFE_DELETE_ARRAY( trans );
-    SAFE_DELETE_ARRAY( thisMel );
-    SAFE_DELETE_ARRAY( nextMel );
+    SAFE_DELETE_ARRAY( thisBrightnessMel );
+    SAFE_DELETE_ARRAY( nextBrightnessMel );
+    SAFE_DELETE_ARRAY( thisFreqMel );
+    SAFE_DELETE_ARRAY( nextFreqMel );
 
 #ifdef STND_MULTI_THREAD
 #ifndef USE_PTHREADS

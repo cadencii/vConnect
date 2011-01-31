@@ -27,10 +27,11 @@ public:
     bool writeMelCepstrum(string_t output);
 
     //! @brief 与えられたスペクトルをメルケプストラムへ変換し自身のバッファへ格納する．
-    void calculateMelCepstrum(int cepstrumLength, const double *f0, const double **sourceSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency);
+    void calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency);
 
     void destroy(void);
     standComplex *getMelCepstrum(double msTime, int *length);
+    double getF0(double msTime);
     int getMelCepstrumLength(void){return cepstrumLength;}
 
 private:

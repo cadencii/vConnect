@@ -23,7 +23,6 @@ class standData{
 public:
     standData(){
         specgram = NULL;
-        /*texture = NULL;*/
         isProcessing = false;
         isValid = false;
 #ifdef STND_MULTI_THREAD
@@ -38,8 +37,10 @@ public:
     }
 #endif
 
-    void getMelCepstrum(int frame, standComplex *dst, int *length, double freq, double briRate);
+    bool getBrightness(int frame, standComplex *dst, int *length, double freq, double briRate);
+    bool getFreqInterp(int frame, standComplex *dst, int *length, double freq, double briRate, double *rate);
     bool readMelCepstrum(vConnectSetting &setting, string_t alias);
+
     standSpecgram *specgram;
     bool        isProcessing;
     bool        isValid;
@@ -51,7 +52,13 @@ public:
 #endif
 
 private:
-    standMelCepstrum melCepstrum;
+    librarySetting  *baseSetting;
+    standMelCepstrum brightness;
+    librarySetting  *brightnessSetting;
+    standMelCepstrum low;
+    librarySetting  *lowSetting;
+    standMelCepstrum hi;
+    librarySetting  *hiSetting;
 };
 
 #endif // __standData_h__
