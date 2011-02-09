@@ -1,3 +1,10 @@
+/*
+ *
+ * 仕様変更につきしばらく放置．Qt版を使ってください．
+ *
+ *
+ */
+
 #include "phoneticTranscriber.h"
 
 #include <fstream>
@@ -203,7 +210,7 @@ void phoneticTranscriber::phoneticTranscribe(utauVoiceDataBase &target, string o
                 targetF0[j] = dstF0[index];
             }
             standMelCepstrum melCepstrum;
-            melCepstrum.calculateMelCepstrum(24, targetF0, targetSpecgram, srcVolumeLen, fftl, fs);            
+//            melCepstrum.calculateMelCepstrum(24, targetF0, targetSpecgram, srcVolumeLen, fftl, fs);            
             melCepstrum.writeMelCepstrum(outputPath + (*i)->lyric + ".stt");
             ofs << "done." << endl;
 

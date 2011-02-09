@@ -14,6 +14,7 @@
  */
 #include "vConnect.h"
 #include "stand.h"
+#include "matching.h"
 #include <time.h>
 
 #define TRANS_MAX 4096
@@ -278,7 +279,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 int calculatePhoneticTime(float msFixedLength, int tLen, int position, bool fast)
 {
     // うーん．．．
-    //return (int)(msFixedLength/framePeriod);
+    return (int)(msFixedLength/framePeriod);
 
     // 真ん中を繰り返し使うようにしよう．
     tLen -= 20;  // 後半 20[frames] は信用しない
@@ -350,7 +351,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     briIndex = breIndex = cleIndex = genIndex = opeIndex = 0;
 
     fftw_plan inverseFFT, forwardFFT;
-    fftw_complex *melSpectrum = new fftw_complex[fftLength];
+    double *melSpectrum = new double[fftLength];
     fftw_complex *melCepstrum = new fftw_complex[fftLength];
 
     standComplex *thisBrightnessMel = new standComplex[fftLength];
@@ -364,12 +365,15 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     if(hFFTWMutex)
         stnd_mutex_lock(hFFTWMutex);
 #endif
-    inverseFFT = fftw_plan_dft_1d(fftLength, melSpectrum, melCepstrum, FFTW_BACKWARD, FFTW_ESTIMATE);
-    forwardFFT = fftw_plan_dft_1d(fftLength, melCepstrum, melSpectrum, FFTW_FORWARD, FFTW_ESTIMATE);
+    inverseFFT = fftw_plan_dft_r2c_1d(fftLength, melSpectrum, melCepstrum, FFTW_ESTIMATE);
+    forwardFFT = fftw_plan_dft_c2r_1d(fftLength, melCepstrum, melSpectrum, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if(hFFTWMutex)
         stnd_mutex_unlock(hFFTWMutex);
 #endif
+    for(int i = 0; i < fftLength; i++){
+        melCepstrum[i][0] = melCepstrum[i][1] = 0.0;
+    }
 
     // 合成開始．長くなってしまうのはどうにもならんのか
     int num_events = vsq->events.eventList.size();
@@ -389,7 +393,6 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     for( int i = beginItemNumber; i < num_events && index < frameLength; i++ ){
         vsqEventEx *itemThis = itemNext;
         int morphBeginFrame = INT_MAX;
-        bool enableBrightness = true, enablePitchChange = true;
         if( i + 1 < num_events ){
             itemNext = vsq->events.eventList[i + 1];
         }
@@ -405,6 +408,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
         // 合成可能範囲内なので wav ファイルを検索，適宜 WORLD で分析．
         if( 0 <= itemThis->singerIndex && itemThis->singerIndex < managers->size() ){
             present = (*managers)[itemThis->singerIndex]->getStandData( itemThis->lyricHandle.getLyric(), options );
+            (*managers)[itemThis->singerIndex]->checkEnableExtention();
 
             if(!present || !present->specgram){
                 // 見つからない場合は次に行こう．
@@ -423,6 +427,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
         if( itemThis->isContinuousBack ){
             if( 0 <= itemNext->singerIndex && itemNext->singerIndex < managers->size() ){
                 next = (*managers)[itemNext->singerIndex]->getStandData( itemNext->lyricHandle.getLyric(), options );
+                (*managers)[itemNext->singerIndex]->checkEnableExtention();
             }
             if( next && next->specgram ){
                 // 固定長が分析長より長い場合は分析長にしておく．
@@ -440,6 +445,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             specgram->getFramePointer( index, target );
             spectrum = target.spectrum;
             aperiodicity = target.aperiodicity;
+            thisFreqMelLen = nextFreqMelLen = 0;
+            thisBrightnessMelLen = nextBrightnessMelLen = 0;
 
             // コントロールトラックのインデックスを進める
             while( index + beginFrame > (*controlCurves)[BRETHINESS][breIndex].frameTime ){ breIndex++; }
@@ -464,10 +471,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             }
 
             present->specgram->getFramePointer( position, presentFrame );
-            enableBrightness &= present->getBrightness(position, thisBrightnessMel, &thisBrightnessMelLen, *(target.f0), briRate);
-            enablePitchChange &= present->getFreqInterp(position, thisFreqMel, &thisFreqMelLen, *(presentFrame.f0), briRate, &thisFreqMixRate);
-            nextBrightnessMelLen = thisBrightnessMelLen;
-            nextFreqMelLen = thisFreqMelLen;
+            present->getBrightness(position, thisBrightnessMel, &thisBrightnessMelLen, *(target.f0));
+            present->getFreqInterp(position, thisFreqMel, &thisFreqMelLen, *(presentFrame.f0), &thisFreqMixRate);
 
             // 現在注目しているフレームが無声音の場合それを優先する．
             if( *(presentFrame.f0) == 0.0 ){
@@ -486,8 +491,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     position = calculatePhoneticTime(itemNext->utauSetting.msFixedLength, next->specgram->getTimeLength(), position - nextConsonantEndFrame, options.fast);
                 }
                 next->specgram->getFramePointer( position, nextFrame );
-                enableBrightness &= next->getBrightness(position, nextBrightnessMel, &nextBrightnessMelLen, *(target.f0), briRate);
-                enablePitchChange &= next->getFreqInterp(position, nextFreqMel, &nextFreqMelLen, *(nextFrame.f0), briRate, &nextFreqMixRate);
+                next->getBrightness(position, nextBrightnessMel, &nextBrightnessMelLen, *(target.f0));
+                next->getFreqInterp(position, nextFreqMel, &nextFreqMelLen, *(nextFrame.f0), &nextFreqMixRate);
 
                 morphRate = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
                 morphRate = 0.5 - 0.5 * cos( ST_PI * morphRate );
@@ -506,8 +511,35 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             for(int k = 0; k <= fftLength / 2; k++){
                 spectrum[k] = pow(presentFrame.spectrum[k], 1.0 - morphRate) * pow(nextFrame.spectrum[k],morphRate);
             }
-            for(int k = 0; k < aperiodicityLength; k++){
+
+            // とりあえず線形補間
+            for(int k = 0; k < aperiodicityLength; k++){    // WORLD 0.0.1
                 aperiodicity[k] = presentFrame.aperiodicity[k] * (1.0 - morphRate) + nextFrame.aperiodicity[k] * morphRate;
+            }
+            // WORLD のバージョンが 0.0.4 の場合はパワースペクトルから補間を修正
+            if( options.fast == false ){
+                // 現在保持しているスペクトルと非周期性指標のパワースペクトルを計算
+                for(int k = 1; k < aperiodicityLength / 2; k++){
+                    temporary[k]  = aperiodicity[k*2-1] * aperiodicity[k*2-1] + aperiodicity[k*2] * aperiodicity[k*2];
+                    temporary[k] *= spectrum[k+1];
+                    temporary[k] += 1.0e-28;   // SafeGuard
+                }
+                // 本来現れるべき周波数パワーとの比でノイズ残差スペクトルの補正
+                for(int k = 1; k < aperiodicityLength / 2; k++){
+                    double powerPresent, powerNext, powerThis;
+                    // スペクトルと残差スペクトルで作られる周波数パワー
+                    powerPresent  = (presentFrame.aperiodicity[k*2-1] * presentFrame.aperiodicity[k*2-1]
+                                  + presentFrame.aperiodicity[k*2] * presentFrame.aperiodicity[k*2])
+                                  * presentFrame.spectrum[k+1];
+                    powerNext     = (nextFrame.aperiodicity[k*2-1] * nextFrame.aperiodicity[k*2-1]
+                                  + nextFrame.aperiodicity[k*2] * nextFrame.aperiodicity[k*2])
+                                  * nextFrame.spectrum[k+1];
+                    // 本来得られるべき周波数パワー
+                    powerThis     = pow(powerPresent, 1.0 - morphRate) * pow(powerNext, morphRate);
+
+                    aperiodicity[k*2-1] *= sqrt(powerThis / temporary[k]);
+                    aperiodicity[k*2] *= sqrt(powerThis / temporary[k]);
+                }
             }
 
             /* ここに周波数変換 */
@@ -539,61 +571,40 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     }
                 }
 
-                if(enableBrightness || enablePitchChange){
-                    stretchToMelScale(melSpectrum, spectrum, fftLength / 2 + 1, fs / 2);
-                    for(int k = 0; k <= fftLength / 2; k++){
-                        melSpectrum[k][0] = log(melSpectrum[k][0] + 1.0e-17) / (double)(fftLength);
-                        melSpectrum[k][1] = 0.0;
-                    }
-                    for(int k = fftLength / 2 + 1; k < fftLength; k++){
-                        melSpectrum[k][0] = melSpectrum[fftLength - k][0];
-                        melSpectrum[k][1] = 0.0;
-                    }
-                    fftw_execute(inverseFFT);
+                // 差分メルケプストラムの和を求める．
+                memset(melCepstrum, 0, sizeof(fftw_complex)*fftLength);
+                melCepstrum[0][0] = (1.0 - morphRate) * thisFreqMel[0].re * thisFreqMixRate;
+                for(int k = 1; k < thisFreqMelLen; k++){
+                    melCepstrum[k][0] = thisFreqMel[k].re * (1.0 - morphRate) * thisFreqMixRate;
+                    melCepstrum[k][0] = thisFreqMel[k].im * (1.0 - morphRate) * thisFreqMixRate;
+                }
 
-                    if(enablePitchChange){
-                        double thisF0 = *(target.f0);
-                        double mixRate = (thisFreqMixRate + nextFreqMixRate) / 2.0;
-                        thisFreqMelLen = min(thisFreqMelLen, nextFreqMelLen);
-                        for(int k = 0; k < thisFreqMelLen; k++){
-                        if(morphRate > 0){
-                            for(int k = 0; k < thisFreqMelLen; k++){
-                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - mixRate) + mixRate * (thisFreqMel[k].re * (1.0 - morphRate) + nextFreqMel[k].re * morphRate);
-                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - mixRate) + mixRate * (thisFreqMel[k].im * (1.0 - morphRate) + nextFreqMel[k].im * morphRate);
-                            }
-                        }else{
-                            for(int k = 0; k < thisFreqMelLen; k++){
-                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - mixRate) + mixRate * thisFreqMel[k].re;
-                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - mixRate) + mixRate * thisFreqMel[k].im;
-                            }
-                        }
-                        }
-                    }
+                melCepstrum[0][0] += morphRate * nextFreqMel[0].re * nextFreqMixRate;
+                for(int k = 1; k < nextFreqMelLen; k++){
+                    melCepstrum[k][0] += nextFreqMel[k].re * morphRate * nextFreqMixRate;
+                    melCepstrum[k][0] += nextFreqMel[k].im * morphRate * nextFreqMixRate;
+                }
 
-                    if(enableBrightness){
-                        thisBrightnessMelLen = min(thisBrightnessMelLen, nextBrightnessMelLen);
-                        if(morphRate > 0){
-                            for(int k = 0; k < thisBrightnessMelLen; k++){
-                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - briRate) + briRate * (thisBrightnessMel[k].re * (1.0 - morphRate) + nextBrightnessMel[k].re * morphRate);
-                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - briRate) + briRate * (thisBrightnessMel[k].im * (1.0 - morphRate) + nextBrightnessMel[k].im * morphRate);
-                            }
-                        }else{
-                            for(int k = 0; k < thisBrightnessMelLen; k++){
-                                melCepstrum[k][0] = melCepstrum[k][0] * (1.0 - briRate) + briRate * thisBrightnessMel[k].re;
-                                melCepstrum[k][1] = melCepstrum[k][1] * (1.0 - briRate) + briRate * thisBrightnessMel[k].im;
-                            }
-                        }
-                    }
-                    for(int k = 1; k < thisBrightnessMelLen; k++){
-                        melCepstrum[fftLength-k][0] = melCepstrum[k][0];
-                        melCepstrum[fftLength-k][1] = -melCepstrum[k][1];
-                    }
-                    fftw_execute(forwardFFT);
-                    stretchFromMelScale(spectrum, melSpectrum, fftLength / 2 + 1, fs / 2);
-                    for(int k = 0; k <= fftLength / 2; k++){
-                        spectrum[k] = exp(spectrum[k]);
-                    }
-                }else{
+                melCepstrum[0][0] += thisBrightnessMel[0].re * briRate;
+                for(int k = 1; k < thisBrightnessMelLen; k++){
+                    melCepstrum[k][0] += thisBrightnessMel[k].re * (1.0 - morphRate) * briRate;
+                    melCepstrum[k][0] += thisBrightnessMel[k].im * (1.0 - morphRate) * briRate;
+                }
+
+                melCepstrum[0][0] += thisFreqMel[0].re;
+                for(int k = 1; k < nextBrightnessMelLen; k++){
+                    melCepstrum[k][0] += nextBrightnessMel[k].re * morphRate * briRate;
+                    melCepstrum[k][0] += nextBrightnessMel[k].im * morphRate * briRate;
+                }
+
+                fftw_execute(forwardFFT);
+                standMelCepstrum::stretchFromMelScale(temporary, melSpectrum, fftLength / 2 + 1, fs / 2);
+                for(int k = 0; k <= fftLength / 2; k++){
+                    spectrum[k] *= exp(temporary[k]);
+                }
+
+                if(thisBrightnessMelLen + nextBrightnessMelLen == 0){
+                    // 普通の Brightness 処理
                     for(int k = 0; k <= fftLength / 2; k++){
                         double freq = (double)k / (double)fftLength * (double)fs;
                         if(freq < *target.f0 * 2){

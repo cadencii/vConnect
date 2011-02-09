@@ -27,7 +27,16 @@ public:
     bool writeMelCepstrum(string_t output);
 
     //! @brief 与えられたスペクトルをメルケプストラムへ変換し自身のバッファへ格納する．
-    void calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency);
+    void calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, double **dstSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency);
+
+    //! @brief スペクトルの横軸を周波数からメル尺度へ変形する．
+    static void stretchToMelScale(double *melSpectrum, const double *spectrum, int spectrumLength, int maxFrequency);
+    //! @brief スペクトルの横軸をメル尺度から周波数へ変形する．
+    static void stretchFromMelScale(double *spectrum, const double *melSpectrum, int spectrumLength, int maxFrequency);
+    //! @brief 周波数をメルスケールへ変換する．
+    static double  getMelScale(double freq);
+    //! @brief メルスケールを周波数へ変換する．
+    static double  getFrequency(double mel);
 
     void destroy(void);
     standComplex *getMelCepstrum(double msTime, int *length);
@@ -41,20 +50,5 @@ private:
     float           *f0;
     float           framePeriod;
 };
-
-extern double interpolateArray( double x, const double *p );
-
-extern void applyStretching( double *T, double *target, int length );
-
-//! @brief スペクトルの横軸を周波数からメル尺度へ変形する．
-void stretchToMelScale(fftw_complex *melSpectrum, const double *spectrum, int spectrumLength, int maxFrequency);
-//! @brief スペクトルの横軸をメル尺度から周波数へ変形する．
-void stretchFromMelScale(double *spectrum, const fftw_complex *melSpectrum, int spectrumLength, int maxFrequency);
-
-//! @brief 周波数をメルスケールへ変換する．
-double  getMelScale(double freq);
-
-//! @brief メルスケールを周波数へ変換する．
-double  getFrequency(double mel);
 
 #endif

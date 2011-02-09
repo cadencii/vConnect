@@ -28,6 +28,7 @@ public:
     void setVoiceDB( utauVoiceDataBase* p, runtimeOptions& options );
 
     standData* getStandData( string_t lyric, runtimeOptions& options);
+    bool checkEnableExtention(void){return enableExtention;}
 private:
     map_t<string_t, standData*> objectMap;
     map_t<string_t, standMelCepstrum*> textureMap;
