@@ -27,7 +27,7 @@ public:
     bool writeMelCepstrum(string_t output);
 
     //! @brief 与えられたスペクトルをメルケプストラムへ変換し自身のバッファへ格納する．
-    void calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, double **dstSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency);
+    void calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, double **dstSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency, double framePeriod);
 
     //! @brief スペクトルの横軸を周波数からメル尺度へ変形する．
     static void stretchToMelScale(double *melSpectrum, const double *spectrum, int spectrumLength, int maxFrequency);

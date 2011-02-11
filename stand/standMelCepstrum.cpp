@@ -139,7 +139,7 @@ void standMelCepstrum::stretchFromMelScale(double *spectrum, const double *melSp
     }
 }
 
-void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, double **dstSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency)
+void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, double **dstSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency, double framePeriod)
 {
     // ケプストラムの最大長はエルミート対称性を考えてスペクトル長の半分を超えない．
     if(!f0 || !sourceSpecgram || cepstrumLength <= 0 || spectrumLength <= 0 || spectrumNumber <= 0 || cepstrumLength > spectrumLength / 2){
@@ -148,6 +148,7 @@ void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0
     double *melSpectrum = new double[spectrumLength];
     double *tmpSpectrum = new double[spectrumLength];
     fftw_complex *tmpCepstrum = new fftw_complex[spectrumLength];
+    this->framePeriod = framePeriod;
 
     if(melSpectrum && tmpCepstrum){
         fftw_plan inverseFFT;
@@ -212,7 +213,7 @@ standComplex *standMelCepstrum::getMelCepstrum(double msTime, int *length)
 {
     standComplex *ret = NULL;
     *length = 0;
-    int index = msTime / this->framePeriod;
+    int index = msTime / framePeriod; //this->framePeriod;
     if(index < 0) index = 0;
     if(index >= this->cepstrumNumber) index = this->cepstrumNumber - 1;
 
@@ -225,7 +226,8 @@ standComplex *standMelCepstrum::getMelCepstrum(double msTime, int *length)
 
 double standMelCepstrum::getF0(double msTime)
 {
-    int index = msTime / this->framePeriod;
+//    int index = msTime / this->framePeriod;
+    int index = msTime / framePeriod;
     if(index < 0) index = 0;
     if(index >= this->cepstrumNumber) index = this->cepstrumNumber - 1;
     return this->f0[index];

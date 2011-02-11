@@ -279,7 +279,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 int calculatePhoneticTime(float msFixedLength, int tLen, int position, bool fast)
 {
     // うーん．．．
-    return (int)(msFixedLength/framePeriod);
+    //return (int)(msFixedLength/framePeriod);
 
     // 真ん中を繰り返し使うようにしよう．
     tLen -= 20;  // 後半 20[frames] は信用しない
@@ -469,6 +469,10 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             }else{
                 position = calculatePhoneticTime(itemThis->utauSetting.msFixedLength, present->specgram->getTimeLength(), position - consonantEndFrame, options.fast);
             }
+            // fatal::STAR スペクトルの末端 fftLength 分のデータは信用出来ない
+            if(position < (double)fftLength / (double)fs * 1000.0 / framePeriod){
+                position = (double)fftLength / (double)fs * 1000.0 / framePeriod;
+            }
 
             present->specgram->getFramePointer( position, presentFrame );
             present->getBrightness(position, thisBrightnessMel, &thisBrightnessMelLen, *(target.f0));
@@ -489,6 +493,10 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     position = (long)((double)position / nextVelocity);
                 }else{
                     position = calculatePhoneticTime(itemNext->utauSetting.msFixedLength, next->specgram->getTimeLength(), position - nextConsonantEndFrame, options.fast);
+                }
+                // fatal::STAR スペクトルの末端 fftLength 分のデータは信用出来ない
+                if(position < (double)fftLength / (double)fs * 1000.0 / framePeriod){
+                    position = (double)fftLength / (double)fs * 1000.0 / framePeriod;
                 }
                 next->specgram->getFramePointer( position, nextFrame );
                 next->getBrightness(position, nextBrightnessMel, &nextBrightnessMelLen, *(target.f0));
@@ -573,28 +581,33 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
 
                 // 差分メルケプストラムの和を求める．
                 memset(melCepstrum, 0, sizeof(fftw_complex)*fftLength);
-                melCepstrum[0][0] = (1.0 - morphRate) * thisFreqMel[0].re * thisFreqMixRate;
-                for(int k = 1; k < thisFreqMelLen; k++){
-                    melCepstrum[k][0] = thisFreqMel[k].re * (1.0 - morphRate) * thisFreqMixRate;
-                    melCepstrum[k][0] = thisFreqMel[k].im * (1.0 - morphRate) * thisFreqMixRate;
+                if(thisFreqMelLen > 0){
+                    melCepstrum[0][0] = (1.0 - morphRate) * thisFreqMel[0].re * thisFreqMixRate;
+                    for(int k = 1; k < thisFreqMelLen; k++){
+                       melCepstrum[k][0] = thisFreqMel[k].re * (1.0 - morphRate) * thisFreqMixRate;
+                       melCepstrum[k][1] = thisFreqMel[k].im * (1.0 - morphRate) * thisFreqMixRate;
+                    }
                 }
-
-                melCepstrum[0][0] += morphRate * nextFreqMel[0].re * nextFreqMixRate;
-                for(int k = 1; k < nextFreqMelLen; k++){
-                    melCepstrum[k][0] += nextFreqMel[k].re * morphRate * nextFreqMixRate;
-                    melCepstrum[k][0] += nextFreqMel[k].im * morphRate * nextFreqMixRate;
+                if(nextFreqMelLen > 0){
+                    melCepstrum[0][0] += morphRate * nextFreqMel[0].re * nextFreqMixRate;
+                    for(int k = 1; k < nextFreqMelLen; k++){
+                        melCepstrum[k][0] += nextFreqMel[k].re * morphRate * nextFreqMixRate;
+                        melCepstrum[k][1] += nextFreqMel[k].im * morphRate * nextFreqMixRate;
+                    }
                 }
-
-                melCepstrum[0][0] += thisBrightnessMel[0].re * briRate;
-                for(int k = 1; k < thisBrightnessMelLen; k++){
-                    melCepstrum[k][0] += thisBrightnessMel[k].re * (1.0 - morphRate) * briRate;
-                    melCepstrum[k][0] += thisBrightnessMel[k].im * (1.0 - morphRate) * briRate;
+                if(thisBrightnessMelLen > 0){
+                    melCepstrum[0][0] += thisBrightnessMel[0].re * briRate;
+                    for(int k = 1; k < thisBrightnessMelLen; k++){
+                        melCepstrum[k][0] += thisBrightnessMel[k].re * (1.0 - morphRate) * briRate;
+                        melCepstrum[k][1] += thisBrightnessMel[k].im * (1.0 - morphRate) * briRate;
+                    }
                 }
-
-                melCepstrum[0][0] += thisFreqMel[0].re;
-                for(int k = 1; k < nextBrightnessMelLen; k++){
-                    melCepstrum[k][0] += nextBrightnessMel[k].re * morphRate * briRate;
-                    melCepstrum[k][0] += nextBrightnessMel[k].im * morphRate * briRate;
+                if(nextBrightnessMelLen > 0){
+                    melCepstrum[0][0] += thisFreqMel[0].re;
+                    for(int k = 1; k < nextBrightnessMelLen; k++){
+                        melCepstrum[k][0] += nextBrightnessMel[k].re * morphRate * briRate;
+                        melCepstrum[k][1] += nextBrightnessMel[k].im * morphRate * briRate;
+                    }
                 }
 
                 fftw_execute(forwardFFT);
