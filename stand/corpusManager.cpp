@@ -90,9 +90,7 @@ standData* corpusManager::getStandData( string_t lyric, runtimeOptions& options)
                 ret = target;
             }
             // 設定が読み込めていてかつ拡張ライブラリを一つでも読み込めた場合は拡張を有効化する．
-            if(this->enableExtention){
-                target->enableExtention = target->readMelCepstrum(setting, lyric);
-            }
+            target->enableExtention = target->readMelCepstrum(setting, lyric);
         }
         target->isProcessing = false;
 

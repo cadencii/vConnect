@@ -32,6 +32,11 @@ vConnectSetting::vConnectSetting()
     libraryArray.resize(SETTING_END);
     for(int i = 0; i < SETTING_END; i++){
         libraryArray[i] = new librarySetting;
+        libraryArray[i]->brightness = 64;
+        libraryArray[i]->enabled = false;
+        libraryArray[i]->frequency = A4_PITCH;
+        libraryArray[i]->noteNumber = A4_NOTE;
+        libraryArray[i]->path = "";
         libraryMap.insert(make_pair(settingName[i], libraryArray[i]));
     }
 }

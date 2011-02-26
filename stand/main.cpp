@@ -5,7 +5,7 @@
  * This file is a part of v.Connect-STAND.
  *
  * v.Connect-STAND is free software; you can redistribute it and/or
- * modify it under the terms of the GNU GPL License.
+ * modify it under the terms of the GNU GPL License
  *
  * v.Connect-STAND is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of

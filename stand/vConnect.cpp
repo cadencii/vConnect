@@ -261,7 +261,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     /* 波形自体の編集をここに書く． */
     //calculateDynamics( dynamics, wave, waveLength, options.volumeNormalization );
 
-    specgram.writeWaveFile( output, beginFrame, NULL);// &dynamics );
+    specgram.writeWaveFile( output, beginFrame, &dynamics );
 
 #ifdef STND_MULTI_THREAD
     // FFTW 用の mutex は合成時にも使うので最後に解放．
@@ -434,10 +434,11 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 if(itemNext->utauSetting.msFixedLength / framePeriod >= next->specgram->getTimeLength()){
                     itemNext->utauSetting.msFixedLength = (double)(next->specgram->getTimeLength()-1) * framePeriod;
                 }
+                // モーフ開始位置は読み込めたら設定する．
+                morphBeginFrame = max(itemThis->beginFrame, itemNext->beginFrame) - beginFrame;
             }
             nextVelocity = pow( 2.0, (double)( 64 - itemNext->velocity ) / 64.0 );
             nextConsonantEndFrame = itemNext->utauSetting.msFixedLength * nextVelocity / framePeriod;
-            morphBeginFrame = max(itemThis->beginFrame, itemNext->beginFrame) - beginFrame;
         }
 
         for( ; index < itemThis->endFrame - beginFrame && index < frameLength; index++ ){
@@ -877,21 +878,23 @@ void    vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
     for( unsigned int i = 0; i < vsq.events.eventList.size(); i++ ){
         vsqEventEx *itemi = vsq.events.eventList[i];
 
-        // 後続がいる場合は必要なパラメータを計算してポルタメントを書く
-        if( itemi->isContinuousBack ){
-            if( previousEndFrame > itemi->beginFrame )
+        if( !itemi->isContinuousBack ){
+            continue;
+        }else{
+            // 後続がいる場合は必要なパラメータを計算してポルタメントを書く
+            if( previousEndFrame > itemi->beginFrame ){
                 noteBeginFrame = previousEndFrame;
-            else
-                if( itemi->isVCV )
+            }else{
+                if( itemi->isVCV ){
                     noteBeginFrame = (long)( vsq.vsqTempoBp.tickToSecond( itemi->tick ) * 1000.0 / framePeriod );
-                else
+                }else{
                     noteBeginFrame = itemi->beginFrame;
+                }
+            }
             portamentoBegin = noteBeginFrame
                       + (long)((double)(itemi->endFrame - noteBeginFrame)
                       * (1.0 - (double)(itemi->portamentoLength) / 100.0));
             tmp = noteFrequency[vsq.events.eventList[i + 1]->note] / noteFrequency[itemi->note];
-        }else{
-            continue;
         }
 
         portamentoLength = itemi->endFrame - portamentoBegin;
@@ -899,12 +902,15 @@ void    vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
         long frameOffset = portamentoBegin - beginFrame;
         for( long j = 0; j < portamentoLength; j++ ){
             double x = (double)j * inv_portamentoLength;
-            f0[j + frameOffset] *= pow( tmp, 0.5 * (1.0 - cos( ST_PI * x ))
-                                    - (double)itemi->portamentoDepth / 100.0 * (sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5) );
+            double portamentoChangeRate = (sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5);
+            f0[j + frameOffset] *= pow( tmp, 0.5 * (1.0 - cos( ST_PI * x )) - (double)itemi->portamentoDepth / 100.0 * portamentoChangeRate);
+            dynamics[j + frameOffset] *= pow(tmp / fabs(tmp) * 3.0, - (double)itemi->decay / 100.0 * portamentoChangeRate);
         }
         for( long j = portamentoLength; j < portamentoLength * 3 / 2; j++ ){
             double x = (double)j * inv_portamentoLength;
-            f0[j + frameOffset] *= pow( tmp, - (double)itemi->portamentoDepth / 100.0 * sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5 );
+            double portamentoChangeRate = (sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5);
+            f0[j + frameOffset] *= pow( tmp, - (double)itemi->portamentoDepth / 100.0 * portamentoChangeRate );
+            dynamics[j + frameOffset] *= pow(tmp / fabs(tmp) * 3.0, - (double)itemi->attack / 100.0 * portamentoChangeRate);
         }
         previousEndFrame = itemi->endFrame;
     }

@@ -1,4 +1,6 @@
-﻿10 Feb. 2011 v2.0.0   added; multiLayered voice Library
+﻿27 Feb. 2011 v2.0.1   fixed; null pointer reference when linear-morphing
+                           ; apply attack/decay as volume with portamento
+10 Feb. 2011 v2.0.0   added; multiLayered voice Library
 15 Jan. 2011 v1.2.1   fixed; bugs perhaps in WORLD 0.0.4 synthesis.
 10 Jan. 2011 v1.2.0   added; support WORLD 0.0.4
 04 Jan. 2011 v1.1.2   added; smooth time stretching function
