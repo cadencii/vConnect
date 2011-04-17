@@ -28,9 +28,9 @@ double  standMelCepstrum::getFrequency(double mel){
 
 standMelCepstrum::standMelCepstrum()
 {
-    this->f0 = NULL;
+    this->noiseRatio = this->t = this->f0 = NULL;
     this->cepstrumLength = 0;
-    this->cepstrumNumber = 0;
+    this->timeLength = 0;
     this->melCepstrum = NULL;
     this->framePeriod = framePeriod;
 }
@@ -44,14 +44,31 @@ void standMelCepstrum::destroy()
 {
     this->cepstrumLength = 0;
     if(this->melCepstrum){
-        for(int i = 0; i < this->cepstrumNumber; i++){
+        for(int i = 0; i < this->timeLength; i++){
             SAFE_DELETE_ARRAY(this->melCepstrum[i]);
         }
         SAFE_DELETE_ARRAY(this->melCepstrum);
     }
-    this->cepstrumNumber = 0;
+    this->timeLength = 0;
     this->framePeriod = framePeriod;
     SAFE_DELETE_ARRAY(this->f0);
+    SAFE_DELETE_ARRAY(this->t);
+    SAFE_DELETE_ARRAY(this->noiseRatio);
+}
+
+void standMelCepstrum::setTimeLength(int timeLength, int cepstrumLength)
+{
+    if(timeLength <= 0) return;
+    this->destroy();
+    this->timeLength = timeLength;
+    this->melCepstrum = new standComplex*[timeLength];
+    this->f0 = new float[timeLength];
+    this->t  = new float[timeLength];
+    this->noiseRatio = new float[timeLength];
+    for(int i = 0; i < timeLength; i++){
+        this->melCepstrum[i] = new standComplex[cepstrumLength];
+    }
+    this->cepstrumLength = cepstrumLength;
 }
 
 bool standMelCepstrum::writeMelCepstrum(string_t output)
@@ -65,13 +82,14 @@ bool standMelCepstrum::writeMelCepstrum(string_t output)
     FILE *fp = fopen(output_s.c_str(), "wb");
     if(fp){
         fwrite(&this->framePeriod, sizeof(float), 1, fp);
-        fwrite(&this->cepstrumNumber, sizeof(int), 1, fp);
+        fwrite(&this->timeLength, sizeof(int), 1, fp);
         fwrite(&this->cepstrumLength, sizeof(int), 1, fp);
-        for(int j = 0; j < this->cepstrumNumber; j++){
-            fwrite(&this->f0[j], sizeof(float), 1, fp);
+        fwrite(&this->t, sizeof(float), this->timeLength, fp);
+        fwrite(&this->f0, sizeof(float), this->timeLength, fp);
+        fwrite(&this->noiseRatio, sizeof(float), this->timeLength, fp);
+        for(int j = 0; j < this->timeLength; j++){
             for(int i = 0; i < this->cepstrumLength; i++){
                 fwrite(&this->melCepstrum[j][i].re, sizeof(float), 1, fp);
-                fwrite(&this->melCepstrum[j][i].im, sizeof(float), 1, fp);
             }
         }
         fclose(fp);
@@ -88,22 +106,26 @@ bool standMelCepstrum::readMelCepstrum(string_t input)
     FILE *fp = fopen(input_s.c_str(), "rb");
     if(fp){
         size_t c = 0;
+
         this->destroy();
+
         c += fread(&this->framePeriod, sizeof(int), 1, fp);
-        c += fread(&this->cepstrumNumber, sizeof(int), 1, fp);
+        c += fread(&this->timeLength, sizeof(int), 1, fp);
         c += fread(&this->cepstrumLength, sizeof(int), 1, fp);
-        this->f0 = new float[cepstrumNumber];
-        this->melCepstrum = new standComplex*[this->cepstrumNumber];
-        for(int j = 0; j < this->cepstrumNumber; j++){
-            this->melCepstrum[j] = new standComplex[this->cepstrumLength];
-            c += fread(&this->f0[j], sizeof(float), 1, fp);
+
+        this->setTimeLength(this->timeLength, this->cepstrumLength);
+
+        c += fread(this->t, sizeof(float), this->timeLength, fp);
+        c += fread(this->f0, sizeof(float), this->timeLength, fp);
+        c += fread(this->noiseRatio, sizeof(float), this->timeLength, fp);
+
+        for(int j = 0; j < this->timeLength; j++){
             for(int i = 0; i < this->cepstrumLength; i++){
                 c += fread(&this->melCepstrum[j][i].re, sizeof(float), 1, fp);
-                c += fread(&this->melCepstrum[j][i].im, sizeof(float), 1, fp);
             }
         }
         // 読み込んだ個数が正しければ真を返す．
-        if(c == 3 + 2 * this->cepstrumLength * this->cepstrumNumber + this->cepstrumNumber){
+        if(c == 3 + this->cepstrumLength * this->timeLength + 2 * this->timeLength){
             ret = true;
         }
         fclose(fp);
@@ -139,10 +161,12 @@ void standMelCepstrum::stretchFromMelScale(double *spectrum, const double *melSp
     }
 }
 
-void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0, double **sourceSpecgram, double **dstSpecgram, int spectrumNumber, int spectrumLength, int maxFrequency, double framePeriod)
+void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *t, const double *f0, const double *noiseRatio,
+                                            double **sourceSpecgram, double **dstSpecgram,
+                                            int timeLength, int spectrumLength, int maxFrequency, double framePeriod)
 {
     // ケプストラムの最大長はエルミート対称性を考えてスペクトル長の半分を超えない．
-    if(!f0 || !sourceSpecgram || cepstrumLength <= 0 || spectrumLength <= 0 || spectrumNumber <= 0 || cepstrumLength > spectrumLength / 2){
+    if(!f0 || !sourceSpecgram || cepstrumLength <= 0 || spectrumLength <= 0 || timeLength <= 0 || cepstrumLength > spectrumLength / 2){
         return;
     }
     double *melSpectrum = new double[spectrumLength];
@@ -152,14 +176,9 @@ void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0
 
     if(melSpectrum && tmpCepstrum){
         fftw_plan inverseFFT;
-        this->destroy();
-        this->cepstrumNumber = spectrumNumber;
-        this->melCepstrum = new standComplex*[cepstrumNumber];
-        this->f0 = new float[cepstrumNumber];
-        for(int i = 0; i < cepstrumNumber; i++){
-            this->melCepstrum[i] = new standComplex[cepstrumLength];
-        }
-        this->cepstrumLength = cepstrumLength;
+
+        this->setTimeLength(timeLength, cepstrumLength);
+
 #ifdef STND_MULTI_THREAD
         if(hFFTWMutex){
             stnd_mutex_lock(hFFTWMutex);
@@ -172,8 +191,10 @@ void standMelCepstrum::calculateMelCepstrum(int cepstrumLength, const double *f0
         }
 #endif
         // メルスケールへ展開
-        for(int j = 0; j < spectrumNumber; j++){
+        for(int j = 0; j < timeLength; j++){
             this->f0[j] = f0[j];
+            this->t[j]  = t[j];
+            this->noiseRatio[j] = noiseRatio[j];
             stretchToMelScale(melSpectrum, sourceSpecgram[j], spectrumLength / 2 + 1, maxFrequency / 2);
             stretchToMelScale(tmpSpectrum, dstSpecgram[j], spectrumLength / 2 + 1, maxFrequency / 2);
             // FFTW は N 点の DFT, IDFT 後は N 倍された値が格納されるので先に割ってしまう．
@@ -215,7 +236,7 @@ standComplex *standMelCepstrum::getMelCepstrum(double msTime, int *length)
     *length = 0;
     int index = msTime / framePeriod; //this->framePeriod;
     if(index < 0) index = 0;
-    if(index >= this->cepstrumNumber) index = this->cepstrumNumber - 1;
+    if(index >= this->timeLength) index = this->timeLength - 1;
 
     if(this->melCepstrum){
         ret = melCepstrum[index];
@@ -226,9 +247,24 @@ standComplex *standMelCepstrum::getMelCepstrum(double msTime, int *length)
 
 double standMelCepstrum::getF0(double msTime)
 {
-//    int index = msTime / this->framePeriod;
     int index = msTime / framePeriod;
     if(index < 0) index = 0;
-    if(index >= this->cepstrumNumber) index = this->cepstrumNumber - 1;
+    if(index >= this->timeLength) index = this->timeLength - 1;
     return this->f0[index];
+}
+
+double standMelCepstrum::getStretchedPosition(double msTime)
+{
+    int index = msTime / framePeriod;
+    if(index < 0) index = 0;
+    if(index >= this->timeLength) index = this->timeLength - 1;
+    return this->t[index];
+}
+
+double standMelCepstrum::getNoiseRatio(double msTime)
+{
+    int index = msTime / framePeriod;
+    if(index < 0) index = 0;
+    if(index >= this->timeLength) index = this->timeLength - 1;
+    return this->noiseRatio[index];
 }

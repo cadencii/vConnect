@@ -443,6 +443,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
 
         for( ; index < itemThis->endFrame - beginFrame && index < frameLength; index++ ){
             double morphRate = 0.0;
+            double noiseRatio = 1.0;
             specgram->getFramePointer( index, target );
             spectrum = target.spectrum;
             aperiodicity = target.aperiodicity;
@@ -454,9 +455,6 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             while( index + beginFrame > (*controlCurves)[CLEARNESS][cleIndex].frameTime ){ cleIndex++; }
             while( index + beginFrame > (*controlCurves)[GENDER][genIndex].frameTime ){ genIndex++; }
             while( index + beginFrame > (*controlCurves)[BRIGHTNESS][briIndex].frameTime ){ briIndex++; }
-
-            // いまはまだはやい
-            // transform_F0( temp_texture, spectrum, *(target.f0), *(presentFrame.f0), fftLength, 1.0 );
 
             /* BRE / BRI / CLE */
             breRate = (double)(*controlCurves)[BRETHINESS][breIndex].value / 128.0;
@@ -475,9 +473,21 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 position = (double)fftLength / (double)fs * 1000.0 / framePeriod;
             }
 
+            double briPos, freqPos, curPos = position;
+            double briNoise = 1.0, freqNoise = 1.0;
+
+            present->getBrightness(position, thisBrightnessMel, &thisBrightnessMelLen, *(target.f0), &briPos, &briNoise);
+            present->getFreqInterp(position, thisFreqMel, &thisFreqMelLen, *(target.f0), &thisFreqMixRate, &freqPos, &freqNoise);
+            if(thisFreqMelLen){
+                curPos = curPos * (1.0 - thisFreqMixRate) + freqPos * thisFreqMixRate;
+            }
+            if(thisBrightnessMelLen){
+                curPos = curPos * (1.0 - briRate) + briPos * briRate;
+            }
+            //position = curPos;
+            noiseRatio = pow(freqNoise, 1.0 - briRate) * pow(briNoise, briRate);
+
             present->specgram->getFramePointer( position, presentFrame );
-            present->getBrightness(position, thisBrightnessMel, &thisBrightnessMelLen, *(target.f0));
-            present->getFreqInterp(position, thisFreqMel, &thisFreqMelLen, *(presentFrame.f0), &thisFreqMixRate);
 
             // 現在注目しているフレームが無声音の場合それを優先する．
             if( *(presentFrame.f0) == 0.0 ){
@@ -499,9 +509,18 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 if(position < (double)fftLength / (double)fs * 1000.0 / framePeriod){
                     position = (double)fftLength / (double)fs * 1000.0 / framePeriod;
                 }
+                next->getBrightness(position, nextBrightnessMel, &nextBrightnessMelLen, *(target.f0), &briPos, &briNoise);
+                next->getFreqInterp(position, nextFreqMel, &nextFreqMelLen, *(target.f0), &nextFreqMixRate, &freqPos, &freqNoise);
+                curPos = position;
+                if(nextFreqMelLen){
+                    curPos = curPos * (1.0 - nextFreqMixRate) + freqPos * nextFreqMixRate;
+                }
+                if(nextBrightnessMelLen){
+                    curPos = curPos * (1.0 - briRate) + briPos * briRate;
+                }
+                //position = curPos;
+
                 next->specgram->getFramePointer( position, nextFrame );
-                next->getBrightness(position, nextBrightnessMel, &nextBrightnessMelLen, *(target.f0));
-                next->getFreqInterp(position, nextFreqMel, &nextFreqMelLen, *(nextFrame.f0), &nextFreqMixRate);
 
                 morphRate = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
                 morphRate = 0.5 - 0.5 * cos( ST_PI * morphRate );
@@ -510,6 +529,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     morphRate = 1.0;
                     *(target.f0) = 0.0;
                 }
+                noiseRatio = pow(noiseRatio, 1.0 - morphRate) * pow(pow(freqNoise, 1.0 - briRate) * pow(briNoise, briRate), morphRate);
             }else{          // これはエラー防止用．
                 nextFrame.f0 = presentFrame.f0;
                 nextFrame.spectrum = presentFrame.spectrum;
@@ -521,93 +541,33 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 spectrum[k] = pow(presentFrame.spectrum[k], 1.0 - morphRate) * pow(nextFrame.spectrum[k],morphRate);
             }
 
-            // とりあえず線形補間
-            for(int k = 0; k < aperiodicityLength; k++){    // WORLD 0.0.1
-                aperiodicity[k] = presentFrame.aperiodicity[k] * (1.0 - morphRate) + nextFrame.aperiodicity[k] * morphRate;
-            }
-            // WORLD のバージョンが 0.0.4 の場合はパワースペクトルから補間を修正
-            if( options.fast == false ){
-                // 現在保持しているスペクトルと非周期性指標のパワースペクトルを計算
-                for(int k = 1; k < aperiodicityLength / 2; k++){
-                    temporary[k]  = aperiodicity[k*2-1] * aperiodicity[k*2-1] + aperiodicity[k*2] * aperiodicity[k*2];
-                    temporary[k] *= spectrum[k+1];
-                    temporary[k] += 1.0e-28;   // SafeGuard
-                }
-                // 本来現れるべき周波数パワーとの比でノイズ残差スペクトルの補正
-                for(int k = 1; k < aperiodicityLength / 2; k++){
-                    double powerPresent, powerNext, powerThis;
-                    // スペクトルと残差スペクトルで作られる周波数パワー
-                    powerPresent  = (presentFrame.aperiodicity[k*2-1] * presentFrame.aperiodicity[k*2-1]
-                                  + presentFrame.aperiodicity[k*2] * presentFrame.aperiodicity[k*2])
-                                  * presentFrame.spectrum[k+1];
-                    powerNext     = (nextFrame.aperiodicity[k*2-1] * nextFrame.aperiodicity[k*2-1]
-                                  + nextFrame.aperiodicity[k*2] * nextFrame.aperiodicity[k*2])
-                                  * nextFrame.spectrum[k+1];
-                    // 本来得られるべき周波数パワー
-                    powerThis     = pow(powerPresent, 1.0 - morphRate) * pow(powerNext, morphRate);
-
-                    aperiodicity[k*2-1] *= sqrt(powerThis / temporary[k]);
-                    aperiodicity[k*2] *= sqrt(powerThis / temporary[k]);
-                }
-            }
+            // aperiodicity の計算
+            vConnect::calculateAperiodicity(aperiodicity, presentFrame.aperiodicity, nextFrame.aperiodicity, presentFrame.aperiodicityLength,
+                                            morphRate, noiseRatio, breRate, options.fast);
 
             /* ここに周波数変換 */
-            if( *(target.f0) ){                // 無声音の場合とりあえず何もしない
-
-                if( options.fast ){
-                    // WORLD 0.0.1 における非周期性パラメタはシグモイド関数のパラメタであり，
-                    // それぞれ以下のパラメタを決定する．
-                    // ap[0] = u :: 非周期性指標のダイナミックレンジ
-                    // ap[1] = b :: 非周期性指標の最大値 max = 1.0 - b で決定する．
-                    // ap[2] = fc:: 非周期性指標の値が(u + b) / 2になる f の値
-                    // ap[3] = w :: シグモイド関数の傾き
-                    // 値は再考の余地大有り．
-                    aperiodicity[0] = 0.1 + 0.4 * breRate;
-                    aperiodicity[1] = 0.9 - 0.7 * breRate;
-                    aperiodicity[2] *= pow(2.0, briRate); // うーん...
-                    aperiodicity[3] *= pow(4.0, 0.5 - breRate);
-                    //
-                    // なお非周期性指標は周波数軸上で
-                    // noiseSpectrum[i] = spectrum[i] * aperiodicityRatio[i]
-                    // の形でスペクトル中に含まれるノイズの量を決定する
-                }else {
-                    // WORLD0.0.4 における非周期性パラメタは STAR スペクトルから計算した最小位相応答システムのスペクトルを
-                    // ピッチマークに基づき切り出した信号のスペクトルで各成分ごとに除算したもののようだ．
-                    // なお，0 番目と奇数番目が実数成分である．
-                    double amp = pow(2.0, breRate);
-                    for( int k = 1; k < aperiodicityLength; k+=2 ){
-                        //aperiodicity[k] *= amp;
-                    }
-                }
+            if( *(target.f0) || options.fast == false ){                // 無声音の場合とりあえず何もしない
 
                 // 差分メルケプストラムの和を求める．
                 memset(melCepstrum, 0, sizeof(fftw_complex)*fftLength);
                 if(thisFreqMelLen > 0){
-                    melCepstrum[0][0] = (1.0 - morphRate) * thisFreqMel[0].re * thisFreqMixRate;
-                    for(int k = 1; k < thisFreqMelLen; k++){
+                    for(int k = 0; k < thisFreqMelLen; k++){
                        melCepstrum[k][0] = thisFreqMel[k].re * (1.0 - morphRate) * thisFreqMixRate;
-                       melCepstrum[k][1] = thisFreqMel[k].im * (1.0 - morphRate) * thisFreqMixRate;
                     }
                 }
                 if(nextFreqMelLen > 0){
-                    melCepstrum[0][0] += morphRate * nextFreqMel[0].re * nextFreqMixRate;
-                    for(int k = 1; k < nextFreqMelLen; k++){
+                    for(int k = 0; k < nextFreqMelLen; k++){
                         melCepstrum[k][0] += nextFreqMel[k].re * morphRate * nextFreqMixRate;
-                        melCepstrum[k][1] += nextFreqMel[k].im * morphRate * nextFreqMixRate;
                     }
                 }
                 if(thisBrightnessMelLen > 0){
-                    melCepstrum[0][0] += thisBrightnessMel[0].re * briRate;
-                    for(int k = 1; k < thisBrightnessMelLen; k++){
+                    for(int k = 0; k < thisBrightnessMelLen; k++){
                         melCepstrum[k][0] += thisBrightnessMel[k].re * (1.0 - morphRate) * briRate;
-                        melCepstrum[k][1] += thisBrightnessMel[k].im * (1.0 - morphRate) * briRate;
                     }
                 }
                 if(nextBrightnessMelLen > 0){
-                    melCepstrum[0][0] += thisFreqMel[0].re;
-                    for(int k = 1; k < nextBrightnessMelLen; k++){
+                    for(int k = 0; k < nextBrightnessMelLen; k++){
                         melCepstrum[k][0] += nextBrightnessMel[k].re * morphRate * briRate;
-                        melCepstrum[k][1] += nextBrightnessMel[k].im * morphRate * briRate;
                     }
                 }
 
@@ -667,6 +627,61 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
 #endif
     return NULL;
 #endif
+}
+
+void vConnect::calculateAperiodicity(double *dst, const double *src1, const double *src2, int aperiodicityLength,
+                                     double morphRate, double noiseRatio, double breRate, bool fast)
+{
+    double *temporary = new double[aperiodicityLength];
+    breRate = pow(6.0, breRate);
+    // とりあえず線形補間
+    for(int k = 0; k < aperiodicityLength; k++)
+    {
+        dst[k] = src1[k] * (1.0 - morphRate) + src2[k] * morphRate;
+    }
+    // WORLD のバージョンが 0.0.4 の場合はパワースペクトルから補間を修正
+    if(fast)
+    {
+        // WORLD 0.0.1 における非周期性パラメタはシグモイド関数のパラメタであり，
+        // それぞれ以下のパラメタを決定する．
+        // ap[0] = u :: 非周期性指標のダイナミックレンジ
+        // ap[1] = b :: 非周期性指標の最大値 max = 1.0 - b で決定する．
+        // ap[2] = fc:: 非周期性指標の値が(u + b) / 2になる f の値
+        // ap[3] = w :: シグモイド関数の傾き
+        // 値は再考の余地大有り．
+        dst[0] = 0.1 + 0.4 * breRate;
+        dst[1] = 0.9 - 0.7 * breRate;
+        dst[2] *= pow(2.0, breRate); // うーん...
+        dst[3] *= pow(4.0, 0.5 - breRate);
+        //
+        // なお非周期性指標は周波数軸上で
+        // noiseSpectrum[i] = spectrum[i] * aperiodicityRatio[i]
+        // の形でスペクトル中に含まれるノイズの量を決定す
+    }
+    else
+    {
+
+        // 励起信号パワースペクトルの平均を得ておく．
+        double aperiodicityAverage = 0.0;
+        for(int k = 1; k < aperiodicityLength / 2; k++){
+            double r = dst[k*2] * dst[k*2] + dst[k*2-1] * dst[k*2-1];
+            r = sqrt(r);
+            aperiodicityAverage += r;
+            temporary[k] = r;
+        }
+        aperiodicityAverage /= (aperiodicityLength / 2 - 1);
+        // noiseRatio と breRate に従って非周期性成分のパワーを増幅
+        for(int k = 189; k < aperiodicityLength /2; k++)
+        {
+//            double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate * noiseRatio + aperiodicityAverage) / temporary[k];
+            double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate + aperiodicityAverage) / temporary[k];
+            coefficient = min(12.0, fabs(coefficient));
+            dst[k*2] *= coefficient;
+            dst[k*2-1] *= coefficient;
+        }
+    }
+
+    delete[] temporary;
 }
 
 void vConnect::calculateVsqInfo( void )

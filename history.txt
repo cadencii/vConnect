@@ -1,4 +1,7 @@
-﻿27 Feb. 2011 v2.0.1   fixed; null pointer reference when linear-morphing
+﻿17 Apr. 2011 v2.0.4   fixed; calculation and extraction of mel-Cepstrum
+                           ; the position PLATINUM cut the wave segments
+                           ; BRE will change noise ratio
+27 Feb. 2011 v2.0.1   fixed; null pointer reference when linear-morphing
                            ; apply attack/decay as volume with portamento
 10 Feb. 2011 v2.0.0   added; multiLayered voice Library
 15 Jan. 2011 v1.2.1   fixed; bugs perhaps in WORLD 0.0.4 synthesis.

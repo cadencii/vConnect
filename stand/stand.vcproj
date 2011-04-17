@@ -134,7 +134,7 @@
 				AdditionalDependencies="iconv.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="1"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				TargetMachine="1"
 			/>
 			<Tool

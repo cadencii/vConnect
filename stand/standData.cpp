@@ -1,6 +1,7 @@
 #include "standData.h"
 
-bool standData::getBrightness(int frame, standComplex *dst, int *length, double freq)
+
+bool standData::getBrightness(int frame, standComplex *dst, int *length, double freq, double *position, double *noise)
 {
     // 今のところ保持している MelCepstrum からデータをコピー
     if(!this->brightnessSetting || !this->brightnessSetting->enabled) return false;
@@ -12,10 +13,13 @@ bool standData::getBrightness(int frame, standComplex *dst, int *length, double 
         dst[i].im = tmp[i].im;
     }
     *length = tmpLen;
+
+    *position = brightness.getStretchedPosition(frame * framePeriod);
+    *noise    = brightness.getNoiseRatio(frame * framePeriod);
     return true;
 }
 
-bool standData::getFreqInterp(int frame, standComplex *dst, int *length, double freq, double *rate)
+bool standData::getFreqInterp(int frame, standComplex *dst, int *length, double freq, double *rate, double *position, double *noise)
 {
     int tmpLen, i;
     standComplex *tmp;
@@ -42,10 +46,14 @@ bool standData::getFreqInterp(int frame, standComplex *dst, int *length, double 
         if(!lowSetting || !lowSetting->enabled) return false;
         tmp = this->low.getMelCepstrum((double)frame * framePeriod, &tmpLen);
         *rate = fabs(base - freq) / fabs(base - low);
+        *position = this->low.getStretchedPosition(frame * framePeriod);
+        *noise    = this->low.getNoiseRatio(frame * framePeriod);
     }else{
         if(!hiSetting || !hiSetting->enabled) return false;
         tmp = this->hi.getMelCepstrum((double)frame * framePeriod, &tmpLen);
         *rate = fabs(freq - base) / fabs(hi - base);
+        *position = this->hi.getStretchedPosition(frame * framePeriod);
+        *noise    = this->hi.getNoiseRatio(frame * framePeriod);
     }
     if(*rate < 0.0) *rate = 0.0;
     if(*rate > 1.0) *rate = 1.0;
@@ -54,6 +62,7 @@ bool standData::getFreqInterp(int frame, standComplex *dst, int *length, double 
         dst[i].im = tmp[i].im;
     }
     *length = tmpLen;
+
 
     return true;
 }
