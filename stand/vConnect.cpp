@@ -671,6 +671,14 @@ void vConnect::calculateAperiodicity(double *dst, const double *src1, const doub
         }
         aperiodicityAverage /= (aperiodicityLength / 2 - 1);
         // noiseRatio と breRate に従って非周期性成分のパワーを増幅
+        for(int k = 1; k < 189; k++)
+        {
+            double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate + aperiodicityAverage) / temporary[k];
+            coefficient = min(12.0, fabs(coefficient));
+            coefficient = pow(coefficient, 0.5 - 0.5 * cos(ST_PI * k / 189));
+            dst[k*2] *= coefficient;
+            dst[k*2-1] *= coefficient;
+        }
         for(int k = 189; k < aperiodicityLength /2; k++)
         {
 //            double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate * noiseRatio + aperiodicityAverage) / temporary[k];

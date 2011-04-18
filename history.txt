@@ -1,4 +1,5 @@
-﻿17 Apr. 2011 v2.0.4   fixed; calculation and extraction of mel-Cepstrum
+﻿18 Apr. 2011 v2.0.5   fixed; BRE's frequency filter
+17 Apr. 2011 v2.0.4   fixed; calculation and extraction of mel-Cepstrum
                            ; the position PLATINUM cut the wave segments
                            ; BRE will change noise ratio
 27 Feb. 2011 v2.0.1   fixed; null pointer reference when linear-morphing
