@@ -33,7 +33,8 @@ public:
     bool synthesize( string_t input, string_t output, runtimeOptions options );
     bool createWspFile( string_t v_path, string_t output, string_t alias, runtimeOptions options );
     static void        calculateAperiodicity(double *dst, const double *src1, const double *src2, int aperiodicityLength,
-                                             double morphRate, double noiseRatio, double breRate, bool fast);
+                                             double morphRatio, double noiseRatio, double breRate, bool fast);
+    static void        getOneFrame(standFrame &dst, standData &src, int position, int consonantEndFrame, double velocity, utauParameters &params, double f0, double briRate, bool fast);
 private:
     vsqFileEx     vsq;
     corpusManager manager;

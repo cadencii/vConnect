@@ -15,13 +15,26 @@
 #ifndef __standFrame_h__
 #define __standFrame_h__
 
-struct standFrame {
+class standFrame {
+public:
+    standFrame();
+    ~standFrame();
+
+    void createCepstrum(int cepstrumNumber);
+
     double *f0;
     double *t;
     double *aperiodicity;
     double *spectrum;
+    standComplex **melCepstra;
+    int *cepstrumLengths;
+    double *mixRatio;
+    double *noiseRatio;
+    int cepstrumNumber;
+
     int fftl;
     int aperiodicityLength;
+
     bool isFast;
 };
 

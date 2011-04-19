@@ -84,9 +84,9 @@ bool standMelCepstrum::writeMelCepstrum(string_t output)
         fwrite(&this->framePeriod, sizeof(float), 1, fp);
         fwrite(&this->timeLength, sizeof(int), 1, fp);
         fwrite(&this->cepstrumLength, sizeof(int), 1, fp);
-        fwrite(&this->t, sizeof(float), this->timeLength, fp);
-        fwrite(&this->f0, sizeof(float), this->timeLength, fp);
-        fwrite(&this->noiseRatio, sizeof(float), this->timeLength, fp);
+        fwrite(this->t, sizeof(float), this->timeLength, fp);
+        fwrite(this->f0, sizeof(float), this->timeLength, fp);
+        fwrite(this->noiseRatio, sizeof(float), this->timeLength, fp);
         for(int j = 0; j < this->timeLength; j++){
             for(int i = 0; i < this->cepstrumLength; i++){
                 fwrite(&this->melCepstrum[j][i].re, sizeof(float), 1, fp);
@@ -120,6 +120,7 @@ bool standMelCepstrum::readMelCepstrum(string_t input)
         c += fread(this->noiseRatio, sizeof(float), this->timeLength, fp);
 
         for(int j = 0; j < this->timeLength; j++){
+            cout << this->f0[j] << endl;
             for(int i = 0; i < this->cepstrumLength; i++){
                 c += fread(&this->melCepstrum[j][i].re, sizeof(float), 1, fp);
             }

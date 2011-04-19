@@ -1,28 +1,65 @@
 #include "standData.h"
 
+int standData::getPosition(int frame, double freq, double briRate)
+{
+    double position = frame;
+    double msFrame = frame * framePeriod;
+    double hi = 1000.0, low = -1000.0, base;
 
-bool standData::getBrightness(int frame, standComplex *dst, int *length, double freq, double *position, double *noise)
+    if(this->brightnessSetting && this->brightnessSetting->enabled)
+    {
+        position = position * (1.0 - briRate) + this->brightness.getStretchedPosition(msFrame) * briRate;
+    }
+
+    if(!baseSetting || baseSetting->enabled){
+        return (int)position;
+    }
+    base = baseSetting->frequency;
+
+    if(lowSetting && lowSetting->enabled){
+        low = lowSetting->frequency;
+    }
+    if(hiSetting && hiSetting->enabled){
+        hi = hiSetting->frequency;
+    }
+
+    base = log(base);
+    low = log(low);
+    hi = log(hi);
+    freq = log(freq);
+
+    if(base > freq){
+        if(lowSetting && lowSetting->enabled){
+            double ratio = fabs(base - freq) / fabs(base - low);
+            position = position * (1.0 - ratio) + this->low.getStretchedPosition(msFrame) * ratio;
+        }
+    }else{
+        if(lowSetting && lowSetting->enabled){
+            double ratio = fabs(freq - base) / fabs(hi - base);
+            position = position * (1.0 - ratio) + this->hi.getStretchedPosition(msFrame) * ratio;
+        }
+    }
+
+    return (int)position;
+}
+
+bool standData::getBrightness(int frame, standComplex **dst, int *length, double freq, double *noise)
 {
     // 今のところ保持している MelCepstrum からデータをコピー
     if(!this->brightnessSetting || !this->brightnessSetting->enabled) return false;
 
-    int tmpLen, i;
-    standComplex *tmp = this->brightness.getMelCepstrum((double)frame * framePeriod, &tmpLen);
-    for(i = 0; i < tmpLen; i++){
-        dst[i].re = tmp[i].re;
-        dst[i].im = tmp[i].im;
-    }
+    int tmpLen;
+    *dst = this->brightness.getMelCepstrum((double)frame * framePeriod, &tmpLen);
+
     *length = tmpLen;
 
-    *position = brightness.getStretchedPosition(frame * framePeriod);
     *noise    = brightness.getNoiseRatio(frame * framePeriod);
     return true;
 }
 
-bool standData::getFreqInterp(int frame, standComplex *dst, int *length, double freq, double *rate, double *position, double *noise)
+bool standData::getFreqInterp(int frame, standComplex **dst, int *length, double freq, double *rate, double *noise)
 {
-    int tmpLen, i;
-    standComplex *tmp;
+    int tmpLen;
     double hi = 1000.0, low = -1000.0, base;
 
     if(baseSetting && baseSetting->enabled){
@@ -44,23 +81,18 @@ bool standData::getFreqInterp(int frame, standComplex *dst, int *length, double 
 
     if(base > freq){
         if(!lowSetting || !lowSetting->enabled) return false;
-        tmp = this->low.getMelCepstrum((double)frame * framePeriod, &tmpLen);
+        *dst = this->low.getMelCepstrum((double)frame * framePeriod, &tmpLen);
         *rate = fabs(base - freq) / fabs(base - low);
-        *position = this->low.getStretchedPosition(frame * framePeriod);
         *noise    = this->low.getNoiseRatio(frame * framePeriod);
     }else{
         if(!hiSetting || !hiSetting->enabled) return false;
-        tmp = this->hi.getMelCepstrum((double)frame * framePeriod, &tmpLen);
+        *dst = this->hi.getMelCepstrum((double)frame * framePeriod, &tmpLen);
         *rate = fabs(freq - base) / fabs(hi - base);
-        *position = this->hi.getStretchedPosition(frame * framePeriod);
         *noise    = this->hi.getNoiseRatio(frame * framePeriod);
     }
     if(*rate < 0.0) *rate = 0.0;
     if(*rate > 1.0) *rate = 1.0;
-    for(i = 0; i < tmpLen; i++){
-        dst[i].re = tmp[i].re;
-        dst[i].im = tmp[i].im;
-    }
+
     *length = tmpLen;
 
 

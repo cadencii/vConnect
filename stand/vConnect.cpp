@@ -305,7 +305,7 @@ int calculatePhoneticTime(float msFixedLength, int tLen, int position, bool fast
 __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
 {
     vConnectArg* p = (vConnectArg*)arg;
-    long beginFrame, frameLength, index, position;
+    long beginFrame, frameLength, index;
     int  fftLength, aperiodicityLength;
     vector<double> *dynamics;
     vector<vector<standBP> > *controlCurves;
@@ -343,6 +343,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
 
     standData *present, *next = NULL;
     standFrame target, presentFrame, nextFrame;
+    presentFrame.createCepstrum(2);
+    nextFrame.createCepstrum(2);
 
     int briIndex, breIndex, cleIndex, genIndex, opeIndex;
     double presentVelocity, nextVelocity, consonantEndFrame, nextConsonantEndFrame, tmp;
@@ -354,13 +356,6 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     double *melSpectrum = new double[fftLength];
     fftw_complex *melCepstrum = new fftw_complex[fftLength];
 
-    standComplex *thisBrightnessMel = new standComplex[fftLength];
-    standComplex *nextBrightnessMel = new standComplex[fftLength];
-    standComplex *thisFreqMel = new standComplex[fftLength];
-    standComplex *nextFreqMel = new standComplex[fftLength];
-    int thisBrightnessMelLen, nextBrightnessMelLen;
-    int thisFreqMelLen, nextFreqMelLen;
-    double thisFreqMixRate, nextFreqMixRate;
 #ifdef STND_MULTI_THREAD
     if(hFFTWMutex)
         stnd_mutex_lock(hFFTWMutex);
@@ -442,13 +437,11 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
         }
 
         for( ; index < itemThis->endFrame - beginFrame && index < frameLength; index++ ){
-            double morphRate = 0.0;
+            double morphRatio = 0.0;
             double noiseRatio = 1.0;
             specgram->getFramePointer( index, target );
             spectrum = target.spectrum;
             aperiodicity = target.aperiodicity;
-            thisFreqMelLen = nextFreqMelLen = 0;
-            thisBrightnessMelLen = nextBrightnessMelLen = 0;
 
             // コントロールトラックのインデックスを進める
             while( index + beginFrame > (*controlCurves)[BRETHINESS][breIndex].frameTime ){ breIndex++; }
@@ -461,33 +454,8 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
             briRate = (double)((*controlCurves)[BRIGHTNESS][briIndex].value - 64 ) / 64.0;
             cleRate = (double)(*controlCurves)[CLEARNESS][cleIndex].value / 128.0;
 
-            position = index - itemThis->beginFrame + beginFrame;
-
-            if( position < consonantEndFrame ){
-                position = (long)((double)position / presentVelocity);
-            }else{
-                position = calculatePhoneticTime(itemThis->utauSetting.msFixedLength, present->specgram->getTimeLength(), position - consonantEndFrame, options.fast);
-            }
-            // fatal::STAR スペクトルの末端 fftLength 分のデータは信用出来ない
-            if(position < (double)fftLength / (double)fs * 1000.0 / framePeriod){
-                position = (double)fftLength / (double)fs * 1000.0 / framePeriod;
-            }
-
-            double briPos, freqPos, curPos = position;
-            double briNoise = 1.0, freqNoise = 1.0;
-
-            present->getBrightness(position, thisBrightnessMel, &thisBrightnessMelLen, *(target.f0), &briPos, &briNoise);
-            present->getFreqInterp(position, thisFreqMel, &thisFreqMelLen, *(target.f0), &thisFreqMixRate, &freqPos, &freqNoise);
-            if(thisFreqMelLen){
-                curPos = curPos * (1.0 - thisFreqMixRate) + freqPos * thisFreqMixRate;
-            }
-            if(thisBrightnessMelLen){
-                curPos = curPos * (1.0 - briRate) + briPos * briRate;
-            }
-            //position = curPos;
-            noiseRatio = pow(freqNoise, 1.0 - briRate) * pow(briNoise, briRate);
-
-            present->specgram->getFramePointer( position, presentFrame );
+            // 1Frame の合成に必要なデータを取ってくる．
+            vConnect::getOneFrame(presentFrame, *present, index - itemThis->beginFrame + beginFrame, consonantEndFrame, presentVelocity, itemThis->utauSetting, *(target.f0), briRate, options.fast);
 
             // 現在注目しているフレームが無声音の場合それを優先する．
             if( *(presentFrame.f0) == 0.0 ){
@@ -496,88 +464,75 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 nextFrame.spectrum = presentFrame.spectrum;
                 nextFrame.aperiodicity = presentFrame.aperiodicity;
 
-                // 音符末尾の場合 morphRateを計算．
+                // 音符末尾の場合 morphRatioを計算．
             }else if( morphBeginFrame <= index ){
-                position = index - itemNext->beginFrame + beginFrame;
 
-                if( position < nextConsonantEndFrame ){
-                    position = (long)((double)position / nextVelocity);
-                }else{
-                    position = calculatePhoneticTime(itemNext->utauSetting.msFixedLength, next->specgram->getTimeLength(), position - nextConsonantEndFrame, options.fast);
-                }
-                // fatal::STAR スペクトルの末端 fftLength 分のデータは信用出来ない
-                if(position < (double)fftLength / (double)fs * 1000.0 / framePeriod){
-                    position = (double)fftLength / (double)fs * 1000.0 / framePeriod;
-                }
-                next->getBrightness(position, nextBrightnessMel, &nextBrightnessMelLen, *(target.f0), &briPos, &briNoise);
-                next->getFreqInterp(position, nextFreqMel, &nextFreqMelLen, *(target.f0), &nextFreqMixRate, &freqPos, &freqNoise);
-                curPos = position;
-                if(nextFreqMelLen){
-                    curPos = curPos * (1.0 - nextFreqMixRate) + freqPos * nextFreqMixRate;
-                }
-                if(nextBrightnessMelLen){
-                    curPos = curPos * (1.0 - briRate) + briPos * briRate;
-                }
-                //position = curPos;
+                // 1Frame の合成に必要なデータを取ってくる．
+                vConnect::getOneFrame(nextFrame, *next, index - itemNext->beginFrame + beginFrame, nextConsonantEndFrame, nextVelocity, itemNext->utauSetting, *(target.f0), briRate, options.fast);
 
-                next->specgram->getFramePointer( position, nextFrame );
-
-                morphRate = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
-                morphRate = 0.5 - 0.5 * cos( ST_PI * morphRate );
+                morphRatio = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
+                morphRatio = 0.5 - 0.5 * cos( ST_PI * morphRatio );
 
                 if( *(nextFrame.f0) == 0.0 && options.fast ){
-                    morphRate = 1.0;
+                    morphRatio = 1.0;
                     *(target.f0) = 0.0;
                 }
-                noiseRatio = pow(noiseRatio, 1.0 - morphRate) * pow(pow(freqNoise, 1.0 - briRate) * pow(briNoise, briRate), morphRate);
+
             }else{          // これはエラー防止用．
                 nextFrame.f0 = presentFrame.f0;
                 nextFrame.spectrum = presentFrame.spectrum;
                 nextFrame.aperiodicity = presentFrame.aperiodicity;
             }
 
-            // morphRate にしたがって spectrum 計算．
+            // morphRatio にしたがって spectrum 計算．
             for(int k = 0; k <= fftLength / 2; k++){
-                spectrum[k] = pow(presentFrame.spectrum[k], 1.0 - morphRate) * pow(nextFrame.spectrum[k],morphRate);
+                spectrum[k] = pow(presentFrame.spectrum[k], 1.0 - morphRatio) * pow(nextFrame.spectrum[k],morphRatio);
             }
 
             // aperiodicity の計算
             vConnect::calculateAperiodicity(aperiodicity, presentFrame.aperiodicity, nextFrame.aperiodicity, presentFrame.aperiodicityLength,
-                                            morphRate, noiseRatio, breRate, options.fast);
+                                            morphRatio, noiseRatio, breRate, options.fast);
 
-            /* ここに周波数変換 */
-            if( *(target.f0) || options.fast == false ){                // 無声音の場合とりあえず何もしない
+            /* 声質変換 */
+            if( *(target.f0) || options.fast == false ){
 
                 // 差分メルケプストラムの和を求める．
                 memset(melCepstrum, 0, sizeof(fftw_complex)*fftLength);
-                if(thisFreqMelLen > 0){
-                    for(int k = 0; k < thisFreqMelLen; k++){
-                       melCepstrum[k][0] = thisFreqMel[k].re * (1.0 - morphRate) * thisFreqMixRate;
+                bool existsCepstrum = false;
+
+                if(presentFrame.cepstrumLengths[1] > 0){
+                    existsCepstrum = true;
+                    for(int k = 0; k < presentFrame.cepstrumLengths[1]; k++){
+                        melCepstrum[k][0] = presentFrame.melCepstra[1][k].re * (1.0 - morphRatio) * presentFrame.mixRatio[1];
                     }
                 }
-                if(nextFreqMelLen > 0){
-                    for(int k = 0; k < nextFreqMelLen; k++){
-                        melCepstrum[k][0] += nextFreqMel[k].re * morphRate * nextFreqMixRate;
+                if(morphRatio > 0.0 && nextFrame.cepstrumLengths[1] > 0){
+                    existsCepstrum = true;
+                    for(int k = 0; k < nextFrame.cepstrumLengths[1]; k++){
+                        melCepstrum[k][0] = nextFrame.melCepstra[1][k].re * morphRatio * nextFrame.mixRatio[1];
                     }
                 }
-                if(thisBrightnessMelLen > 0){
-                    for(int k = 0; k < thisBrightnessMelLen; k++){
-                        melCepstrum[k][0] += thisBrightnessMel[k].re * (1.0 - morphRate) * briRate;
+                if(presentFrame.cepstrumLengths[0] > 0){
+                    existsCepstrum = true;
+                    for(int k = 0; k < presentFrame.cepstrumLengths[0]; k++){
+                        melCepstrum[k][0] += presentFrame.melCepstra[0][k].re * (1.0 - morphRatio) * briRate;
                     }
                 }
-                if(nextBrightnessMelLen > 0){
-                    for(int k = 0; k < nextBrightnessMelLen; k++){
-                        melCepstrum[k][0] += nextBrightnessMel[k].re * morphRate * briRate;
+                if(morphRatio > 0.0 && nextFrame.cepstrumLengths[0] > 0){
+                    existsCepstrum = true;
+                    for(int k = 0; k < nextFrame.cepstrumLengths[0]; k++){
+                        melCepstrum[k][0] += nextFrame.melCepstra[0][k].re * morphRatio * briRate;
                     }
                 }
 
+                // 差分メルケプストラムの適用
                 fftw_execute(forwardFFT);
                 standMelCepstrum::stretchFromMelScale(temporary, melSpectrum, fftLength / 2 + 1, fs / 2);
                 for(int k = 0; k <= fftLength / 2; k++){
                     spectrum[k] *= exp(temporary[k]);
                 }
 
-                if(thisBrightnessMelLen + nextBrightnessMelLen == 0){
+                if(!existsCepstrum){
                     // 普通の Brightness 処理
                     for(int k = 0; k <= fftLength / 2; k++){
                         double freq = (double)k / (double)fftLength * (double)fs;
@@ -604,10 +559,6 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 }
 
                 memcpy( spectrum, temporary, sizeof(double)*( fftLength / 2 + 1 ) );
-                // 不必要な部分はゼロ詰め．
-                for(int k = fftLength / 2 + 1; k < fftLength; k++){
-                    spectrum[k] = 0.0;
-                }
             }
         }
     }
@@ -616,10 +567,6 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
     SAFE_DELETE_ARRAY( melCepstrum );
     SAFE_DELETE_ARRAY( temporary );
     SAFE_DELETE_ARRAY( trans );
-    SAFE_DELETE_ARRAY( thisBrightnessMel );
-    SAFE_DELETE_ARRAY( nextBrightnessMel );
-    SAFE_DELETE_ARRAY( thisFreqMel );
-    SAFE_DELETE_ARRAY( nextFreqMel );
 
 #ifdef STND_MULTI_THREAD
 #ifndef USE_PTHREADS
@@ -629,15 +576,38 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
 #endif
 }
 
+void vConnect::getOneFrame(standFrame &dst, standData &src, int position, int consonantEndFrame, double velocity, utauParameters &params, double f0, double briRate, bool fast)
+{
+    if( position < consonantEndFrame ){
+        position = (long)((double)position / velocity);
+    }else{
+        position = calculatePhoneticTime(params.msFixedLength, src.specgram->getTimeLength(), position - consonantEndFrame, fast);
+    }
+
+    // fatal::STAR スペクトルの末端 fftLength 分のデータは信用出来ない
+    if(position < (double)dst.fftl / (double)fs * 1000.0 / framePeriod){
+        position = (double)dst.fftl / (double)fs * 1000.0 / framePeriod;
+    }
+
+    position = src.getPosition(position, f0, briRate);
+
+    cout << position << endl;
+
+    src.getBrightness(position, &dst.melCepstra[0], &dst.cepstrumLengths[0], f0, &dst.noiseRatio[0]);
+    src.getFreqInterp(position, &dst.melCepstra[1], &dst.cepstrumLengths[1], f0, &dst.mixRatio[1], &dst.noiseRatio[1]);
+
+    src.specgram->getFramePointer( position, dst );
+}
+
 void vConnect::calculateAperiodicity(double *dst, const double *src1, const double *src2, int aperiodicityLength,
-                                     double morphRate, double noiseRatio, double breRate, bool fast)
+                                     double morphRatio, double noiseRatio, double breRate, bool fast)
 {
     double *temporary = new double[aperiodicityLength];
     breRate = pow(6.0, breRate);
     // とりあえず線形補間
     for(int k = 0; k < aperiodicityLength; k++)
     {
-        dst[k] = src1[k] * (1.0 - morphRate) + src2[k] * morphRate;
+        dst[k] = src1[k] * (1.0 - morphRatio) + src2[k] * morphRatio;
     }
     // WORLD のバージョンが 0.0.4 の場合はパワースペクトルから補間を修正
     if(fast)

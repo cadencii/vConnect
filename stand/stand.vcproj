@@ -134,7 +134,7 @@
 				AdditionalDependencies="iconv.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="1"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -311,6 +311,10 @@
 			</File>
 			<File
 				RelativePath=".\stand.h"
+				>
+			</File>
+			<File
+				RelativePath=".\standFrame.cpp"
 				>
 			</File>
 			<File

@@ -37,9 +37,11 @@ public:
     }
 #endif
 
-    bool getBrightness(int frame, standComplex *dst, int *length, double freq, double *position, double *noise);
-    bool getFreqInterp(int frame, standComplex *dst, int *length, double freq, double *rate, double *position, double *noise);
+    bool getBrightness(int frame, standComplex **dst, int *length, double freq, double *noise);
+    bool getFreqInterp(int frame, standComplex **dst, int *length, double freq, double *rate, double *noise);
     bool readMelCepstrum(vConnectSetting &setting, string_t alias);
+
+    int  getPosition(int frame, double freq, double briRate);
 
     standSpecgram *specgram;
     bool        isProcessing;
