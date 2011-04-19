@@ -591,8 +591,6 @@ void vConnect::getOneFrame(standFrame &dst, standData &src, int position, int co
 
     position = src.getPosition(position, f0, briRate);
 
-    cout << position << endl;
-
     src.getBrightness(position, &dst.melCepstra[0], &dst.cepstrumLengths[0], f0, &dst.noiseRatio[0]);
     src.getFreqInterp(position, &dst.melCepstra[1], &dst.cepstrumLengths[1], f0, &dst.mixRatio[1], &dst.noiseRatio[1]);
 

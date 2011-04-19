@@ -17,7 +17,7 @@
  */
 #include "vConnect.h"
 #include <locale>
-#define __TEST__
+//#define __TEST__
 
 int main( int argc, char *argv[] ){
 #ifdef _DEBUG
