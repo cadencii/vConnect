@@ -120,7 +120,6 @@ bool standMelCepstrum::readMelCepstrum(string_t input)
         c += fread(this->noiseRatio, sizeof(float), this->timeLength, fp);
 
         for(int j = 0; j < this->timeLength; j++){
-            cout << this->f0[j] << endl;
             for(int i = 0; i < this->cepstrumLength; i++){
                 c += fread(&this->melCepstrum[j][i].re, sizeof(float), 1, fp);
             }
@@ -257,7 +256,7 @@ double standMelCepstrum::getF0(double msTime)
 double standMelCepstrum::getStretchedPosition(double msTime)
 {
     int index = msTime / framePeriod;
-    if(index < 0) index = 0;
+    if(index < 1) index = 1;
     if(index >= this->timeLength) index = this->timeLength - 1;
     return this->t[index];
 }

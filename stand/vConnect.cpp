@@ -601,7 +601,7 @@ void vConnect::calculateAperiodicity(double *dst, const double *src1, const doub
                                      double morphRatio, double noiseRatio, double breRate, bool fast)
 {
     double *temporary = new double[aperiodicityLength];
-    breRate = pow(6.0, breRate);
+    breRate = pow(3.0, breRate);
     // とりあえず線形補間
     for(int k = 0; k < aperiodicityLength; k++)
     {
@@ -799,7 +799,7 @@ void    vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
         vsqEventEx *itemi = vsq.events.eventList[i];
 
         // デフォルト値で埋める
-        for( ; index < itemi->beginFrame - beginFrame; index++ ){
+        for( ; index < itemi->beginFrame - beginFrame && index < frameLength; index++ ){
             f0[index] = -1.0;//0.0;
             t[index] = (double)index * framePeriod / 1000.0;
             dynamics[index] = 0.0;
@@ -827,7 +827,7 @@ void    vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
 		}
 
         // ノート・ビブラート・微細振動を書く
-        for( ; index < itemi->endFrame - beginFrame; index++ ){
+        for( ; index < itemi->endFrame - beginFrame && index < frameLength; index++ ){
             // ピッチetcカーブに格納されている値の内どれを使うか？
             while( index + beginFrame > controlCurves[PITCH_BEND][pitIndex].frameTime ){
                 pitIndex++;
@@ -891,13 +891,15 @@ void    vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
         portamentoLength = itemi->endFrame - portamentoBegin;
         double inv_portamentoLength = 1.0 / (double)portamentoLength;
         long frameOffset = portamentoBegin - beginFrame;
-        for( long j = 0; j < portamentoLength; j++ ){
+        for( long j = 0; j < portamentoLength && j + frameOffset < dynamics.size(); j++ ){
+            if(j + frameOffset >= frameLength) break;
             double x = (double)j * inv_portamentoLength;
             double portamentoChangeRate = (sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5);
             f0[j + frameOffset] *= pow( tmp, 0.5 * (1.0 - cos( ST_PI * x )) - (double)itemi->portamentoDepth / 100.0 * portamentoChangeRate);
             dynamics[j + frameOffset] *= pow(tmp / fabs(tmp) * 3.0, - (double)itemi->decay / 100.0 * portamentoChangeRate);
         }
         for( long j = portamentoLength; j < portamentoLength * 3 / 2; j++ ){
+            if(j + frameOffset >= frameLength) break;
             double x = (double)j * inv_portamentoLength;
             double portamentoChangeRate = (sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5);
             f0[j + frameOffset] *= pow( tmp, - (double)itemi->portamentoDepth / 100.0 * portamentoChangeRate );

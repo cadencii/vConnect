@@ -184,36 +184,23 @@ bool    waveFileEx::readWaveData( FILE* fp )
     temp = buffer;
 
     if( temp.compare( "data" ) == 0 ){
+        char *data;
         fread( (void*)&dataSize, sizeof(int), 1, fp );
         maxNum = dataSize / format.numChannels / ( format.bitsPerSample / 8 );
+        data = new char[dataSize];
+        fread(data, sizeof(char), dataSize, fp);
 
         waveBuffer.resize( maxNum );
 
-        unsigned long bytesPerSample = format.bitsPerSample / 8;
-        char cValue;
-        short sValue;
-        int iValue;
-        long Value;
-
-        for( unsigned long index = 0; index < maxNum; index++ ){
-            for( unsigned long channel = 0; channel < format.numChannels; channel++ ){
-                if( format.bitsPerSample == 8 ){
-                    cValue = fgetc( fp );
-                    Value = cValue;
-                }else if( format.bitsPerSample == 16 ){
-                    fread( (void*)&sValue, 2, 1, fp );
-                    Value = sValue;
-                }else if( format.bitsPerSample == 32 ){
-                    fread( (void*)&iValue, 4, 1, fp );
-                    Value = iValue;
-                }else{
-                    fread( (void*)&iValue,bytesPerSample, 1, fp );
-                    Value = iValue;
-                }
-                if( channel == 0 )
-                    waveBuffer[index] = (double)Value / (double)( 1 << format.bitsPerSample );
-            }
+        for(unsigned int index = 0; index < maxNum; index += format.numChannels)
+        {
+            // short 固定．いずれ拡張したいけど．．．
+            int value = ((short*)data)[index];
+            waveBuffer[index] = (double)value / (double)(1 << format.bitsPerSample);
         }
+
+        delete[] data;
+
         result = true;
     }else{
         outputError( "This wave file does not contain any data!" );
@@ -243,6 +230,12 @@ int    waveFileEx::writeWaveFile( string fileName ){
             unsigned int fileSize = waveSize + 44;
             unsigned int chunkSize = 16;
 
+            short *data = new short[waveBuffer.size()];
+            for(unsigned long i = 0; i < waveBuffer.size(); i++)
+            {
+                data[i] = (short)( 32767.0 * waveBuffer[i] ); 
+            }
+
             fprintf( fp, "RIFF" );
             fwrite( (void*)&fileSize, 4, 1, fp );
             fprintf( fp, "WAVEfmt " );
@@ -256,14 +249,10 @@ int    waveFileEx::writeWaveFile( string fileName ){
             fprintf( fp, "data" );
 
             fwrite( (void*)&waveSize, 4, 1, fp );        
+            fwrite( (void*)data, 2, waveBuffer.size(), fp);
 
-            /* write Data */
-            short value;
+            delete[] data;
 
-            for( unsigned long i = 0; i < waveBuffer.size(); i++ ){
-                value = (short)( 32767.0 * waveBuffer[i] ); 
-                fwrite( (void*)&value, 2, 1, fp );
-            }
             result = 1;
         }
         fclose( fp );

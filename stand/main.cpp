@@ -19,6 +19,8 @@
 #include <locale>
 //#define __TEST__
 
+#define VCONNECT_VERSION "v.Connect-STAND ver2.0.0"
+
 int main( int argc, char *argv[] ){
 #ifdef _DEBUG
     //setlocale( LC_CTYPE, "japanese" );
@@ -114,7 +116,7 @@ int main( int argc, char *argv[] ){
         // ファイルの指定のどちらかが欠けている場合
         // あるいはwsp 生成オプションが立っているがエイリアス指定の無い場合
         // 説明文を表示してbailout
-        cout << "vConnect-STAND ver0.1.0a" << endl;
+        cout << VCONNECT_VERSION << endl;
         cout << "usage:" << endl;
         cout << "    vConnect -i [vsq_meta_text_path] -o [out_wave_path] {options}" << endl;
         cout << "    vConnect [vsq_meta_text_path] [out_wave_path]" << endl;
