@@ -77,7 +77,7 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
 // WORLD Synthesis
 void synthesis(double *f0, int tLen, double **specgram, double **aperiodicity, int fftl, double framePeriod, int fs, 
                double *synthesisOut, int xLen);
-void getMinimumPhaseSpectrum(double *inputSpec, fftw_complex *spectrum, fftw_complex *cepstrum, int fftl);
+void getMinimumPhaseSpectrum(double *inputSpec, fftw_complex *spectrum, fftw_complex *cepstrum, int fftl, fftw_plan forward, fftw_plan inverse);
 
 // WORLD Synthesis 0.0.4
 void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpecgram, int fftl, double framePeriod, int fs, 

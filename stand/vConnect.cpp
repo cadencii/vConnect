@@ -525,14 +525,15 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                     }
                 }
 
-                // 差分メルケプストラムの適用
-                fftw_execute(forwardFFT);
-                standMelCepstrum::stretchFromMelScale(temporary, melSpectrum, fftLength / 2 + 1, fs / 2);
-                for(int k = 0; k <= fftLength / 2; k++){
-                    spectrum[k] *= exp(temporary[k]);
-                }
 
-                if(!existsCepstrum){
+                if(existsCepstrum){
+                    // 差分メルケプストラムの適用
+                    fftw_execute(forwardFFT);
+                    standMelCepstrum::stretchFromMelScale(temporary, melSpectrum, fftLength / 2 + 1, fs / 2);
+                    for(int k = 0; k <= fftLength / 2; k++){
+                        spectrum[k] *= exp(temporary[k]);
+                    }
+                }else if(*target.f0){
                     // 普通の Brightness 処理
                     for(int k = 0; k <= fftLength / 2; k++){
                         double freq = (double)k / (double)fftLength * (double)fs;
@@ -628,7 +629,6 @@ void vConnect::calculateAperiodicity(double *dst, const double *src1, const doub
     }
     else
     {
-
         // 励起信号パワースペクトルの平均を得ておく．
         double aperiodicityAverage = 0.0;
         for(int k = 1; k < aperiodicityLength / 2; k++){
@@ -649,7 +649,7 @@ void vConnect::calculateAperiodicity(double *dst, const double *src1, const doub
         }
         for(int k = 189; k < aperiodicityLength /2; k++)
         {
-//            double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate * noiseRatio + aperiodicityAverage) / temporary[k];
+            //double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate * noiseRatio + aperiodicityAverage) / temporary[k];
             double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate + aperiodicityAverage) / temporary[k];
             coefficient = min(12.0, fabs(coefficient));
             dst[k*2] *= coefficient;

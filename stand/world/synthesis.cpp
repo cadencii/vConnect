@@ -60,26 +60,10 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
     return ans;
 }*/
 
-void getMinimumPhaseSpectrum(double *inputSpec, fftw_complex *spectrum, fftw_complex *cepstrum, int fftl)
+void getMinimumPhaseSpectrum(double *inputSpec, fftw_complex *spectrum, fftw_complex *cepstrum, int fftl, fftw_plan forwardFFT, fftw_plan inverseFFT)
 {
     int i;
     double real, imag;
-    fftw_plan forwardFFT, inverseFFT;
-#ifdef STND_MULTI_THREAD
-    if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
-    }
-
-    forwardFFT = fftw_plan_dft_1d(fftl, spectrum, cepstrum, FFTW_FORWARD, FFTW_ESTIMATE);
-    inverseFFT = fftw_plan_dft_1d(fftl, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
-
-    if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
-    }
-#else
-    forwardFFT = fftw_plan_dft_1d(fftl, spectrum, cepstrum, FFTW_FORWARD, FFTW_ESTIMATE);
-    inverseFFT = fftw_plan_dft_1d(fftl, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
-#endif
 
     // 値を取り出す
     for(i = 0;i <= fftl/2;i++)    
@@ -112,19 +96,6 @@ void getMinimumPhaseSpectrum(double *inputSpec, fftw_complex *spectrum, fftw_com
         spectrum[i][0] = real;
         spectrum[i][1] = imag;
     }
-#ifdef STND_MULTI_THREAD
-    if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
-    }
-#endif
-    fftw_destroy_plan(forwardFFT);
-    fftw_destroy_plan(inverseFFT);
-#ifdef STND_MULTI_THREAD
-    if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
-    }
-#endif
-
 }
 
 // 特定時刻の応答を取得する．
@@ -137,6 +108,8 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
     fftw_plan    inverseFFT_RP;                // FFTセット
     fftw_plan    inverseFFT_RA;                // FFTセット
     fftw_plan    forwardFFT_R;                // FFTセット
+
+    fftw_plan    minForward, minInverse;
 
     int currentFrame, currentPosition;
     double *periodicSpec, *aperiodicSpec, *aperiodicRatio;
@@ -155,18 +128,18 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
     if( hFFTWMutex ){
         stnd_mutex_lock( hFFTWMutex );
     }
+#endif
 
     forwardFFT_R = fftw_plan_dft_r2c_1d(fftl, aperiodicResponse, noiseSpec, FFTW_ESTIMATE);
     inverseFFT_RP = fftw_plan_dft_c2r_1d(fftl, spectrum, periodicResponse ,  FFTW_ESTIMATE);
     inverseFFT_RA = fftw_plan_dft_c2r_1d(fftl, spectrum, aperiodicResponse,  FFTW_ESTIMATE);
+    minForward = fftw_plan_dft_1d(fftl, spectrum, cepstrum, FFTW_FORWARD, FFTW_ESTIMATE);
+    minInverse = fftw_plan_dft_1d(fftl, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
 
+#ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
         stnd_mutex_unlock( hFFTWMutex );
     }
-#else
-    forwardFFT_R = fftw_plan_dft_r2c_1d(fftl, aperiodicResponse, noiseSpec, FFTW_ESTIMATE);
-    inverseFFT_RP = fftw_plan_dft_c2r_1d(fftl, spectrum, periodicResponse ,  FFTW_ESTIMATE);
-    inverseFFT_RA = fftw_plan_dft_c2r_1d(fftl, spectrum, aperiodicResponse,  FFTW_ESTIMATE);
 #endif
 
     currentFrame = (int)(currentTime/(framePeriod/1000.0) + 0.5);    
@@ -200,7 +173,7 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
         {
             periodicSpec[i] = specgram[currentFrame][i] * aperiodicRatio[i];
         }
-        getMinimumPhaseSpectrum(periodicSpec, spectrum, cepstrum, fftl);
+        getMinimumPhaseSpectrum(periodicSpec, spectrum, cepstrum, fftl, minForward, minInverse);
 
         fftw_execute(inverseFFT_RP);
 
@@ -209,7 +182,7 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
         {
             aperiodicSpec[i] = specgram[currentFrame][i] * ((1-aperiodicRatio[i])+0.000000000000001);
         }
-        getMinimumPhaseSpectrum(aperiodicSpec, spectrum, cepstrum, fftl);
+        getMinimumPhaseSpectrum(aperiodicSpec, spectrum, cepstrum, fftl, minForward, minInverse);
         for(i = 0;i < noiseSize;i++)
             aperiodicResponse[i] = randn();
         for(;i < fftl;i++)
@@ -247,18 +220,19 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
     if( hFFTWMutex ){
         stnd_mutex_lock( hFFTWMutex );
     }
+#endif
 
     fftw_destroy_plan(inverseFFT_RP);
     fftw_destroy_plan(inverseFFT_RA);
     fftw_destroy_plan(forwardFFT_R);
 
+    fftw_destroy_plan(minForward);
+    fftw_destroy_plan(minInverse);
+
+#ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
         stnd_mutex_unlock( hFFTWMutex );
     }
-#else
-    fftw_destroy_plan(inverseFFT_RP);
-    fftw_destroy_plan(inverseFFT_RA);
-    fftw_destroy_plan(forwardFFT_R);
 #endif
     free(periodicSpec);
     free(aperiodicSpec);

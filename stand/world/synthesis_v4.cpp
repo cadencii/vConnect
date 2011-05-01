@@ -32,7 +32,7 @@
 // 特定時刻の応答を取得する．
 void getOneFrameSegment_v4(double *f0, int tLen, double **specgram, double **residualSpecgram, int fftl, double framePeriod, double currentTime, int fs, double defaultF0,
                         fftw_complex *spectrum, fftw_complex *cepstrum, 
-                        double *response, int xLen, fftw_plan *inverseFFT_RP)
+                        double *response, int xLen, fftw_plan *inverseFFT_RP, fftw_plan minForward, fftw_plan minInverse)
 {
     int i;
     double real, imag, tmp;
@@ -45,7 +45,7 @@ void getOneFrameSegment_v4(double *f0, int tLen, double **specgram, double **res
     tmp = currentTime + 1.0/(f0[currentFrame] == 0.0 ? defaultF0 : f0[currentFrame]);
     
     // 値を取り出す
-    getMinimumPhaseSpectrum(specgram[currentFrame], spectrum, cepstrum, fftl);
+    getMinimumPhaseSpectrum(specgram[currentFrame], spectrum, cepstrum, fftl, minForward, minInverse);
     
     spectrum[0][0] *= residualSpecgram[currentFrame][0];
     for(i = 1;i < fftl/2;i++)
@@ -70,13 +70,15 @@ void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpec
     fftw_complex        *cepstrum, *spectrum;    // ケプストラムとスペクトル
     cepstrum = (fftw_complex *)malloc(sizeof(fftw_complex) * fftl);
     spectrum = (fftw_complex *)malloc(sizeof(fftw_complex) * fftl);
-    fftw_plan    inverseFFT_RP;                // FFTセット
+    fftw_plan    inverseFFT_RP, minForward, minInverse;                // FFTセット
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
         stnd_mutex_lock( hFFTWMutex );
     }
 #endif
     inverseFFT_RP = fftw_plan_dft_c2r_1d(fftl, spectrum, impulseResponse ,  FFTW_ESTIMATE);
+    minForward = fftw_plan_dft_1d(fftl, spectrum, cepstrum, FFTW_FORWARD, FFTW_ESTIMATE);
+    minInverse = fftw_plan_dft_1d(fftl, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
         stnd_mutex_unlock( hFFTWMutex );
@@ -99,7 +101,7 @@ void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpec
         for(j = 0;j < fftl;j++) impulseResponse[j] = 0.0; // 配列は毎回初期化
 
         getOneFrameSegment_v4(f0, tLen, specgram, residualSpecgram, fftl, framePeriod, currentTime, fs, DEFAULT_F0,
-                        spectrum, cepstrum, impulseResponse, xLen, &inverseFFT_RP);
+                        spectrum, cepstrum, impulseResponse, xLen, &inverseFFT_RP, minForward, minInverse);
 
         currentPosition = (int)(currentTime*(double)fs);
 //        for(j = 0;j < fftl/2;j++)
@@ -122,6 +124,8 @@ void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpec
     }
 #endif
     fftw_destroy_plan(inverseFFT_RP);
+    fftw_destroy_plan(minForward);
+    fftw_destroy_plan(minInverse);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
         stnd_mutex_unlock( hFFTWMutex );

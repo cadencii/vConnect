@@ -30,7 +30,8 @@
 #include <math.h>
 
 void getOneFrameResidualSpec(double *x, int xLen, int fs, int positionIndex, double framePeriod, double f0, double *specgram, int fftl, double *pulseLocations, int pCount,
-                            double *residualSpec, fftw_plan *forwardFFT, fftw_complex *tmpSpec, fftw_complex *starSpec, fftw_complex *ceps, double *tmpWave)
+                            double *residualSpec, fftw_plan *forwardFFT, fftw_complex *tmpSpec, fftw_complex *starSpec, fftw_complex *ceps, double *tmpWave,
+                            fftw_plan minForward, fftw_plan minInverse)
 {
     int i, j;
     double T0;
@@ -71,7 +72,7 @@ void getOneFrameResidualSpec(double *x, int xLen, int fs, int positionIndex, dou
     for(;j < fftl;j++)
         tmpWave[j] = 0.0;
 
-    getMinimumPhaseSpectrum(specgram, starSpec, ceps, fftl);
+    getMinimumPhaseSpectrum(specgram, starSpec, ceps, fftl, minForward, minInverse);
 
     fftw_execute(*forwardFFT);
 
@@ -234,6 +235,7 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     // マルチスレッド用にこちらに確保．
     double              *tmpWave;
     fftw_plan            forwardFFT;    // FFTセット
+    fftw_plan           minForward, minInverse;
     fftw_complex        *tmpSpec, *starSpec, *ceps;        // スペクトル
     tmpSpec        = (fftw_complex *)malloc(sizeof(fftw_complex) * fftl);
     starSpec    = (fftw_complex *)malloc(sizeof(fftw_complex) * fftl);
@@ -247,6 +249,8 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     }
 #endif
        forwardFFT = fftw_plan_dft_r2c_1d(fftl, tmpWave, tmpSpec, FFTW_ESTIMATE);
+       minForward = fftw_plan_dft_1d(fftl, starSpec, ceps, FFTW_FORWARD, FFTW_ESTIMATE);
+       minInverse = fftw_plan_dft_1d(fftl, ceps, starSpec, FFTW_BACKWARD, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
         stnd_mutex_unlock( hFFTWMutex );
@@ -264,20 +268,16 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     int pCount;
     pCount = getPulseLocations(x, xLen, totalPhase, vuvNum, stList, edList, fs, framePeriod, wedgeList, pulseLocations);
 
-    double *tmpResidualSpec;
-    tmpResidualSpec = (double *)malloc(sizeof(double) * fftl);
     double currentF0;
     for(j = 0;j < fftl;j++) residualSpecgram[0][j] = 0.0;
     for(i = 1;i < tLen;i++)
     {
         currentF0 = f0[i] <= FLOOR_F0 ? DEFAULT_F0 : f0[i];
         getOneFrameResidualSpec(x, xLen, fs, i, framePeriod/1000.0, currentF0, specgram[i], fftl, pulseLocations, pCount,
-                        tmpResidualSpec, &forwardFFT, tmpSpec, starSpec, ceps, tmpWave);
-        for(j = 0;j < fftl;j++) residualSpecgram[i][j] = tmpResidualSpec[j];
+                        residualSpecgram[i], &forwardFFT, tmpSpec, starSpec, ceps, tmpWave, minForward, minInverse);
     }
 
     free(fixedF0);
-    free(tmpResidualSpec);
     free(pulseLocations);
     free(totalPhase); free(f0interpolatedRaw); free(signalTime);
     free(wedgeList);
@@ -288,6 +288,8 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     }
 #endif
     fftw_destroy_plan(forwardFFT);
+    fftw_destroy_plan(minForward);
+    fftw_destroy_plan(minInverse);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
         stnd_mutex_unlock( hFFTWMutex );
