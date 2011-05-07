@@ -1,8 +1,22 @@
+/*
+ * standFrame.cpp
+ * Copyright ﾂｩ 2011 HAL, kbinani
+ *
+ * This file is part of vConnect-STAND.
+ *
+ * org.kbinani.cadencii is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
+ *
+ * org.kbinani.cadencii is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "stand.h"
 #include "standFrame.h"
 
-// んー．．．
-#define NULL 0
+#ifndef NULL
+#define NULL (0)
+#endif
 
 standFrame::standFrame()
 {

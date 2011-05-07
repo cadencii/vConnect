@@ -68,8 +68,10 @@ bool vConnect::createWspFile( string_t v_path, string_t output, string_t alias, 
     manager.setVoiceDB( &utauDB, options );
     data = manager.getStandData( alias, options );
 
-    if( data == NULL ) // 失敗
+    if( data == NULL ){
+        // 失敗
         return false;
+    }
 
     // 成功
     double *spectrum = new double[2048];
@@ -82,38 +84,48 @@ bool vConnect::createWspFile( string_t v_path, string_t output, string_t alias, 
     // 固定長以下 100 フレームが代表点．
     begin = (int)( parameters.msFixedLength / framePeriod );
     end = begin + 100;
-    if( end >= data->specgram->getTimeLength() )
+    if( end >= data->specgram->getTimeLength() ){
         end = data->specgram->getTimeLength() - 1;
+    }
 
     double w = (double)( end - begin );
     f0 = 0.0;
 
     for( index = begin; index < end; index++ ){
         data->specgram->getFramePointer( index, frame );
-        if( !( *frame.f0 ) )
+        if( !( *frame.f0 ) ){
             continue;
+        }
         c++;
-        for( int i = 0; i < 1024; i++ )
+        for( int i = 0; i < 1024; i++ ){
             spectrum[i] += frame.spectrum[i];
-        for( int i = 0; i < 4; i ++ )
+        }
+        for( int i = 0; i < 4; i ++ ){
             aperiodicity[i] += frame.aperiodicity[i];
+        }
         f0 += *( frame.f0 ) / w;
     }
-    for( int i = 0; i < 1024; i++ )
+    for( int i = 0; i < 1024; i++ ){
         spectrum[i] /= (double)c;
-    for( int i = 0; i < 4; i++ )
+    }
+    for( int i = 0; i < 4; i++ ){
         aperiodicity[i] /= (double)c;
-    for( int i = 1024; i < 2048; i++ )
+    }
+    for( int i = 1024; i < 2048; i++ ){
         spectrum[i] = frame.spectrum[i];
+    }
     // spectrum, aperiodicity, f0 の順に格納．
-    char buf[2048];
-    sprintf( buf, "%s", output.c_str() );  // うーん....
-    FILE *fp = fopen( buf, "w" );          // うーん．．．．
+    string buf;//char buf[2048];
+    mb_conv( output, buf );
+    //sprintf( buf, "%s", output.c_str() );  // うーん....
+    FILE *fp = fopen( buf.c_str(), "w" );          // うーん．．．．
     if( fp ){
-        for( int i = 0; i < 2048; i++ )
+        for( int i = 0; i < 2048; i++ ){
             fprintf( fp, "%.10e\n", spectrum[i] );
-        for( int i = 0; i < 4; i++ )
+        }
+        for( int i = 0; i < 4; i++ ){
             fprintf( fp, "%.10e\n", aperiodicity[i] );
+        }
         fprintf( fp, "%lf\n", f0 );
     } else {
         SAFE_DELETE_ARRAY( spectrum );
@@ -131,8 +143,9 @@ bool vConnect::createWspFile( string_t v_path, string_t output, string_t alias, 
 
 vConnect::vConnect()
 {
-    for( int i = 0; i < NOTE_NUM; i++ )
+    for( int i = 0; i < NOTE_NUM; i++ ){
         noteFrequency[i] = A4_PITCH * pow( 2.0, (double)( i - A4_NOTE ) / 12.0 );
+    }
     vibrato[0] = 0.0;
     for( int i = 1; i < VIB_NUM; i++ ){
         double period = exp( 5.24 - 1.07e-2 * i ) * 2.0 / 1000.0;

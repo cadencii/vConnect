@@ -1,5 +1,5 @@
 SRC=./stand/corpusManager.cpp ./stand/main.cpp ./stand/stand.cpp ./stand/standSpecgram.cpp \
-    ./stand/standTexture.cpp ./stand/vConnect.cpp ./stand/vowelTable.cpp \
+    ./stand/vConnect.cpp ./stand/vowelTable.cpp \
     ./stand/mb_text.cpp ./stand/matching.cpp \
     \
     ./stand/utauVoiceDB/utauVoiceDataBase.cpp ./stand/utauVoiceDB/utauFreq.cpp \
@@ -13,7 +13,9 @@ SRC=./stand/corpusManager.cpp ./stand/main.cpp ./stand/stand.cpp ./stand/standSp
     \
     ./stand/world/dio.cpp ./stand/world/platinum.cpp ./stand/world/star.cpp \
     ./stand/world/platinum_v4.cpp ./stand/world/synthesis.cpp \
-    ./stand/world/synthesis_v4.cpp ./stand/world/matlabfunctions.cpp
+    ./stand/world/synthesis_v4.cpp ./stand/world/matlabfunctions.cpp \
+    ./stand/standMelCepstrum.cpp ./stand/standData.cpp \
+    ./stand/vConnectSetting.cpp ./stand/standFrame.cpp
 
 #we have more *.h's dependency
 HEADER=./stand/mb_text.h ./stand/matching.h ./stand/stand.h

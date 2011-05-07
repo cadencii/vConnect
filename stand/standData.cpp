@@ -112,17 +112,17 @@ bool standData::readMelCepstrum(vConnectSetting &setting, string_t alias)
 
     if(brightnessSetting && brightnessSetting->enabled){
         path = brightnessSetting->path;
-        brightness.readMelCepstrum(path + alias + ".stt");
+        brightness.readMelCepstrum( path + alias + _T( ".stt" ) );
     }
 
     if(lowSetting && lowSetting->enabled){
         path = lowSetting->path;
-        low.readMelCepstrum(path + alias + ".stt");
+        low.readMelCepstrum( path + alias + _T( ".stt" ) );
     }
 
     if(hiSetting && hiSetting->enabled){
         path = hiSetting->path;
-        hi.readMelCepstrum(path + alias + ".stt");
+        hi.readMelCepstrum( path + alias + _T( ".stt" ) );
     }
 
     this->enableExtention = ret = true;
