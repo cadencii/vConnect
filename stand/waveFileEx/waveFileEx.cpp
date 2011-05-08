@@ -44,8 +44,9 @@ int waveFileEx::getWaveBuffer( vector<double>& dstBuffer )
 
     if( waveBuffer && waveLength > 0 ){
         dstBuffer.resize( waveLength );
-        for( unsigned long i = 0; i < waveLength; i++ )
+        for( unsigned long i = 0; i < waveLength; i++ ){
             dstBuffer[i] = waveBuffer[i];
+        }
         result = 1;
     }
     return result;
@@ -70,8 +71,9 @@ int waveFileEx::setWaveBuffer( vector<double>& srcBuffer )
 
     if( !( srcBuffer.empty() ) ){
         createBuffer(srcBuffer.size());
-        for( unsigned long i = 0; i < waveLength; i++ )
+        for( unsigned long i = 0; i < waveLength; i++ ){
             waveBuffer[i] = srcBuffer[i];
+        }
         result = 1;
     }
     return result;
@@ -100,13 +102,15 @@ int waveFileEx::readWaveFile( string fileName ){
 #endif
 
     if( fp ){
-        if( readWaveHeader( fp ) )
-            if( readWaveData( fp ) )
+        if( readWaveHeader( fp ) ){
+            if( readWaveData( fp ) ){
                 result = 1;
-            else
+            }else{
                 result = -1;
-        else
+            }
+        }else{
             result = 0;
+        }
         fclose( fp );
     }
 
@@ -145,9 +149,11 @@ bool    waveFileEx::readWaveHeader( FILE *fp )
                 fread( (void*)&(formatChunk.bytesPerSecond), 4, 1, fp );
                 fread( (void*)&(formatChunk.blockAlign), 2, 1, fp );
                 fread( (void*)&(formatChunk.bitsPerSample), 2, 1, fp );
-                if( chunkSize > 16 )
-                    for( int i = 0; i < 16 - chunkSize; i++ )
+                if( chunkSize > 16 ){
+                    for( int i = 0; i < 16 - chunkSize; i++ ){
                         fgetc( fp );
+                    }
+                }
 
                 if( formatChunk.bitsPerSample == 16 && formatChunk.chunkID == 1 ){
                     result = true;
@@ -169,7 +175,7 @@ bool    waveFileEx::readWaveData( FILE* fp )
     int dataSize;
     unsigned long maxNum = 0;
 
-    // ‚»‚Ìê‚µ‚Ì‚¬D
+    // ãã®å ´ã—ã®ãŽï¼Ž
     buffer[0] = 0;
     while( fread( (void*)buffer, sizeof(char), 1, fp ) == 1 )  {
         if( buffer[0] == 'd' ){
@@ -193,9 +199,9 @@ bool    waveFileEx::readWaveData( FILE* fp )
 
         for(unsigned int index = 0, waveIndex = 0; waveIndex < maxNum; index += format.numChannels, waveIndex++)
         {
-            // short ŒÅ’èD‚¢‚¸‚êŠg’£‚µ‚½‚¢‚¯‚ÇDDD
+            // short å›ºå®šï¼Žã„ãšã‚Œæ‹¡å¼µã—ãŸã„ã‘ã©ï¼Žï¼Žï¼Ž
             int value = ((short*)data)[index];
-            // ‚±‚ê”¼•ª‚É‚È‚Á‚Ä‚ËH‚Æ‚è‚ ‚¦‚¸¡‚Í•ú’uD
+            // ã“ã‚ŒåŠåˆ†ã«ãªã£ã¦ã­ï¼Ÿã¨ã‚Šã‚ãˆãšä»Šã¯æ”¾ç½®ï¼Ž
             waveBuffer[waveIndex] = (double)value / (double)(1 << format.bitsPerSample);
         }
 
@@ -266,12 +272,15 @@ void    waveFileEx::normalize( void )
     double max = 1.0;
     for( unsigned long i = 0; i < waveLength; i++ ){
         temp = fabs( waveBuffer[i] );
-        if( temp > max )
+        if( temp > max ){
             max = temp;
+        }
     }
-    if( max != 0.0 )
-        for( unsigned long i = 0; i < waveLength; i++ )
+    if( max != 0.0 ){
+        for( unsigned long i = 0; i < waveLength; i++ ){
             waveBuffer[i] /= max;
+        }
+    }
 }
 
 void    waveFileEx::applyDynamics( vector<double>& dynamics, int sample_rate, double framePeriod ){
@@ -299,19 +308,23 @@ int    waveFileEx::getWaveBuffer( vector<double>& dstBuffer, double leftBlank, d
         long beginFrame = (long)( (leftBlank / 1000.0) * format.samplePerSecond );
         long endFrame;
 
-        if( rightBlank < 0 )
+        if( rightBlank < 0 ){
             endFrame = beginFrame + (long)( (-rightBlank / 1000.0) * format.samplePerSecond );
-        else
+        }else{
             endFrame = waveLength - (long)( rightBlank / 1000.0 * format.samplePerSecond );
+        }
 
-        if( endFrame > beginFrame )
+        if( endFrame > beginFrame ){
             dstBuffer.resize( endFrame - beginFrame );
+        }
 
-        for( long i = beginFrame; i < endFrame; i++ )
-            if( 0 <= i && i < (long)waveLength )
+        for( long i = beginFrame; i < endFrame; i++ ){
+            if( 0 <= i && i < (long)waveLength ){
                 dstBuffer[i-beginFrame] = waveBuffer[i];
-            else
+            }else{
                 dstBuffer[i-beginFrame] = 0;
+            }
+        }
         ret = 1;
     }
 
@@ -339,10 +352,11 @@ int    waveFileEx::getWaveBuffer( double *dstBuffer, double leftBlank, double ri
         long beginIndex = (long)( (leftBlank / 1000.0) * format.samplePerSecond );
         long endIndex;
 
-        if( rightBlank < 0 )
+        if( rightBlank < 0 ){
             endIndex = beginIndex + (long)( (-rightBlank / 1000.0) * format.samplePerSecond );
-        else
+        }else{
             endIndex = waveLength - (long)( rightBlank / 1000.0 * format.samplePerSecond );
+        }
 
         if( endIndex < beginIndex && endIndex - beginIndex < 0 ){
             return ret;
@@ -375,8 +389,9 @@ int waveFileEx::setOffset( double secOffset )
     double *temp;
     size = waveLength;
 
-    if( secOffset > 0.0 )
+    if( secOffset > 0.0 ){
         offset = (unsigned long)( secOffset * format.samplePerSecond );
+    }
 
     temp = new double[size + offset];
 
