@@ -31,6 +31,7 @@ using namespace std;
 class waveFileEx{
 public:
     waveFileEx();
+    ~waveFileEx(){destroy();}
     /* If the data is stereo, only left-channel will be read. */
     int    readWaveFile( string fileName );
     int    writeWaveFile( string fileName );
@@ -44,7 +45,7 @@ public:
     int    getWaveBuffer( vector<double>& dstBuffer, double leftBlank, double rightBlank );
     int    getWaveBuffer( double *dstBuffer, double leftBlank, double rightBlank, int length );
 
-    long   getWaveLength( void ){ return waveBuffer.size(); }
+    long   getWaveLength( void ){ return waveLength; }
     long   getWaveLength( double leftBlank, double rightBlank );
 
     int    setOffset( double secOffset );
@@ -53,6 +54,8 @@ public:
 
 protected:
 private:
+    void        destroy(void){delete[] waveBuffer; waveLength = 0;}
+    void        createBuffer(int length){destroy(); waveBuffer = new double[length]; waveLength = length;}
     bool        readWaveHeader( FILE* fp );
     bool        readWaveData( FILE* fp );
 
@@ -60,7 +63,8 @@ private:
 
     static void outputError( string s );
 
-    vector<double>    waveBuffer;
+    double          *waveBuffer;
+    int             waveLength;
     waveFormatEx    format;
 };
 
