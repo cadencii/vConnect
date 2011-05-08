@@ -24,6 +24,7 @@ waveFileEx::waveFileEx()
     setDefaultFormat();
     waveLength = 0;
     waveBuffer = NULL;
+    secOffset = 0.0;
 }
 
 void waveFileEx::setDefaultFormat( void )
@@ -232,14 +233,19 @@ int    waveFileEx::writeWaveFile( string fileName ){
             setDefaultFormat();
             /* This code may occur an error on big-endian CPU. */
             /* write Header */
+            unsigned int offset = secOffset * format.samplePerSecond;
             unsigned int waveSize = waveLength * ( format.bitsPerSample / 8 ) * format.numChannels;
             unsigned int fileSize = waveSize + 44;
             unsigned int chunkSize = 16;
 
-            short *data = new short[waveLength];
-            for(unsigned long i = 0; i < waveLength; i++)
+            short *data = new short[waveLength + offset];
+            for(int i = 0; i < offset; i++)
             {
-                data[i] = (short)( 32767.0 * waveBuffer[i] ); 
+                data[i] = 0;
+            }
+            for(unsigned long i = 0, j = offset; i < waveLength; i++, j++)
+            {
+                data[j] = (short)( 32767.0 * waveBuffer[i] ); 
             }
 
             fprintf( fp, "RIFF" );
@@ -255,7 +261,7 @@ int    waveFileEx::writeWaveFile( string fileName ){
             fprintf( fp, "data" );
 
             fwrite( (void*)&waveSize, 4, 1, fp );        
-            fwrite( (void*)data, 2, waveLength, fp);
+            fwrite( (void*)data, 2, waveLength + offset, fp);
 
             delete[] data;
 
@@ -385,22 +391,8 @@ int    waveFileEx::getWaveBuffer( double *dstBuffer, double leftBlank, double ri
 int waveFileEx::setOffset( double secOffset )
 {
     int ret = 1;
-    unsigned long size, offset = 0;
-    double *temp;
-    size = waveLength;
 
-    if( secOffset > 0.0 ){
-        offset = (unsigned long)( secOffset * format.samplePerSecond );
-    }
-
-    temp = new double[size + offset];
-
-    memset(temp, 0, sizeof(double) * offset);
-    memcpy(temp + offset, waveBuffer, sizeof(double) * waveLength);
-
-    delete[] waveBuffer;
-    waveBuffer = temp;
-    waveLength = size + offset;
+    this->secOffset = secOffset;
 
     return ret;    
 }

@@ -76,22 +76,29 @@ void star(double *x, int xLen, int fs, double *timeAxis, double *f0,
 #endif
     sliceSTAR = (double *)malloc(sizeof(double) * fftl);
 
-    for(i = 0;i < tLen;i++)
-    {
-        if(f0[i] == 0 && mode)
+    if(mode){
+        for(i = 0;i < tLen;i++)
         {
-            index = (int)((double)i*(timeAxis[1]-timeAxis[0])*(double)fs);
-            for(j = 0;j <= fftl/2;j++)
+            if(f0[i] == 0)
             {
-                if(j+index >= xLen) break;
-                specgram[i][j] = x[j+index];
+                index = (int)((double)i*(timeAxis[1]-timeAxis[0])*(double)fs);
+                for(j = 0;j <= fftl/2;j++)
+                {
+                    if(j+index >= xLen) break;
+                    specgram[i][j] = x[j+index];
+                }
+            }
+            else
+            {
+    		    currentF0 = f0[i] <= FLOOR_F0 ? DEFAULT_F0 : f0[i];
+    		    starGeneralBody(x, xLen, fs, currentF0, timeAxis[i], fftl, specgram[i], waveform, powerSpec, ySpec,&forwardFFT);
             }
         }
-        else
+    }else{
+        for(i = 0;i < tLen;i++)
         {
-    		currentF0 = f0[i] <= FLOOR_F0 ? DEFAULT_F0 : f0[i];
-    		starGeneralBody(x, xLen, fs, currentF0, timeAxis[i], fftl, sliceSTAR, waveform, powerSpec, ySpec,&forwardFFT);
-    		for(j = 0;j <= fftl/2;j++) specgram[i][j] = sliceSTAR[j];
+  		    currentF0 = f0[i] <= FLOOR_F0 ? DEFAULT_F0 : f0[i];
+   		    starGeneralBody(x, xLen, fs, currentF0, timeAxis[i], fftl, specgram[i], waveform, powerSpec, ySpec,&forwardFFT);
         }
     }
 

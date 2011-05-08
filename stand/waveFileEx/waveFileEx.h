@@ -54,7 +54,7 @@ public:
 
 protected:
 private:
-    void        destroy(void){delete[] waveBuffer; waveLength = 0;}
+    void        destroy(void){delete[] waveBuffer; waveLength = 0; secOffset = 0.0;}
     void        createBuffer(int length){destroy(); waveBuffer = new double[length]; waveLength = length;}
     bool        readWaveHeader( FILE* fp );
     bool        readWaveData( FILE* fp );
@@ -65,6 +65,8 @@ private:
 
     double          *waveBuffer;
     int             waveLength;
+    // 空白時間を持つことにした．
+    double          secOffset;
     waveFormatEx    format;
 };
 

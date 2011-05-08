@@ -522,7 +522,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 if(morphRatio > 0.0 && nextFrame.cepstrumLengths[1] > 0){
                     existsCepstrum = true;
                     for(int k = 0; k < nextFrame.cepstrumLengths[1]; k++){
-                        melCepstrum[k][0] = nextFrame.melCepstra[1][k].re * morphRatio * nextFrame.mixRatio[1];
+                        melCepstrum[k][0] += nextFrame.melCepstra[1][k].re * morphRatio * nextFrame.mixRatio[1];
                     }
                 }
                 if(presentFrame.cepstrumLengths[0] > 0){
@@ -566,7 +566,7 @@ __stnd_thread_start_retval __stnd_declspec calculateSpecgram(void *arg)
                 for( int k = 0; k <= fftLength / 2; k++ ){
                     tmp = genRate * (double)k;
                     if( tmp > fftLength / 2 ){
-                        temporary[k] = spectrum[fftLength / 2 - 1];
+                        temporary[k] = spectrum[fftLength / 2];
                     }else{
                         temporary[k] = interpolateArray( tmp, spectrum );
                     }
