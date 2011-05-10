@@ -234,7 +234,7 @@ int    waveFileEx::writeWaveFile( string fileName ){
             /* This code may occur an error on big-endian CPU. */
             /* write Header */
             unsigned int offset = secOffset * format.samplePerSecond;
-            unsigned int waveSize = waveLength * ( format.bitsPerSample / 8 ) * format.numChannels;
+            unsigned int waveSize = (offset + waveLength) * ( format.bitsPerSample / 8 ) * format.numChannels;
             unsigned int fileSize = waveSize + 44;
             unsigned int chunkSize = 16;
 
