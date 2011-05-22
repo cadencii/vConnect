@@ -83,7 +83,8 @@ standData* corpusManager::getStandData( string_t lyric, runtimeOptions& options)
         }
 #endif
 
-        if(voiceDB->getUtauParameters( parameters, lyric )){
+        if( voiceDB->getParams( parameters, lyric ) )
+        {
             target->specgram = new standSpecgram;
             if(target->specgram->computeWaveFile( voicePath + parameters.fileName, parameters, fast )){
                 target->isValid = true;

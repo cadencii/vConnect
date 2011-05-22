@@ -74,9 +74,9 @@ public:
         bool fast);
 
 private:
-    vsqFileEx vsq;
-    corpusManager manager;
-    vector<corpusManager *> managers;
+    vsqFileEx mVsq;
+    corpusManager mManager;
+    vector<corpusManager *> mManagerList;
     //これ要らないstandSpecgram specgram;
 
     static double noteFrequency[NOTE_NUM];

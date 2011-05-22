@@ -27,16 +27,26 @@ public: // public method
     /// <param name="codepage">oto.iniファイルのテキスト・エンコーディング．</param>
     int read( string_t fileName, const char *codepage );
 
-    int getUtauParameters( utauParameters& parameters, string_t search );
+    /// <summary>
+    /// 指定した音素の原音のパラメータを取得します
+    /// </summary>
+    /// <param name="parameters">パラメータの格納先</param>
+    /// <param name="search">パラメータを取得する音素</param>
+    /// <returns>取得に失敗した場合に0，成功した場合は0以外の値を返します．</returns>
+    int getParams( utauParameters& parameters, string_t search );
 
-    int getVoicePath( string_t& dst ){
-        dst = voicePath; 
-        return 1;
-    }
+    /// <summary>
+    /// oto.iniファイルのパスを取得します．
+    /// </summary>
+    /// <param name="dst">ファイルパスの格納先．</param>
+    /// <returns>1を返します．</returns>
+    int getVoicePath( string_t &dst );
 
-    bool empty( void ){
-        return settingMap.empty();
-    }
+    /// <summary>
+    /// 音素の数が0かどうかを取得します．
+    /// </summary>
+    /// <returns>音素の数が0の場合trueを，そうでない場合はfalseを返します．</returns>
+    bool empty();
 
 
 public: // public static method
@@ -54,7 +64,7 @@ public: // public static method
 
     /// <summary>
     /// UTAU音源をリストに追加します．
-    /// </sumamry>
+    /// </summary>
     /// <param name="db">音源のインスタンス</param>
     static void dbRegist( UtauDB *db );
 
@@ -68,9 +78,14 @@ public: // public static method
 
 protected: // protected field
 
-    string_t voicePath;
-    map_t<string_t, utauParameters *> settingMap;
-    list<utauParameters *> settingList;
+    /// <summary>
+    /// oto.iniファイルのパス．
+    /// </summary>
+    string_t mVoicePath;
+
+    map_t<string_t, utauParameters *> mSettingMap;
+
+    list<utauParameters *> mSettingList;
 
 
 private: // private static field
@@ -80,5 +95,7 @@ private: // private static field
     /// </summary>
     static vector<UtauDB *> mDBs;
 };
+
+typedef UtauDB utauVoiceDataBase;
 
 #endif
