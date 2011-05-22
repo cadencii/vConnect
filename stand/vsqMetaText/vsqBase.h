@@ -62,7 +62,7 @@ public:
 protected:
     static    double                tempo;
     static    long                endTick;
-    static    vector<utauVoiceDataBase*> voiceDBs;
+    //static    vector<utauVoiceDataBase*> voiceDBs;
     static    map_t<string_t, vsqBase*> objectMap;
     static    map_t<string_t, int> singerMap;
 

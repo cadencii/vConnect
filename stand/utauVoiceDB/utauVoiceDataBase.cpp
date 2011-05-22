@@ -13,6 +13,32 @@
  */
 #include "utauVoiceDataBase.h"
 
+vector<utauVoiceDataBase *> utauVoiceDataBase::mDBs;
+
+int utauVoiceDataBase::dbSize()
+{
+    return (int)utauVoiceDataBase::mDBs.size();
+}
+
+utauVoiceDataBase *utauVoiceDataBase::dbGet( int index )
+{
+    return utauVoiceDataBase::mDBs[index];
+}
+
+void utauVoiceDataBase::dbRegist( utauVoiceDataBase *db )
+{
+    utauVoiceDataBase::mDBs.push_back( db );
+}
+
+void utauVoiceDataBase::dbClear()
+{
+    for( unsigned int i = 0; i < utauVoiceDataBase::mDBs.size(); i++ )
+    {
+        SAFE_DELETE( utauVoiceDataBase::mDBs[i] );
+    }
+    utauVoiceDataBase::mDBs.clear();
+}
+
 utauVoiceDataBase::~utauVoiceDataBase()
 {
     list<utauParameters*>::iterator i;
@@ -21,7 +47,8 @@ utauVoiceDataBase::~utauVoiceDataBase()
             delete (*i);
 }
 
-int utauVoiceDataBase::readUtauVoiceDataBase( string_t fileName, const char *codepage ){
+int utauVoiceDataBase::read( string_t path_oto_ini, const char *codepage )
+{
     int result = 2;
     MB_FILE* fp;
     //char buf[LINEBUFF_LEN];
@@ -30,22 +57,22 @@ int utauVoiceDataBase::readUtauVoiceDataBase( string_t fileName, const char *cod
 #ifdef _DEBUG
     string s2;
     mb_conv( fileName, s2 );
-    cout << "utauVoiceDataBase::readUtauVoiceDataBase; before normalize; fileName=" << s2 << endl;
+    cout << "utauVoiceDataBase::readUtauVoiceDataBase; before normalize; path_oto_ini=" << s2 << endl;
 #endif
-    normalize_path_separator( fileName );
+    normalize_path_separator( path_oto_ini );
 #ifdef _DEBUG
     string s;
     mb_conv( fileName, s );
-    cout << "utauVoiceDataBase::readUtauVoiceDataBase; after normalize; fileName=" << s << endl;
+    cout << "utauVoiceDataBase::readUtauVoiceDataBase; after normalize; path_oto_ini=" << s << endl;
 #endif
     
-    fp = mb_fopen( fileName, codepage );
+    fp = mb_fopen( path_oto_ini, codepage );
 
 #ifdef _DEBUG
     cout << "utauVoiceDataBase::readUtauVoiceDataBase; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
 #endif
     if( fp ){
-        voicePath = fileName.substr( 0, fileName.rfind( PATH_SEPARATOR ) + 1 );
+        voicePath = path_oto_ini.substr( 0, path_oto_ini.rfind( PATH_SEPARATOR ) + 1 );
 
         while( mb_fgets( temp, fp ) ){
 #ifdef _DEBUG
@@ -112,7 +139,7 @@ int utauVoiceDataBase::readUtauVoiceDataBase( string_t fileName, const char *cod
     return result;
 }
 
-int    utauVoiceDataBase::getUtauParameters( utauParameters &parameters, string_t search )
+int utauVoiceDataBase::getUtauParameters( utauParameters &parameters, string_t search )
 {
     int    result = 0;
     map_t<string_t, utauParameters*>::iterator i = settingMap.find( search );

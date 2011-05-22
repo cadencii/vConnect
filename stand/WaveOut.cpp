@@ -126,6 +126,10 @@ void WaveOut::kill() {
 #endif
 }
 
+/// <summary>
+/// 現在の再生位置を取得します．
+/// <returns>秒単位の再生位置．再生が未だ始まっていない場合は負の値を返します．</returns>
+/// </summary>
 double WaveOut::getPosition(){
 #ifdef WAVEOUT_OS_WIN
     if( NULL == mWaveOut ){
@@ -245,6 +249,12 @@ void WaveOut::setResolution( int resolution ){
 #endif
 }
 
+/// <summary>
+/// 波形データをスピーカに送ります．
+/// <param name="left">左チャンネルの波形データ</param>
+/// <param name="right">右チャンネルの波形データ</param>
+/// <param name="length">データの個数</param>
+/// </summary>
 void WaveOut::append( double *left, double *right, int length ){
 #ifdef WAVEOUT_OS_WIN
     if( NULL == mWaveOut ){

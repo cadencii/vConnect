@@ -1,11 +1,8 @@
-/*======================================================*/
-/*                                                      */
-/*    vsqFileEx.h                                       */
-/*                        (c) HAL 2009-                 */
-/*         vsqFileEx class is the I/O class             */
-/*                        of VOCALOID sequence file.    */
-/*                                                      */
-/*======================================================*/
+/*
+ * vsqFileEx.h
+ * Copyright © 2009-2011 HAL,
+ * Copyright © 2011 kbinani
+ */
 #ifndef __vsqFileEx_h__
 #define __vsqFileEx_h__
 
@@ -15,20 +12,59 @@
 #include "vsqPhonemeDB.h"
 #include "../runtimeOptions.h"
 
-class vsqFileEx : public vsqBase {
+/// <summary>
+/// VSQメタテキストが表現するシーケンスを取り扱うクラスです．
+/// </summary>
+class vsqFileEx : public vsqBase
+{
 public:
+    /// <summary>
+    /// コンストラクタ．コントロールカーブのvectorの初期化等を行います．
+    /// </summary>
     vsqFileEx();
 
-    int    readVsqFile( string_t fileName, runtimeOptions options );
+    /// <summary>
+    /// VSQのメタテキストを読み込みます．
+    /// </summary>
+    /// <param name="file_name">読み込むメタテキストファイルのパス．</param>
+    /// <param name="options">読み込み時の設定値．</param>
+    /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
+    bool read( string_t file_name, runtimeOptions options );
 
-    vector<utauVoiceDataBase*>* getVoiceDBs( void ){ return &voiceDBs; }
-    double                getEndSec( void ){ return vsqTempoBp.tickToSecond( endTick ); }
-    int                   getSingerIndex( string_t t_search );
+    /// <summary>
+    /// </summary>
+    vector<utauVoiceDataBase *> *getVoiceDBs();
 
-    vector<vsqBPList>    controlCurves;
-    vsqEventList        events;
-    vsqTempo            vsqTempoBp;
+    /// <summary>
+    /// シーケンスの演奏長さを取得します．単位は秒です．
+    /// </summary>
+    /// <returns>シーケンスの演奏長さ．</returns>
+    double getEndSec();
+
+    /// <summary>
+    /// 歌手の名前から，歌手を特定するためのインデックスを取得します．
+    /// </summary>
+    /// <param name="singer_name">歌手の名前</param>
+    /// <returns>歌手を特定するインデックス．歌手が見つけられなかった場合は規定値の0を返します．</returns>
+    int getSingerIndex( string_t singer_name );
+
+    /// <summary>
+    /// ダイナミクスなどのコントロールカーブを格納したvector．
+    /// </summary>
+    vector<vsqBPList> controlCurves;
+
+    /// <summary>
+    /// シーケンス内の音符と歌手変更イベントを格納したリスト．
+    /// </summary>
+    vsqEventList events;
+
+    /// <summary>
+    /// テンポの変更情報を格納したリスト．
+    /// </summary>
+    vsqTempo vsqTempoBp;
+
 protected:
+
 private:
     vsqPhonemeDB        voiceDataBase;
 };

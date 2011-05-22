@@ -26,14 +26,14 @@ public:
     }
 
     ~vsqPhonemeDB(){
-        for( unsigned int i = 0; i < voiceDBs.size(); i++ ){
+        utauVoiceDataBase::dbClear();
+        /*for( unsigned int i = 0; i < voiceDBs.size(); i++ ){
             SAFE_DELETE( voiceDBs[i] );
         }
-        voiceDBs.clear();
+        voiceDBs.clear();*/
     }
 
     void setParameter( string_t key, string_t value ){
-        utauVoiceDataBase *p = new utauVoiceDataBase;
         string_t::size_type indx_tab = key.find( _T( "\t" ) );
         string_t singer_name, path_otoini;
 
@@ -48,9 +48,10 @@ public:
         // 名前登録して
         singerMap.insert( make_pair( singer_name, singerIndex ) );
         // 中身読んで
-        p->readUtauVoiceDataBase( path_otoini, _codepage_otoini.c_str() );
+        utauVoiceDataBase *p = new utauVoiceDataBase;
+        p->read( path_otoini, _codepage_otoini.c_str() );
         // リストに追加
-        voiceDBs.push_back( p );
+        utauVoiceDataBase::dbRegist( p );
         singerIndex++;
     }
 

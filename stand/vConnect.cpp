@@ -59,14 +59,14 @@ bool vConnect::createWspFile( string_t v_path, string_t output, string_t alias, 
     options.fast = true;
 
     // 初期化
-    if( utauDB.readUtauVoiceDataBase( v_path, options.encodingOtoIni.c_str() ) != 1 )
+    if( utauDB.read( v_path, options.encodingOtoIni.c_str() ) != 1 )
         return false;
 
     utauDB.getUtauParameters( parameters, alias );
 
     // 読み込み
-    manager.setVoiceDB( &utauDB, options );
-    data = manager.getStandData( alias, options );
+    this->manager.setVoiceDB( &utauDB, options );
+    data = this->manager.getStandData( alias, options );
 
     if( data == NULL ){
         // 失敗
@@ -160,11 +160,13 @@ vConnect::vConnect()
 
 vConnect::~vConnect()
 {
-    for( unsigned int i = 0; i < managers.size(); i++ )
-        SAFE_DELETE( managers[i] );
+    for( unsigned int i = 0; i < this->managers.size(); i++ )
+    {
+        SAFE_DELETE( this->managers[i] );
+    }
 }
 
-void    vConnect::emptyPath( double secOffset, string_t output )
+void vConnect::emptyPath( double secOffset, string_t output )
 {
     waveFileEx wave;
     wave.setOffset( secOffset );
@@ -174,26 +176,29 @@ void    vConnect::emptyPath( double secOffset, string_t output )
     return;
 }
 
-bool vConnect::synthesize( string_t input, string_t output, runtimeOptions options ){
+bool vConnect::synthesize( string_t input, string_t output, runtimeOptions options )
+{
 #ifdef _DEBUG
     cout << "vConnect::synthesize; calling vsq.readVsqFile...";
 #endif
     // 読み込みこけたら帰る
-    if( vsq.readVsqFile( input, options ) != 1 ){
+    if( false == this->vsq.read( input, options ) )
+    {
 #ifdef _DEBUG
         cout << " done, failed" << endl;
 #endif
         return false;
     }
 #ifdef _DEBUG
-        cout << " done, successed" << endl;
+    cout << " done, successed" << endl;
 #endif
 
     options.fast = false;
 
     // 空のときは空の wave を出力して終了
-    if( vsq.events.eventList.empty() ){
-        emptyPath( vsq.getEndSec(), output );
+    if( this->vsq.events.eventList.empty() )
+    {
+        emptyPath( this->vsq.getEndSec(), output );
         return true;
     }
 
@@ -202,18 +207,20 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     standSpecgram specgram;
     double *wave;
 
-    vector<utauVoiceDataBase*> *pDBs = vsq.getVoiceDBs();
-    for( unsigned int i = 0; i < pDBs->size(); i++ ){
+    //vector<utauVoiceDataBase*> *pDBs = this->vsq.getVoiceDBs();
+    for( int i = 0; i < utauVoiceDataBase::dbSize(); i++ )
+    {
         corpusManager *p = new corpusManager;
-        p->setVoiceDB( (*pDBs)[i], options );
-        managers.push_back( p );
+        p->setVoiceDB( utauVoiceDataBase::dbGet( i ), options );
+        i++;
+        this->managers.push_back( p );
     }
 
     // 準備１．先行発音などパラメータの適用，及びコントロールカーブをフレーム時刻へ変換
     this->calculateVsqInfo();
 
     // 準備２．合成に必要なローカル変数の初期化
-    beginFrame = vsq.events.eventList[0]->beginFrame;
+    beginFrame = this->vsq.events.eventList[0]->beginFrame;
     frameLength = endFrame - beginFrame;
 
     specgram.setFrameLength( frameLength, options.fast );
@@ -234,7 +241,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     arg1.offset = 0;
     arg1.frameLength = frameLength;
     arg1.options = &options;
-    arg1.vsq = &vsq;
+    arg1.vsq = &this->vsq;
     arg1.specgram = &specgram;
     arg1.controlCurves = &controlCurves;
 #ifdef STND_MULTI_THREAD
@@ -676,9 +683,9 @@ void vConnect::calculateAperiodicity(double *dst, const double *src1, const doub
 void vConnect::calculateVsqInfo( void )
 {
     // 書きづらいので
-    vector<vsqEventEx*>* events = &( vsq.events.eventList );
+    vector<vsqEventEx*>* events = &( this->vsq.events.eventList );
     string_t temp;
-    vector<utauVoiceDataBase*> *pDBs = vsq.getVoiceDBs();
+    //vector<utauVoiceDataBase*> *pDBs = this->vsq.getVoiceDBs();
     utauVoiceDataBase* voiceDB;
 
     float msPreUtterance, msVoiceOverlap;
@@ -688,13 +695,15 @@ void vConnect::calculateVsqInfo( void )
 
     /////////
     // 前から後ろをチェック
-    for( unsigned int i = 0; i < events->size(); i++ ){
-        vsqEventEx* itemi = vsq.events.eventList[i];
+    for( unsigned int i = 0; i < events->size(); i++ )
+    {
+        vsqEventEx* itemi = this->vsq.events.eventList[i];
         
         // タイプ判定
-        while( itemi->type == _T( "Singer" ) ){
+        while( itemi->type == _T( "Singer" ) )
+        {
             // 歌手なら歌手番号拾ってきて
-            singerIndex = vsq.getSingerIndex( itemi->iconHandle.getIDS() );
+            singerIndex = this->vsq.getSingerIndex( itemi->iconHandle.getIDS() );
 
             // 自分を消して
             vector<vsqEventEx*>::iterator it = events->begin();
@@ -713,11 +722,13 @@ void vConnect::calculateVsqInfo( void )
             if( i >= events->size() )
                 break;
             // 次の音符へ
-            itemi = vsq.events.eventList[i];
+            itemi = this->vsq.events.eventList[i];
         }
-        if( singerIndex < 0 || singerIndex >= pDBs->size() )
+        if( singerIndex < 0 || singerIndex >= utauVoiceDataBase::dbSize() )
+        {
             continue;
-        voiceDB = (*pDBs)[singerIndex];
+        }
+        voiceDB = utauVoiceDataBase::dbGet( singerIndex );
         // 原音設定の反映
         temp = itemi->lyricHandle.getLyric();
         msPreUtterance = itemi->utauSetting.msPreUtterance;
@@ -737,7 +748,7 @@ void vConnect::calculateVsqInfo( void )
 
         // 開始位置の計算
         itemi->beginFrame = (long)( (
-                        vsq.vsqTempoBp.tickToSecond( itemi->tick ) * 1000.0 - itemi->utauSetting.msPreUtterance
+                        this->vsq.vsqTempoBp.tickToSecond( itemi->tick ) * 1000.0 - itemi->utauSetting.msPreUtterance
                         * pow( 2.0, ( 64.0 - itemi->velocity ) / 64.0 ) ) / framePeriod );
         // ポルタメントが０％の場合適当な値を入れておく
         if( itemi->portamentoLength < 2 )
@@ -750,7 +761,7 @@ void vConnect::calculateVsqInfo( void )
     for( unsigned int i = 0; i < events->size(); i++ ){
         // まず Tick 時刻から終了時刻を計算
         (*events)[i]->endFrame = (long)(
-            ( vsq.vsqTempoBp.tickToSecond( vsq.events.eventList[i]->tick + vsq.events.eventList[i]->length ) * 1000.0 ) / framePeriod );
+            ( this->vsq.vsqTempoBp.tickToSecond( this->vsq.events.eventList[i]->tick + this->vsq.events.eventList[i]->length ) * 1000.0 ) / framePeriod );
 
         // 一個前の音符がある場合，連続性のチェック
         if( i ){
@@ -783,20 +794,26 @@ void vConnect::calculateVsqInfo( void )
     }
 
     for( unsigned int i = 0; i < events->size(); i++ )
+    {
         if( endFrame < (*events)[i]->endFrame )
+        {
             endFrame = (*events)[i]->endFrame;
+        }
+    }
 
     // コントロールカーブは vsq 管理クラスにやってもらう
-    controlCurves.resize( vsq.controlCurves.size() );
+    this->controlCurves.resize( this->vsq.controlCurves.size() );
     for( unsigned int i = 0; i < controlCurves.size(); i++ )
-        vsq.controlCurves[i].getList( controlCurves[i] );
+    {
+        this->vsq.controlCurves[i].getList( this->controlCurves[i] );
+    }
 }
 
-void    vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
+void vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
 {
     standFrame frame;
     double *f0, *t, pitch_change, tmp, vibratoTheta = 0.0, vibratoRate, vibratoDepth;
-    long beginFrame = vsq.events.eventList[0]->beginFrame;
+    long beginFrame = this->vsq.events.eventList[0]->beginFrame;
     long frameLength = endFrame - beginFrame;
     long index = 0;
     long portamentoBegin, portamentoLength;
@@ -808,8 +825,8 @@ void    vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
     f0 = frame.f0;
     t = frame.t;
 
-    for( unsigned int i = 0; i < vsq.events.eventList.size(); i++ ){
-        vsqEventEx *itemi = vsq.events.eventList[i];
+    for( unsigned int i = 0; i < this->vsq.events.eventList.size(); i++ ){
+        vsqEventEx *itemi = this->vsq.events.eventList[i];
 
         // デフォルト値で埋める
         for( ; index < itemi->beginFrame - beginFrame && index < frameLength; index++ ){

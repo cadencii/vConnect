@@ -26,18 +26,18 @@ vsqFileEx::vsqFileEx(){
     
 }
 
-int vsqFileEx::readVsqFile( string_t fileName, runtimeOptions options ){
+bool vsqFileEx::read( string_t file_name, runtimeOptions options ){
 #ifdef _DEBUG
     cout << "vsqFileEx::readVsqFile" << endl;
 #endif
-    int result = 0;
+    bool result = false;
     voiceDataBase.setRuntimeOptions( options );
 
     MB_FILE *fp;
 #ifdef _DEBUG
     cout << "vsqFileEx::readVsqFile; calling mb_fopen...";
 #endif
-    fp = mb_fopen( fileName, options.encodingVsqText.c_str() );
+    fp = mb_fopen( file_name, options.encodingVsqText.c_str() );
 #ifdef _DEBUG
     cout << " done" << endl;
     cout << "vsqFileEx::readVsqFile; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
@@ -91,7 +91,7 @@ int vsqFileEx::readVsqFile( string_t fileName, runtimeOptions options ){
         mb_fclose( fp );
 
         // utau音源が無ければ合成しようがないので false.
-        result = ( !voiceDBs.empty() );
+        result = (utauVoiceDataBase::dbSize() > 0);
     }
 #ifdef _DEBUG
     cout << "type any key to continue...";
@@ -101,12 +101,23 @@ int vsqFileEx::readVsqFile( string_t fileName, runtimeOptions options ){
     return result;
 }
 
+/*vector<utauVoiceDataBase *> *vsqFileEx::getVoiceDBs()
+{
+    return &(this->voiceDBs);
+}*/
+
+double vsqFileEx::getEndSec()
+{
+     return this->vsqTempoBp.tickToSecond( endTick );
+}
+
 int vsqFileEx::getSingerIndex( string_t t_search )
 {
     int ret = 0;
     map_t<string_t, int>::iterator i = singerMap.find( t_search );
     if( i != singerMap.end() )
+    {
         ret = i->second;
+    }
     return ret;
 }
-
