@@ -1,15 +1,8 @@
 /*
+ * utauVoiceDataBase.h
  *
- *    utauVoiceDataBase.h
- *                        (c) HAL 2009-
- *
- * This files is a part of v.Connect.
- * utauVoiceDataBase is a container class of contains UTAU oto.ini
- *
- * These files are distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
+ * Copyright Â© 2009-2011 HAL,
+ * Copyright Â© 2011 kbinani.
  */
 #ifndef __utauVoiceDataBase_h__
 #define __utauVoiceDataBase_h__
@@ -18,6 +11,9 @@
 #include "utauFreq.h"
 #include "../stand.h"
 
+/// <summary>
+/// UTAUéŸ³æºã‚’ç®¡ç†ã™ã‚‹æ©Ÿèƒ½ã‚’æä¾›ã—ã¾ã™ï¼
+/// </summary>
 class utauVoiceDataBase
 {
 public: // public method
@@ -25,10 +21,10 @@ public: // public method
     ~utauVoiceDataBase();
 
     /// <summary>
-    /// oto.ini‚Ìƒtƒ@ƒCƒ‹–¼‚Æ‚»‚ÌƒeƒLƒXƒgEƒGƒ“ƒR[ƒfƒBƒ“ƒO‚ğw’è‚µ‚ÄCoto.ini‚ğ“Ç‚İ‚İ‚Ü‚·D
+    /// oto.iniã®ãƒ•ã‚¡ã‚¤ãƒ«åã¨ãã®ãƒ†ã‚­ã‚¹ãƒˆãƒ»ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã‚’æŒ‡å®šã—ã¦ï¼Œoto.iniã‚’èª­ã¿è¾¼ã¿ã¾ã™ï¼
     /// </summary>
-    /// <param name="path_oto_ini">oto.iniƒtƒ@ƒCƒ‹‚ÌƒpƒXD</param>
-    /// <param name="codepage">oto.iniƒtƒ@ƒCƒ‹‚ÌƒeƒLƒXƒgEƒGƒ“ƒR[ƒfƒBƒ“ƒOD</param>
+    /// <param name="path_oto_ini">oto.iniãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ï¼</param>
+    /// <param name="codepage">oto.iniãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ†ã‚­ã‚¹ãƒˆãƒ»ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ï¼</param>
     int read( string_t fileName, const char *codepage );
 
     int getUtauParameters( utauParameters& parameters, string_t search );
@@ -46,27 +42,27 @@ public: // public method
 public: // public static method
     
     /// <summary>
-    /// “ÇÏ‚İ‚ÌUTAU‰¹Œ¹‚ÌŒÂ”‚ğæ“¾‚µ‚Ü‚·D
+    /// èª­è¾¼æ¸ˆã¿ã®UTAUéŸ³æºã®å€‹æ•°ã‚’å–å¾—ã—ã¾ã™ï¼
     /// </summary>
-    /// <returns>“ÇÏ‚İ‚ÌUTAU‰¹Œ¹‚ÌŒÂ”D</returns>
+    /// <returns>èª­è¾¼æ¸ˆã¿ã®UTAUéŸ³æºã®å€‹æ•°ï¼</returns>
     static int dbSize();
 
     /// <summary>
-    /// “Ç‚İ‚ñ‚¾UTAU‰¹Œ¹‚ÌƒŠƒXƒg‚ğ”jŠü‚µ‚Ü‚·D
+    /// èª­ã¿è¾¼ã‚“ã UTAUéŸ³æºã®ãƒªã‚¹ãƒˆã‚’ç ´æ£„ã—ã¾ã™ï¼
     /// </summary>
     static void dbClear();
 
     /// <summary>
-    /// UTAU‰¹Œ¹‚ğƒŠƒXƒg‚É’Ç‰Á‚µ‚Ü‚·D
+    /// UTAUéŸ³æºã‚’ãƒªã‚¹ãƒˆã«è¿½åŠ ã—ã¾ã™ï¼
     /// </sumamry>
-    /// <param name="db">‰¹Œ¹‚ÌƒCƒ“ƒXƒ^ƒ“ƒX</param>
+    /// <param name="db">éŸ³æºã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹</param>
     static void dbRegist( utauVoiceDataBase *db );
 
     /// <summary>
-    /// w’è‚µ‚½ƒCƒ“ƒfƒbƒNƒX‚ÌUTAU‰¹Œ¹‚ğæ“¾‚µ‚Ü‚·D
+    /// æŒ‡å®šã—ãŸã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®UTAUéŸ³æºã‚’å–å¾—ã—ã¾ã™ï¼
     /// </summary>
-    /// <param name="index">‰¹Œ¹‚ğw’è‚·‚éƒCƒ“ƒfƒbƒNƒX</param>
-    /// <returns>UTAU‰¹Œ¹D</returns>
+    /// <param name="index">éŸ³æºã‚’æŒ‡å®šã™ã‚‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹</param>
+    /// <returns>UTAUéŸ³æºï¼</returns>
     static utauVoiceDataBase *dbGet( int index );
 
 
@@ -80,7 +76,7 @@ protected: // protected field
 private: // private static field
 
     /// <summary>
-    /// Às‚É“Ç‚İ‚Ü‚ê‚½UTAU‰¹Œ¹‚ÌƒŠƒXƒg‚Å‚·D
+    /// å®Ÿè¡Œæ™‚ã«èª­ã¿è¾¼ã¾ã‚ŒãŸUTAUéŸ³æºã®ãƒªã‚¹ãƒˆã§ã™ï¼
     /// </summary>
     static vector<utauVoiceDataBase *> mDBs;
 };
