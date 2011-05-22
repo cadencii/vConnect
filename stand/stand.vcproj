@@ -235,6 +235,14 @@
 			Name="utauVoiceDB"
 			>
 			<File
+				RelativePath=".\utauVoiceDB\UtauDB.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utauVoiceDB\UtauDB.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utauVoiceDB\utauFreq.cpp"
 				>
 			</File>
@@ -244,14 +252,6 @@
 			</File>
 			<File
 				RelativePath=".\utauVoiceDB\utauParameters.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utauVoiceDB\utauVoiceDataBase.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utauVoiceDB\utauVoiceDataBase.h"
 				>
 			</File>
 		</Filter>

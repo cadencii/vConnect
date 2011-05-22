@@ -18,21 +18,21 @@
 #include "standSpecgram.h"
 #include "standMelCepstrum.h"
 #include "vowelTable.h"
-#include "utauVoiceDB/utauVoiceDataBase.h"
+#include "utauVoiceDB/UtauDB.h"
 #include "standData.h"
 #include "vConnectSetting.h"
 
 class corpusManager {
 public:
     ~corpusManager();
-    void setVoiceDB( utauVoiceDataBase* p, runtimeOptions& options );
+    void setVoiceDB( UtauDB* p, runtimeOptions& options );
 
     standData* getStandData( string_t lyric, runtimeOptions& options);
     bool checkEnableExtention(void){return enableExtention;}
 private:
     map_t<string_t, standData*> objectMap;
     map_t<string_t, standMelCepstrum*> textureMap;
-    utauVoiceDataBase* voiceDB;
+    UtauDB* voiceDB;
     string_t voicePath;
     vowelTable vowels;
 

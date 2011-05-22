@@ -50,7 +50,7 @@ phoneticTranscriber::phoneticTranscriber()
     }
 }
 
-void phoneticTranscriber::phoneticTranscribe(utauVoiceDataBase &target, string outputPath, string suffix)
+void phoneticTranscriber::phoneticTranscribe(UtauDB &target, string outputPath, string suffix)
 {
     list<utauParameters*>::iterator i;
     utauParameters targetParameter;

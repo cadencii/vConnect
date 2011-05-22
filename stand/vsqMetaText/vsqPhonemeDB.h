@@ -26,7 +26,7 @@ public:
     }
 
     ~vsqPhonemeDB(){
-        utauVoiceDataBase::dbClear();
+        UtauDB::dbClear();
         /*for( unsigned int i = 0; i < voiceDBs.size(); i++ ){
             SAFE_DELETE( voiceDBs[i] );
         }
@@ -48,10 +48,10 @@ public:
         // 名前登録して
         singerMap.insert( make_pair( singer_name, singerIndex ) );
         // 中身読んで
-        utauVoiceDataBase *p = new utauVoiceDataBase;
+        UtauDB *p = new UtauDB;
         p->read( path_otoini, _codepage_otoini.c_str() );
         // リストに追加
-        utauVoiceDataBase::dbRegist( p );
+        UtauDB::dbRegist( p );
         singerIndex++;
     }
 

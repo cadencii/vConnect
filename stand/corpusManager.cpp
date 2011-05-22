@@ -103,7 +103,7 @@ standData* corpusManager::getStandData( string_t lyric, runtimeOptions& options)
     return ret;
 }
 
-void corpusManager::setVoiceDB( utauVoiceDataBase* p, runtimeOptions& options )
+void corpusManager::setVoiceDB( UtauDB* p, runtimeOptions& options )
 {
     string_t tmp;
     voiceDB = p;

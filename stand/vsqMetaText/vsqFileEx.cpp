@@ -91,7 +91,7 @@ bool vsqFileEx::read( string_t file_name, runtimeOptions options ){
         mb_fclose( fp );
 
         // utau音源が無ければ合成しようがないので false.
-        result = (utauVoiceDataBase::dbSize() > 0);
+        result = (UtauDB::dbSize() > 0);
     }
 #ifdef _DEBUG
     cout << "type any key to continue...";

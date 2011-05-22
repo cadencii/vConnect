@@ -50,7 +50,7 @@ double    vConnect::getPitchFluctuation( double second )
 
 bool vConnect::createWspFile( string_t v_path, string_t output, string_t alias, runtimeOptions options )
 {
-    utauVoiceDataBase utauDB;
+    UtauDB utauDB;
     utauParameters parameters;
     standData *data;
     standFrame frame;
@@ -207,11 +207,11 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     standSpecgram specgram;
     double *wave;
 
-    //vector<utauVoiceDataBase*> *pDBs = this->vsq.getVoiceDBs();
-    for( int i = 0; i < utauVoiceDataBase::dbSize(); i++ )
+    //vector<UtauDB*> *pDBs = this->vsq.getVoiceDBs();
+    for( int i = 0; i < UtauDB::dbSize(); i++ )
     {
         corpusManager *p = new corpusManager;
-        p->setVoiceDB( utauVoiceDataBase::dbGet( i ), options );
+        p->setVoiceDB( UtauDB::dbGet( i ), options );
         i++;
         this->managers.push_back( p );
     }
@@ -685,8 +685,8 @@ void vConnect::calculateVsqInfo( void )
     // 書きづらいので
     vector<vsqEventEx*>* events = &( this->vsq.events.eventList );
     string_t temp;
-    //vector<utauVoiceDataBase*> *pDBs = this->vsq.getVoiceDBs();
-    utauVoiceDataBase* voiceDB;
+    //vector<UtauDB*> *pDBs = this->vsq.getVoiceDBs();
+    UtauDB* voiceDB;
 
     float msPreUtterance, msVoiceOverlap;
     int singerIndex = 0;
@@ -724,11 +724,11 @@ void vConnect::calculateVsqInfo( void )
             // 次の音符へ
             itemi = this->vsq.events.eventList[i];
         }
-        if( singerIndex < 0 || singerIndex >= utauVoiceDataBase::dbSize() )
+        if( singerIndex < 0 || singerIndex >= UtauDB::dbSize() )
         {
             continue;
         }
-        voiceDB = utauVoiceDataBase::dbGet( singerIndex );
+        voiceDB = UtauDB::dbGet( singerIndex );
         // 原音設定の反映
         temp = itemi->lyricHandle.getLyric();
         msPreUtterance = itemi->utauSetting.msPreUtterance;

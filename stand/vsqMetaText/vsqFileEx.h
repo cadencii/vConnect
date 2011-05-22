@@ -33,7 +33,7 @@ public:
 
     /// <summary>
     /// </summary>
-    vector<utauVoiceDataBase *> *getVoiceDBs();
+    vector<UtauDB *> *getVoiceDBs();
 
     /// <summary>
     /// シーケンスの演奏長さを取得します．単位は秒です．

@@ -1,11 +1,11 @@
 /*
- * utauVoiceDataBase.h
+ * UtauDB.h
  *
  * Copyright © 2009-2011 HAL,
  * Copyright © 2011 kbinani.
  */
-#ifndef __utauVoiceDataBase_h__
-#define __utauVoiceDataBase_h__
+#ifndef __UtauDB_h__
+#define __UtauDB_h__
 
 #include "utauParameters.h"
 #include "utauFreq.h"
@@ -14,11 +14,11 @@
 /// <summary>
 /// UTAU音源を管理する機能を提供します．
 /// </summary>
-class utauVoiceDataBase
+class UtauDB
 {
 public: // public method
 
-    ~utauVoiceDataBase();
+    ~UtauDB();
 
     /// <summary>
     /// oto.iniのファイル名とそのテキスト・エンコーディングを指定して，oto.iniを読み込みます．
@@ -56,14 +56,14 @@ public: // public static method
     /// UTAU音源をリストに追加します．
     /// </sumamry>
     /// <param name="db">音源のインスタンス</param>
-    static void dbRegist( utauVoiceDataBase *db );
+    static void dbRegist( UtauDB *db );
 
     /// <summary>
     /// 指定したインデックスのUTAU音源を取得します．
     /// </summary>
     /// <param name="index">音源を指定するインデックス</param>
     /// <returns>UTAU音源．</returns>
-    static utauVoiceDataBase *dbGet( int index );
+    static UtauDB *dbGet( int index );
 
 
 protected: // protected field
@@ -78,7 +78,7 @@ private: // private static field
     /// <summary>
     /// 実行時に読み込まれたUTAU音源のリストです．
     /// </summary>
-    static vector<utauVoiceDataBase *> mDBs;
+    static vector<UtauDB *> mDBs;
 };
 
 #endif

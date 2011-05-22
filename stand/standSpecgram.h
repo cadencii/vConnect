@@ -18,7 +18,7 @@
 #define __standSpecgram_h__
 
 #include "stand.h"
-#include "utauVoiceDB/utauVoiceDataBase.h"
+#include "utauVoiceDB/UtauDB.h"
 #include "standFrame.h"
 
 // ノーマライズ用平均二乗振幅の基準値
