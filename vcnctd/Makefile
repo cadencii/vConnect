@@ -1,5 +1,5 @@
-SRC=vcnctd.cpp Config.cpp
-HEADER=Config.h
+SRC=vcnctd.cpp Config.cpp daemon.c
+HEADER=Config.h daemon.h
 
 vcnctd: $(SRC)
 	g++ $(SRC) -o vcnctd
