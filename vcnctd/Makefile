@@ -56,7 +56,7 @@ HDR=Config.h \
 	../stand/stand.h
 
 vcnctd: $(SRC)
-	g++ $(SRC) -o vcnctd -liconv -lfftw3
+	g++ $(SRC) -o vcnctd -liconv -lfftw3 -lpthread
 
 clean:
 	rm vcnctd
