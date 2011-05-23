@@ -1,32 +1,32 @@
 SRC=vcnctd.cpp \
 	Config.cpp \
 	daemon.c \
-	../stand/mb_text.cpp \
-	../stand/vConnect.cpp \
-	../stand/standData.cpp \
 	../stand/corpusManager.cpp \
+	../stand/matching.cpp \
+	../stand/mb_text.cpp \
+	../stand/stand.cpp \
+	../stand/standData.cpp \
 	../stand/standFrame.cpp \
-	../stand/vsqMetaText/vsqBase.cpp \
-	../stand/vsqMetaText/vsqTempo.cpp \
-	../stand/vsqMetaText/vsqHandle.cpp \
-	../stand/vsqMetaText/vsqFileEx.cpp \
+	../stand/standMelCepstrum.cpp \
+	../stand/standSpecgram.cpp \
 	../stand/utauVoiceDB/UtauDB.cpp \
+	../stand/vConnect.cpp \
+	../stand/vConnectSetting.cpp \
+	../stand/vsqMetaText/vsqBase.cpp \
 	../stand/vsqMetaText/vsqEventList.cpp \
 	../stand/vsqMetaText/vsqEventEx.cpp \
+	../stand/vsqMetaText/vsqFileEx.cpp \
+	../stand/vsqMetaText/vsqHandle.cpp \
+	../stand/vsqMetaText/vsqTempo.cpp \
 	../stand/vowelTable.cpp \
 	../stand/vsqMetaText/vsqBPList.cpp \
-	../stand/standSpecgram.cpp \
-	../stand/world/star.cpp \
-	../stand/world/platinum.cpp \
-	../stand/world/matlabfunctions.cpp \
 	../stand/waveFileEx/waveFileEx.cpp \
-	../stand/world/synthesis.cpp \
-	../stand/matching.cpp \
-	../stand/vConnectSetting.cpp \
-	../stand/standMelCepstrum.cpp \
-	../stand/stand.cpp \
-	../stand/world/platinum_v4.cpp \
 	../stand/world/dio.cpp \
+	../stand/world/matlabfunctions.cpp \
+	../stand/world/platinum.cpp \
+	../stand/world/platinum_v4.cpp \
+	../stand/world/star.cpp \
+	../stand/world/synthesis.cpp \
 	../stand/world/synthesis_v4.cpp
 
 HDR=Config.h \
