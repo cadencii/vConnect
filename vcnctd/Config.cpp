@@ -5,5 +5,18 @@
  */
 #include "Config.h"
 
-string Config::mConfPath = "/etc/vcnctd.conf";
+namespace vcnctd
+{
 
+    string Config::mConfPath = "/etc/vcnctd.conf";
+
+    int Config::load()
+    {
+    }
+
+    string Config::getConfPath()
+    {
+        return Config::mConfPath;
+    }
+
+}
