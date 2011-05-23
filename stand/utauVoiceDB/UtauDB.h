@@ -1,8 +1,8 @@
 /*
  * UtauDB.h
  *
- * Copyright © 2009-2011 HAL,
- * Copyright © 2011 kbinani.
+ * Copyright (C) 2009-2011 HAL,
+ * Copyright (C) 2011 kbinani.
  */
 #ifndef __UtauDB_h__
 #define __UtauDB_h__
