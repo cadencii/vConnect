@@ -28,7 +28,7 @@ public:
     ~corpusManager();
     void setUtauDB( UtauDB *p, runtimeOptions &options );
     
-    void analyze();
+    void analyze( runtimeOptions &options );
 
     standData *getStandData( string_t lyric, runtimeOptions &options );
     bool checkEnableExtention();

@@ -14,15 +14,14 @@
  */
 #include "corpusManager.h"
 
-void corpusManager::analyze()
+void corpusManager::analyze( runtimeOptions &options )
 {
     map_t<string_t, utauParameters *>::iterator itr;
     for( itr = mUtauDB->begin(); itr != mUtauDB->end(); itr++ )
     {
         string_t lyric = itr->first;
-#ifdef _DEBUG
+        this->getStandData( lyric, options );
         cout << "corpusManager::analyze; lyric=" << lyric << endl;
-#endif
     }
 }
 

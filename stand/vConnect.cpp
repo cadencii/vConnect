@@ -233,6 +233,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     {
         corpusManager *p = new corpusManager;
         p->setUtauDB( UtauDB::dbGet( i ), options );
+        p->analyze( options );
         mManagerList.push_back( p );
     }
 

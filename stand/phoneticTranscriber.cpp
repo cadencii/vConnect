@@ -50,7 +50,7 @@ phoneticTranscriber::phoneticTranscriber()
     }
 }
 
-void phoneticTranscriber::phoneticTranscribe(UtauDB &target, string outputPath, string suffix)
+void phoneticTranscriber::phoneticTranscribe( UtauDB &target, string outputPath, string suffix )
 {
     list<utauParameters*>::iterator i;
     utauParameters targetParameter;
@@ -65,17 +65,17 @@ void phoneticTranscriber::phoneticTranscribe(UtauDB &target, string outputPath, 
 
     int transIndex;
 
-    target.getVoicePath(targetVoicePath);
+    target.getDBPath( targetVoicePath );
 
     ofstream ofs("log.txt");
-    ofs << "==============\n====begin transcription.\nsrcPath; " << mVoicePath.c_str() << "\ndstPath; " << targetVoicePath.c_str() << endl;
+    ofs << "==============\n====begin transcription.\nsrcPath; " << mDBPath.c_str() << "\ndstPath; " << targetVoicePath.c_str() << endl;
     for(i = mSettingList.begin(); i != mSettingList.end(); i++){
         ofs << "----" << endl;
         ofs << "begin; alias\"" << (*i)->lyric << "\"" << endl;
 
         string suffixLyric = (*i)->lyric + suffix;
         if( target.getParams( targetParameter, suffixLyric ) ){
-            srcFileName = mVoicePath + (*i)->fileName + ".wav";
+            srcFileName = mDBPath + (*i)->fileName + ".wav";
             dstFileName = targetVoicePath + targetParameter.fileName + ".wav";
 
             double *dstF0, **dstSpecgram, *dstT;
