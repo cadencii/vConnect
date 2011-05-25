@@ -40,7 +40,7 @@ public: // public method
     /// </summary>
     /// <param name="dst">ファイルパスの格納先．</param>
     /// <returns>1を返します．</returns>
-    int getVoicePath( string_t &dst );
+    int getDBPath( string_t &dst );
 
     /// <summary>
     /// 音素の数が0かどうかを取得します．
@@ -48,7 +48,10 @@ public: // public method
     /// <returns>音素の数が0の場合trueを，そうでない場合はfalseを返します．</returns>
     bool empty();
 
-
+    map_t<string_t, utauParameters *>::iterator begin();
+    
+    map_t<string_t, utauParameters *>::iterator end();
+    
 public: // public static method
     
     /// <summary>
@@ -81,7 +84,7 @@ protected: // protected field
     /// <summary>
     /// oto.iniファイルのパス．
     /// </summary>
-    string_t mVoicePath;
+    string_t mDBPath;
 
     map_t<string_t, utauParameters *> mSettingMap;
 

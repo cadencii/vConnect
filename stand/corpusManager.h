@@ -27,6 +27,8 @@ class corpusManager
 public:
     ~corpusManager();
     void setUtauDB( UtauDB *p, runtimeOptions &options );
+    
+    void analyze();
 
     standData *getStandData( string_t lyric, runtimeOptions &options );
     bool checkEnableExtention();
@@ -34,8 +36,8 @@ public:
 private:
     map_t<string_t, standData *> objectMap;
     map_t<string_t, standMelCepstrum *> textureMap;
-    UtauDB *voiceDB;
-    string_t voicePath;
+    UtauDB *mUtauDB;
+    string_t mDBPath;
     vowelTable vowels;
 
     vConnectSetting setting;

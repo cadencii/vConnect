@@ -8,6 +8,16 @@
 
 vector<UtauDB *> UtauDB::mDBs;
 
+map_t<string_t, utauParameters *>::iterator UtauDB::begin()
+{
+    return mSettingMap.begin();
+}
+
+map_t<string_t, utauParameters *>::iterator UtauDB::end()
+{
+    return mSettingMap.end();
+}
+
 int UtauDB::dbSize()
 {
     return (int)UtauDB::mDBs.size();
@@ -70,7 +80,7 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
 #endif
     if( fp )
     {
-        mVoicePath = path_oto_ini.substr( 0, path_oto_ini.rfind( PATH_SEPARATOR ) + 1 );
+        mDBPath = path_oto_ini.substr( 0, path_oto_ini.rfind( PATH_SEPARATOR ) + 1 );
 
         while( mb_fgets( temp, fp ) )
         {
@@ -169,9 +179,9 @@ int UtauDB::getParams( utauParameters &parameters, string_t search )
     return result;
 }
 
-int UtauDB::getVoicePath( string_t &dst )
+int UtauDB::getDBPath( string_t &dst )
 {
-    dst = mVoicePath; 
+    dst = mDBPath; 
     return 1;
 }
 

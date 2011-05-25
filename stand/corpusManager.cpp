@@ -14,6 +14,18 @@
  */
 #include "corpusManager.h"
 
+void corpusManager::analyze()
+{
+    map_t<string_t, utauParameters *>::iterator itr;
+    for( itr = mUtauDB->begin(); itr != mUtauDB->end(); itr++ )
+    {
+        string_t lyric = itr->first;
+#ifdef _DEBUG
+        cout << "corpusManager::analyze; lyric=" << lyric << endl;
+#endif
+    }
+}
+
 corpusManager::~corpusManager()
 {
     map_t<string_t, standData *>::iterator i;
@@ -27,7 +39,6 @@ corpusManager::~corpusManager()
     {
         SAFE_DELETE( j->second );
     }
-    
 }
 
 standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options )
@@ -96,10 +107,10 @@ standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options 
         }
 #endif
 
-        if( voiceDB->getParams( parameters, lyric ) )
+        if( mUtauDB->getParams( parameters, lyric ) )
         {
             target->specgram = new standSpecgram;
-            if( target->specgram->computeWaveFile( voicePath + parameters.fileName, parameters, fast ) )
+            if( target->specgram->computeWaveFile( mDBPath + parameters.fileName, parameters, fast ) )
             {
                 target->isValid = true;
                 ret = target;
@@ -122,13 +133,13 @@ standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options 
 void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
 {
     string_t tmp;
-    voiceDB = p;
+    mUtauDB = p;
     if( p )
     {
-        p->getVoicePath( voicePath );
+        p->getDBPath( mDBPath );
     }
     tmp = _T("vConnect.ini");
-    enableExtention = setting.readSetting(voicePath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
+    enableExtention = setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
     //tmp = voicePath + _T("vowelTable.txt");
     //vowels.readVowelTable( tmp, options );
 }
