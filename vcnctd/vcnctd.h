@@ -35,8 +35,6 @@ namespace vcnctd
     
     namespace vsq
     {
-        typedef vConnect Synthesizer;
-        typedef runtimeOptions Options;
         typedef vsqEventList EventList;
         typedef vsqEventEx Event;
         typedef vsqLyric Lyric;
@@ -46,10 +44,14 @@ namespace vcnctd
     
     namespace stand
     {
+        typedef vConnect Synthesizer;
+        typedef runtimeOptions Options;
         typedef standMelCepstrum MelCeps;
         typedef standSpecgram Specgram;
         typedef standFrame Frame;
-        typedef standData BankSource;
+        typedef standData SynthSource;
+        typedef corpusManager CorpusManager;
+        typedef librarySetting librarySetting;
     }
 
 }
