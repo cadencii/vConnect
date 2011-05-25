@@ -1,7 +1,7 @@
-/*
+/**
  * vsqFileEx.h
- * Copyright © 2009-2011 HAL,
- * Copyright © 2011 kbinani
+ * Copyright (C) 2009-2011 HAL,
+ * Copyright (C) 2011 kbinani
  */
 #ifndef __vsqFileEx_h__
 #define __vsqFileEx_h__
@@ -30,10 +30,6 @@ public:
     /// <param name="options">読み込み時の設定値．</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
     bool read( string_t file_name, runtimeOptions options );
-
-    /// <summary>
-    /// </summary>
-    vector<UtauDB *> *getVoiceDBs();
 
     /// <summary>
     /// シーケンスの演奏長さを取得します．単位は秒です．
@@ -66,7 +62,7 @@ public:
 protected:
 
 private:
-    vsqPhonemeDB        voiceDataBase;
+    vsqPhonemeDB voiceDataBase;
 };
 
 #endif

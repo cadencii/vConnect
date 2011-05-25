@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
-#ifndef __vsqBPLish_h__
+#ifndef __vsqBPList_h__
 #define __vsqBPList_h__
 
 #include "vsqBase.h"

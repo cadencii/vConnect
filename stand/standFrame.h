@@ -15,12 +15,13 @@
 #ifndef __standFrame_h__
 #define __standFrame_h__
 
-class standFrame {
+class standFrame
+{
 public:
     standFrame();
     ~standFrame();
 
-    void createCepstrum(int cepstrumNumber);
+    void createCepstrum( int num_cepstrum );
 
     double *f0;
     double *t;

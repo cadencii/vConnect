@@ -1,32 +1,33 @@
-/*======================================================*/
-/*                                                      */
-/*    vsqFileEx.cpp                                     */
-/*                        (c) HAL 2009-                 */
-/*                                                      */
-/*======================================================*/
+/*
+ * vsqFileEx.cpp
+ * Copyright (C) 2009-2011 HAL,
+ * Copyright (C) 2011 kbinani.
+ */
 #include "vsqFileEx.h"
 
-vsqFileEx::vsqFileEx(){
+vsqFileEx::vsqFileEx()
+{
     string_t temp;
 
     controlCurves.resize( CONTROL_CURVE_NUM );
 
-    for( unsigned int i = 0; i < controlCurves.size(); i++ ){
-        objectMap.insert( make_pair( controlCurveName[i], (vsqBase*)&(controlCurves[i]) ) );
+    for( unsigned int i = 0; i < controlCurves.size(); i++ )
+    {
+        objectMap.insert( make_pair( controlCurveName[i], (vsqBase *)&(controlCurves[i]) ) );
         /* The note on 0 tick can be allocated before 0 tick, because of its preutterance. */
         controlCurves[i].setParameter( -10000, controlCurveDefaultValue[i] );
     }
 
     temp = _T("[EventList]");
-    objectMap.insert( make_pair( temp, (vsqBase*)&events ) );
+    objectMap.insert( make_pair( temp, (vsqBase *)&events ) );
     temp = _T("[Tempo]");
-    objectMap.insert( make_pair( temp, (vsqBase*)&vsqTempoBp ) );
+    objectMap.insert( make_pair( temp, (vsqBase *)&vsqTempoBp ) );
     temp = _T("[oto.ini]");
-    objectMap.insert( make_pair( temp, (vsqBase*)&voiceDataBase ) );
-    
+    objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
 }
 
-bool vsqFileEx::read( string_t file_name, runtimeOptions options ){
+bool vsqFileEx::read( string_t file_name, runtimeOptions options )
+{
 #ifdef _DEBUG
     cout << "vsqFileEx::readVsqFile" << endl;
 #endif
@@ -43,34 +44,44 @@ bool vsqFileEx::read( string_t file_name, runtimeOptions options ){
     cout << "vsqFileEx::readVsqFile; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
 #endif
 
-    if( fp ){
+    if( fp )
+    {
         string_t temp, search, left, right;
-        map_t<string_t, vsqBase*>::iterator i;
+        map_t<string_t, vsqBase *>::iterator i;
 
-        while( mb_fgets( temp, fp ) ){
+        while( mb_fgets( temp, fp ) )
+        {
 #ifdef _DEBUG
             string s;
             mb_conv( temp, s );
             cout << "vsqFileEx::readVsqFile; temp=" << s << endl;
 #endif
-            if( temp.find( _T("[") ) == 0 ){
+            if( temp.find( _T("[") ) == 0 )
+            {
                 search = temp;
                 continue;
             }
             string_t::size_type indx_equal = temp.find( _T("=") );
-            if( indx_equal == string_t::npos ){
+            if( indx_equal == string_t::npos )
+            {
                 left = temp;
                 right = _T("");
-            }else{
+            }
+            else
+            {
                 left = temp.substr( 0, indx_equal );
                 right = temp.substr( indx_equal + 1 );
             }
             i = objectMap.find( search );
-            if( i != objectMap.end() ){
-                if( i->second ){
-                    if( search.compare( _T("[EventList]") ) == 0 ){
+            if( i != objectMap.end() )
+            {
+                if( i->second )
+                {
+                    if( search.compare( _T("[EventList]") ) == 0 )
+                    {
                         string_t::size_type indx_comma = right.find( _T(",") );
-                        while( indx_comma != string_t::npos ){
+                        while( indx_comma != string_t::npos )
+                        {
                             // コンマが見つからなくなるまでループ
                             string_t tright = right.substr( 0, indx_comma );
                             i->second->setParameter( left, tright );
@@ -80,7 +91,9 @@ bool vsqFileEx::read( string_t file_name, runtimeOptions options ){
                     }
                     i->second->setParameter( left, right );
                 }
-            }else{
+            }
+            else
+            {
                 string message;
                 string t_search;
                 mb_conv( search, t_search );
@@ -100,11 +113,6 @@ bool vsqFileEx::read( string_t file_name, runtimeOptions options ){
 #endif
     return result;
 }
-
-/*vector<utauVoiceDataBase *> *vsqFileEx::getVoiceDBs()
-{
-    return &(this->voiceDBs);
-}*/
 
 double vsqFileEx::getEndSec()
 {

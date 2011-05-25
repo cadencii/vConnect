@@ -34,20 +34,20 @@ standFrame::~standFrame()
     delete[] cepstrumLengths;
 }
 
-void standFrame::createCepstrum(int cepstrumNumber)
+void standFrame::createCepstrum( int num_cepstrum )
 {
-    if(cepstrumNumber > 0)
+    if( num_cepstrum <= 0 ) return;
+
+    this->cepstrumNumber = num_cepstrum;
+    melCepstra           = new standComplex*[num_cepstrum];
+    mixRatio             = new double[num_cepstrum];
+    noiseRatio           = new double[num_cepstrum];
+    cepstrumLengths      = new int[num_cepstrum];
+    
+    for( int i = 0; i < num_cepstrum; i++ )
     {
-        this->cepstrumNumber = cepstrumNumber;
-        melCepstra = new standComplex*[cepstrumNumber];
-        mixRatio = new double[cepstrumNumber];
-        noiseRatio = new double[cepstrumNumber];
-        cepstrumLengths = new int[cepstrumNumber];
-        for(int i = 0; i < cepstrumNumber; i++)
-        {
-            mixRatio[i] = 0.0;
-            noiseRatio[i] = 0.0;
-            cepstrumLengths[i] = 0;
-        }
+        mixRatio[i] = 0.0;
+        noiseRatio[i] = 0.0;
+        cepstrumLengths[i] = 0;
     }
 }

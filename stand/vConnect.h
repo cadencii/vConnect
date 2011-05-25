@@ -29,7 +29,7 @@
 /// vConnect-STANDの合成器です．
 /// </summary>
 class vConnect {
-public:
+public: // public method
     vConnect();
 
     ~vConnect();
@@ -52,6 +52,7 @@ public:
         string_t alias,
         runtimeOptions options );
 
+public: // public static method
     static void calculateAperiodicity(
         double *dst,
         const double *src1,
@@ -73,33 +74,36 @@ public:
         double briRate,
         bool fast);
 
-private:
-    vsqFileEx mVsq;
-    corpusManager mManager;
-    vector<corpusManager *> mManagerList;
-    //これ要らないstandSpecgram specgram;
-
-    static double noteFrequency[NOTE_NUM];
-    static double vibrato[VIB_NUM];
-    double fluctTheta;
-
+private: // private method
     /* 内部処理用関数 */
     void calculateVsqInfo();
     void calculateF0(
-        standSpecgram& dst,
-        vector<double>& dynamics );
+        standSpecgram &dst,
+        vector<double> &dynamics );
     void calculateDynamics(
         vector<double> &dynamics,
         double *wave,
         long wave_len,
         bool volumeNormalization );
-    vector<vector<standBP> > controlCurves;
-
+    
+private: // private static method
     // vConnect内でしか使わない関数．
     static double getPitchFluctuation( double second );
     static void emptyPath( double secOffset, string_t output );
+    
+private: // private field
+    vsqFileEx mVsq;
+    corpusManager mManager;
+    vector<corpusManager *> mManagerList;
+    //これ要らないstandSpecgram specgram;
+    long mEndFrame;
+    double mFluctTheta;
+    vector<vector<standBP> > mControlCurves;
 
-    long endFrame;
+private: // private static field
+    static double mNoteFrequency[NOTE_NUM];
+    static double mVibrato[VIB_NUM];
+
 };
 
 #endif

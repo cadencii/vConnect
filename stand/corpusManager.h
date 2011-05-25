@@ -22,22 +22,24 @@
 #include "standData.h"
 #include "vConnectSetting.h"
 
-class corpusManager {
+class corpusManager
+{
 public:
     ~corpusManager();
-    void setVoiceDB( UtauDB* p, runtimeOptions& options );
+    void setUtauDB( UtauDB *p, runtimeOptions &options );
 
-    standData* getStandData( string_t lyric, runtimeOptions& options);
-    bool checkEnableExtention(void){return enableExtention;}
+    standData *getStandData( string_t lyric, runtimeOptions &options );
+    bool checkEnableExtention();
+
 private:
-    map_t<string_t, standData*> objectMap;
-    map_t<string_t, standMelCepstrum*> textureMap;
-    UtauDB* voiceDB;
+    map_t<string_t, standData *> objectMap;
+    map_t<string_t, standMelCepstrum *> textureMap;
+    UtauDB *voiceDB;
     string_t voicePath;
     vowelTable vowels;
 
     vConnectSetting setting;
-    bool            enableExtention;
+    bool enableExtention;
 };
 
 #endif // __corpusManager_h__
