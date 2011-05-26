@@ -11,6 +11,8 @@
 #include <iostream>
 #include <vector>
 
+#include "ConfDB.h"
+
 using namespace std;
 
 namespace vcnctd
@@ -41,12 +43,17 @@ namespace vcnctd
         static int getRawDBCount();
 
         /// <summary>
-        /// 第index番目の未解析音源のoto.iniファイルのパスを取得します．
+        /// 第index番目の未解析音源の設定を取得します．
         /// </summary>
         /// <param name="index">取得する音源のインデックス</param>
-        /// <returns>oto.iniファイルのパス</returns>
-        static string getRawDBPath( int index );
+        /// <returns>未解析音源の設定</returns>
+        static ConfDB *getRawDBConf( int index );
 
+        /// <summary>
+        /// このクラスで確保したメモリーを破棄します．
+        /// </summary>
+        static void destroy();
+        
     private:
         /// <summary>
         /// vcnctd.confファイルのパス
@@ -54,9 +61,9 @@ namespace vcnctd
         static string mConfPath;
 
         /// <summary>
-        /// UTAU音源のoto.iniファイルのディレクトリのリスト
+        /// 未解析のUTAU音源の設定リスト．
         /// </summary>
-        static vector<string> mRawDBPath;
+        static vector<ConfDB *> mRawDBConf;
     };
 
 }

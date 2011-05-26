@@ -44,7 +44,7 @@ namespace vcnctd
     
     namespace stand
     {
-        typedef vConnect Synthesizer;
+        typedef vConnect Synth;
         typedef runtimeOptions Options;
         typedef standMelCepstrum MelCeps;
         typedef standSpecgram Specgram;
@@ -52,6 +52,7 @@ namespace vcnctd
         typedef standData SynthSource;
         typedef corpusManager CorpusManager;
         typedef librarySetting librarySetting;
+        typedef UtauDB UtauDB;
     }
 
 }

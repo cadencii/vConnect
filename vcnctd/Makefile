@@ -1,5 +1,6 @@
 SRC=vcnctd.cpp \
 	Config.cpp \
+    ConfDB.cpp \
 	daemon.c \
 	../stand/corpusManager.cpp \
 	../stand/matching.cpp \
@@ -31,6 +32,7 @@ SRC=vcnctd.cpp \
 
 HDR=Config.h \
 	daemon.h \
+    ConfDB.h \
 	../stand/mb_text.h \
 	../stand/vConnect.h \
 	../stand/standData.h \

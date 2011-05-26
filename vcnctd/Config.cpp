@@ -3,24 +3,42 @@
  *
  * Copyright (C) 2011 kbinani.
  */
+#include <string>
+#include <iostream>
+
 #include "Config.h"
+
+using namespace std;
 
 namespace vcnctd
 {
 
     string Config::mConfPath = "/etc/vcnctd.conf";
-    vector<string> Config::mRawDBPath;
+    vector<ConfDB *> Config::mRawDBConf;
 
+    void Config::destroy()
+    {
+        for( int i = 0; i < mRawDBConf.size(); i++ )
+        {
+            ConfDB *conf = mRawDBConf[i];
+            if( conf )
+            {
+                delete conf;
+            }
+        }
+        mRawDBConf.clear();
+    }
+    
     int Config::getRawDBCount()
     {
-        return mRawDBPath.size();
+        return mRawDBConf.size();
     }
 
-    string Config::getRawDBPath( int index )
+    ConfDB *Config::getRawDBConf( int index )
     {
-        if( index < 0 ) return "";
-        if( mRawDBPath.size() <= index ) return "";
-        return mRawDBPath[index];
+        if( index < 0 ) return NULL;
+        if( mRawDBConf.size() <= index ) return NULL;
+        return mRawDBConf[index];
     }
     
     int Config::load()
@@ -36,38 +54,50 @@ namespace vcnctd
         char buf[4096];
         // current_parseには，現在パースしているエントリ[db]等の文字列が入る
         string current_parse = "";
-        while( fgets( buf, 4096, fp ) )
+        bool skip_line = false;
+        string line;
+        while( true )
         {
-            string line = buf;
+            if( skip_line )
+            {
+                skip_line = false;
+            }
+            else
+            {
+                if( fgets( buf, 4096, fp ) )
+                {
+                    line = buf;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            cout << "Config::load; line=" << line << endl;
             int indx_cr = line.find( "\n" );
             if( indx_cr != string::npos )
             {
                 line = line.substr( 0, indx_cr );
             }
             
-            if( line.find( "[" ) == 0 )
+            if( line.find( "[db]" ) == 0 )
             {
-                current_parse = line;
-            }
-            else
-            {
-                if( current_parse.compare( "[db]" ) == 0 )
-                {
-                    int indx = line.find( "=" );
-                    if( indx > 0 )
-                    {
-                        string key = line.substr( 0, indx );
-                        string value = line.substr( indx + 1 );
-                        if( key.compare( "path" ) == 0 )
-                        {
-                            mRawDBPath.push_back( value );
-                        }
-                    }
-                }
+                ConfDB *conf = new ConfDB();
+                skip_line = true;
+                bool ret = conf->parse( fp, line );
+                mRawDBConf.push_back( conf );
+                if( !ret ) break;
             }
         }
         fclose( fp );
 
+        for( int i = 0; i < mRawDBConf.size(); i++ )
+        {
+            string path = mRawDBConf[i]->getPath();
+            string charset = mRawDBConf[i]->getCharset();
+            cout << "[#" << i << "] path=" << path << "; charset=" << charset << endl;
+        }
+        
         return 1;
     }
 
