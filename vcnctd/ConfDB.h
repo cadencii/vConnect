@@ -23,7 +23,7 @@ namespace vcnctd
     public:
 
         /// <summary>
-        /// コンストラクタ．
+        /// コンストラクタ．規定値を入れる処理をします．
         /// </summary>
         ConfDB();
 
@@ -49,7 +49,15 @@ namespace vcnctd
         
     private:
 
+        /// <summary>
+        /// oto.iniファイルのパス
+        /// </summary>
         string mPath;
+
+        /// <summary>
+        /// oto.iniファイルのキャラクタ・エンコーディング．
+        /// デフォルト値は"UTF-8"．
+        /// </summary>
         string mCharset;
     };
     

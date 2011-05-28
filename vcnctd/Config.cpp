@@ -13,10 +13,7 @@ using namespace std;
 namespace vcnctd
 {
 
-    string Config::mConfPath = "/etc/vcnctd.conf";
-    vector<ConfDB *> Config::mRawDBConf;
-
-    void Config::destroy()
+    Config::~Config()
     {
         for( int i = 0; i < mRawDBConf.size(); i++ )
         {
@@ -41,13 +38,15 @@ namespace vcnctd
         return mRawDBConf[index];
     }
     
-    int Config::load()
+    Config::Config()
     {
+        mConfPath = "/etc/vcnctd.conf";
+
         // 設定ファイルを読み取りモードで開く
         FILE *fp = fopen( getConfPath().c_str(), "r" );
         if( !fp )
         {
-            return 0;
+            return;
         }
 
         // 各行について調べる．
@@ -98,12 +97,12 @@ namespace vcnctd
             cout << "[#" << i << "] path=" << path << "; charset=" << charset << endl;
         }
         
-        return 1;
+        return;
     }
 
     string Config::getConfPath()
     {
-        return Config::mConfPath;
+        return mConfPath;
     }
 
 }

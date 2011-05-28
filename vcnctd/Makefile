@@ -1,4 +1,5 @@
 SRC=vcnctd.cpp \
+    Server.cpp \
 	Config.cpp \
     ConfDB.cpp \
 	daemon.c \
@@ -30,7 +31,8 @@ SRC=vcnctd.cpp \
 	../stand/world/synthesis.cpp \
 	../stand/world/synthesis_v4.cpp
 
-HDR=Config.h \
+HDR=Server.h \
+    Config.h \
 	daemon.h \
     ConfDB.h \
 	../stand/mb_text.h \
@@ -58,7 +60,7 @@ HDR=Config.h \
 	../stand/stand.h
 
 vcnctd: $(SRC)
-	g++ $(SRC) -o vcnctd -liconv -lfftw3 -lpthread
+	g++ -g $(SRC) -o vcnctd -liconv -lfftw3 -lpthread
 
 clean:
 	rm vcnctd

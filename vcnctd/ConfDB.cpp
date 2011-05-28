@@ -16,7 +16,6 @@ namespace vcnctd
 
     bool ConfDB::parse( FILE *fp, string &last_line )
     {
-        cout << "ConfDB::parse" << endl;
         char buf[4096];
         string line;
         while( true )

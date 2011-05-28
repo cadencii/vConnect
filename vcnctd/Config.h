@@ -25,45 +25,45 @@ namespace vcnctd
     {
     public:
         /// <summary>
-        /// 設定値を読み込みます
+        /// コンストラクタ．設定値を読み込みます
         /// </summary>
-        /// <returns>読み込みに失敗した場合0，成功した場合は0以外の値を返します．</returns>
-        static int load();
+        Config();
 
+        /// <summary>
+        /// デストラクタ．
+        /// </summary>
+        ~Config();
+        
         /// <summary>
         /// 設定ファイルのパスを取得します．
         /// </summary>
         /// <returns>設定ファイルのパス．</returns>
-        static string getConfPath();
+        string getConfPath();
 
         /// <summary>
         /// 未解析の音源の個数を取得します
         /// </summary>
         /// <returns>未解析音源の個数</returns>
-        static int getRawDBCount();
+        int getRawDBCount();
 
         /// <summary>
         /// 第index番目の未解析音源の設定を取得します．
         /// </summary>
         /// <param name="index">取得する音源のインデックス</param>
         /// <returns>未解析音源の設定</returns>
-        static ConfDB *getRawDBConf( int index );
+        ConfDB *getRawDBConf( int index );
 
-        /// <summary>
-        /// このクラスで確保したメモリーを破棄します．
-        /// </summary>
-        static void destroy();
         
     private:
         /// <summary>
         /// vcnctd.confファイルのパス
         /// </summary>
-        static string mConfPath;
+        string mConfPath;
 
         /// <summary>
         /// 未解析のUTAU音源の設定リスト．
         /// </summary>
-        static vector<ConfDB *> mRawDBConf;
+        vector<ConfDB *> mRawDBConf;
     };
 
 }
