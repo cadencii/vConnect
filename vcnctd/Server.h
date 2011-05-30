@@ -6,6 +6,19 @@
 #ifndef __Server_h__
 #define __Server_h__
 
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h> 
+#include <sys/time.h>   /* selectシステムコール */
+#include <unistd.h>
+
+#define PORT 8765       /* サーバーが使うポート番号  */
+#define MAX_SOCKETS 5      /* 最大ソケット数をここで決めた (最大32)*/
+#define UNUSED (-1)
+
 #include "Config.h"
 #include "vcnctd.h"
 
@@ -25,8 +38,16 @@ namespace vcnctd
         /// コンストラクタ．
         /// </summary>
         Server();
-        
+
+        /// <summary>
+        /// デストラクタ．
+        /// </summary>
         ~Server();
+        
+        /// <summary>
+        /// ポートのLISTENを開始します．
+        /// </summary>
+        void startListening();        
         
         /// <summary>
         /// 未解析の音源について，解析を行います．
@@ -52,6 +73,11 @@ namespace vcnctd
         /// 解析済み音源を保持するインスタンスのリスト．
         /// </summary>
         vector<CorpusManager *> mCorpusManagers;
+
+        /// <summary>
+        /// ソケットのリスト
+        /// </summary>
+        int mSockets[MAX_SOCKETS];
         
     };
     

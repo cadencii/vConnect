@@ -7,8 +7,6 @@
 #include "Config.h"
 #include "Server.h"
 
-#include <stdlib.h>
-
 #include <iostream>
 
 using namespace vcnctd;
@@ -18,13 +16,14 @@ static Server *server = NULL;
 
 int main( int argc, char *argv[] )
 {
-    mtrace();
-    
     // デーモンのインスタンスを生成（とりあえず
     server = new Server();
     
     // 未解析の音源について解析を行う
     server->analyze();
 
+    // サーバーのメインループを起動
+    server->startListening();
+    
     return 0;
 }
