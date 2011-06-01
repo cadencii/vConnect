@@ -52,7 +52,6 @@ namespace vcnctd
         typedef standData SynthSource;
         typedef corpusManager CorpusManager;
         typedef librarySetting librarySetting;
-        typedef UtauDB UtauDB;
     }
 
 }

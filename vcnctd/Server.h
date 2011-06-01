@@ -9,8 +9,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/time.h>   /* selectシステムコール */
 #include <unistd.h>
 
 #define PORT 8765       /* サーバーが使うポート番号  */

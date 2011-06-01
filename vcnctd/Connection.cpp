@@ -56,7 +56,7 @@ namespace vcnctd
         /* 
          * saddrの中身を0にしておかないと、bind()でエラーが起こることがある
          */
-        bzero( (char *)&saddr, sizeof( saddr ) );
+        memset( (char *)&saddr, 0, sizeof( saddr ) );
         
         /* ソケットに名前をつける bind() */
         saddr.sin_family = AF_INET;

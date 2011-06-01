@@ -6,8 +6,15 @@
 #ifndef __Connection_h__
 #define __Connection_h__
 
-#include <sys/socket.h>
-#include <netinet/in.h> 
+#ifdef __WIN32__
+    #include <winsock2.h>
+    typedef int socklen_t;
+#else
+    #include <netinet/in.h> 
+    #include <sys/socket.h>
+    #include <sys/types.h>
+#endif
+#include <sys/time.h>   /* selectシステムコール */
 #include <map>
 
 #include "Config.h"

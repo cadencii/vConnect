@@ -62,7 +62,7 @@ HDR=Server.h \
 	../stand/stand.h
 
 vcnctd: $(SRC) $(HDR)
-	g++  $(SRC) -o vcnctd -liconv -lfftw3 -lpthread
+	g++ -w $(SRC) -o vcnctd -liconv -lfftw3 -lpthread
 
 clean:
 	rm vcnctd

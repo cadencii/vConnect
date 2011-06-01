@@ -21,8 +21,8 @@ namespace vcnctd
         for( int i = 0; i < num; i++ )
         {
             CorpusManager *man = mCorpusManagers[i];
-            if( man ) delete man;
             mCorpusManagers[i] = NULL;
+            if( man ) delete man;
         }
         mCorpusManagers.clear();
         UtauDB::dbClear();
@@ -31,7 +31,7 @@ namespace vcnctd
     void Server::startListening()
     {
         // ソケット接続を初期化．
-        this->cons->initSockets();
+        this->cons->initSockets( this->config );
         
         /* 接続されるのを待つ listen() */
         /* 第2引数の値を大きくする */
