@@ -10,8 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h> 
 #include <sys/time.h>   /* selectシステムコール */
 #include <unistd.h>
 
@@ -20,6 +18,7 @@
 #define UNUSED (-1)
 
 #include "Config.h"
+#include "Connection.h"
 #include "vcnctd.h"
 
 using namespace vcnctd;
@@ -54,7 +53,13 @@ namespace vcnctd
         /// </summary>
         void analyze();
         
+
     public:
+        
+        /// <summary>
+        /// ソケット接続を管理するインスタンス．
+        /// </summary>
+        Connection *cons;
         
         /// <summary>
         /// 合成器のインスタンスです．
@@ -77,7 +82,7 @@ namespace vcnctd
         /// <summary>
         /// ソケットのリスト
         /// </summary>
-        int mSockets[MAX_SOCKETS];
+        //int mSockets[MAX_SOCKETS];
         
     };
     

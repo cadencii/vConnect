@@ -12,6 +12,7 @@ namespace vcnctd
     {
         this->synth = new Synth();
         this->config = new Config();
+        this->cons = new Connection();
     }
 
     Server::~Server()
@@ -29,47 +30,12 @@ namespace vcnctd
     
     void Server::startListening()
     {
-        //int s[SOCK_MAX + 1]; /* array of socket descriptors */
-        int max = 0;         /* max num of used socket */
-        int n = 0;
-        socklen_t len;
-        fd_set readfds;
-        int clilen;               /* client length */
-        struct sockaddr_in saddr; /* サーバ側(自分)のアドレス情報 */
-        struct sockaddr_in caddr; /* クライアント側のアドレス情報を入れるところ */
-        char str[1024];           /* string buffer */
-        int i, j;                 /* loop counter */
-        int msglen;
-        
-        /* 
-         *  ソケットを作る。
-         *  このソケットはINETドメインでストリーム型(コネクション型) 。
-         */
-        if( (mSockets[0] = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
-        {
-            perror( "socket" );
-            exit( 1 );
-        }
-        
-        /* 
-         * saddrの中身を0にしておかないと、bind()でエラーが起こることがある
-         */
-        bzero( (char *)&saddr, sizeof( saddr ) );
-        
-        /* ソケットに名前をつける bind() */
-        saddr.sin_family = AF_INET;
-        saddr.sin_addr.s_addr = INADDR_ANY;
-        saddr.sin_port = htons( PORT ); /* 定数PORTは#defineしたもの */
-        
-        if( (bind( mSockets[0], (struct sockaddr *)&saddr, sizeof( saddr ) )) == -1 )
-        {
-            perror( "bind" );
-            exit( 1 );
-        }
+        // ソケット接続を初期化．
+        this->cons->initSockets();
         
         /* 接続されるのを待つ listen() */
         /* 第2引数の値を大きくする */
-        if( (listen( mSockets[0], MAX_SOCKETS )) == -1 )
+        if( (listen( this->cons->get( 0 ), MAX_SOCKETS )) == -1 )
         {
             perror( "listen" );
             exit( 1 );

@@ -52,7 +52,12 @@ namespace vcnctd
         /// <param name="index">取得する音源のインデックス</param>
         /// <returns>未解析音源の設定</returns>
         ConfDB *getRawDBConf( int index );
-
+        
+        /// <summary>
+        /// アクセスを受け付けるポート番号を取得します．
+        /// </summary>
+        /// <returns>アクセスを受け付けるポート番号．</returns>
+        int getPort();
         
     private:
         /// <summary>
@@ -64,6 +69,11 @@ namespace vcnctd
         /// 未解析のUTAU音源の設定リスト．
         /// </summary>
         vector<ConfDB *> mRawDBConf;
+        
+        /// <summary>
+        /// アクセスを受け付けるポート番号．
+        /// </summary>
+        int mPort;
     };
 
 }

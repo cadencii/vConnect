@@ -12,7 +12,11 @@ using namespace std;
 
 namespace vcnctd
 {
-
+    int Config::getPort()
+    {
+        return mPort;
+    }
+    
     Config::~Config()
     {
         for( int i = 0; i < mRawDBConf.size(); i++ )
@@ -40,7 +44,9 @@ namespace vcnctd
     
     Config::Config()
     {
+        // デフォルト値で埋める
         mConfPath = "/etc/vcnctd.conf";
+        mPort = 52525;
 
         // 設定ファイルを読み取りモードで開く
         FILE *fp = fopen( getConfPath().c_str(), "r" );
