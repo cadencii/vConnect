@@ -3,7 +3,6 @@ SRC=vcnctd.cpp \
 	Config.cpp \
     ConfDB.cpp \
 	daemon.c \
-    ../stand/vsqMetaText/TextReader.cpp \
 	../stand/corpusManager.cpp \
 	../stand/matching.cpp \
 	../stand/mb_text.cpp \
@@ -36,7 +35,6 @@ HDR=Server.h \
     Config.h \
 	daemon.h \
     ConfDB.h \
-    ../stand/vsqMetaText/TextReader.h \
 	../stand/mb_text.h \
 	../stand/vConnect.h \
 	../stand/standData.h \
