@@ -19,7 +19,7 @@
 #define MAX_SOCKETS 5      /* 最大ソケット数をここで決めた (最大32)*/
 #define UNUSED (-1)
 
-#include "../stand/vsqMetaText/Socket.h"
+#include "../stand/Socket.h"
 #include "Config.h"
 #include "vcnctd.h"
 

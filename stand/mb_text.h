@@ -21,6 +21,7 @@
 #include <clocale>
 #include <locale>
 #include <iostream>
+#include "Socket.h"
 
 using namespace std;
 

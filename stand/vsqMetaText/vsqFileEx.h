@@ -11,7 +11,7 @@
 #include "vsqTempo.h"
 #include "vsqPhonemeDB.h"
 #include "../runtimeOptions.h"
-#include "Socket.h"
+#include "../Socket.h"
 
 /// <summary>
 /// VSQメタテキストが表現するシーケンスを取り扱うクラスです．

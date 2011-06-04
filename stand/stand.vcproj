@@ -511,6 +511,10 @@
 			RelativePath="..\pthreadVC2.lib"
 			>
 		</File>
+		<File
+			RelativePath=".\Socket.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

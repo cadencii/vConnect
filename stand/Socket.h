@@ -6,7 +6,8 @@
 #ifndef __Socket_h__
 #define __Socket_h__
 
-#include <unistd.h> // for 'read' system call
+#include <io.h> // for 'read' system call
+
 typedef int Socket;
 
 #endif
