@@ -11,6 +11,7 @@
 #include "vsqTempo.h"
 #include "vsqPhonemeDB.h"
 #include "../runtimeOptions.h"
+#include "Socket.h"
 
 /// <summary>
 /// VSQメタテキストが表現するシーケンスを取り扱うクラスです．
@@ -24,13 +25,21 @@ public:
     vsqFileEx();
 
     /// <summary>
-    /// VSQのメタテキストを読み込みます．
+    /// ファイルからVSQのメタテキストを読み込みます．
     /// </summary>
     /// <param name="file_name">読み込むメタテキストファイルのパス．</param>
     /// <param name="options">読み込み時の設定値．</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
     bool read( string_t file_name, runtimeOptions options );
 
+    /// <summary>
+    /// ソケットからVSQのメタテキストを読み込みます．
+    /// </summary>
+    /// <param name="socket">読み込むソケット．</param>
+    /// <param name="options">読み込み時の設定値．</param>
+    /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
+    bool read( Socket socket, runtimeOptions options );
+    
     /// <summary>
     /// シーケンスの演奏長さを取得します．単位は秒です．
     /// </summary>
@@ -62,6 +71,14 @@ public:
 protected:
 
 private:
+
+    /// <summary>
+    /// VSQのメタテキストを読み込みます．
+    /// </summary>
+    /// <param name="fp">読み込むストリーム．</param>
+    /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
+    bool readCore( MB_FILE *fp );
+    
     vsqPhonemeDB voiceDataBase;
 };
 

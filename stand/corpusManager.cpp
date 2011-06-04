@@ -21,7 +21,9 @@ void corpusManager::analyze( runtimeOptions &options )
     {
         string_t lyric = itr->first;
         this->getStandData( lyric, options );
-        cout << "corpusManager::analyze; lyric=" << lyric << endl;
+        string str_lyric;
+        mb_conv( lyric, str_lyric );
+        cout << "corpusManager::analyze; lyric=" << str_lyric << endl;
     }
 }
 

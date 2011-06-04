@@ -2,11 +2,12 @@ SRC=./stand/corpusManager.cpp ./stand/main.cpp ./stand/stand.cpp ./stand/standSp
     ./stand/vConnect.cpp ./stand/vowelTable.cpp \
     ./stand/mb_text.cpp ./stand/matching.cpp \
     \
-    ./stand/utauVoiceDB/utauVoiceDataBase.cpp ./stand/utauVoiceDB/utauFreq.cpp \
+    ./stand/utauVoiceDB/UtauDB.cpp ./stand/utauVoiceDB/utauFreq.cpp \
     \
     ./stand/vsqMetaText/vsqBase.cpp ./stand/vsqMetaText/vsqBPList.cpp \
     ./stand/vsqMetaText/vsqEventEx.cpp ./stand/vsqMetaText/vsqEventList.cpp \
     ./stand/vsqMetaText/vsqFileEx.cpp ./stand/vsqMetaText/vsqHandle.cpp \
+    ./stand/vsqMetaText/TextReader.cpp \
     ./stand/vsqMetaText/vsqTempo.cpp \
     \
     ./stand/waveFileEx/waveFileEx.cpp \

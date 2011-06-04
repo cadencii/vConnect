@@ -26,6 +26,12 @@ vsqFileEx::vsqFileEx()
     objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
 }
 
+bool vsqFileEx::read( Socket socket, runtimeOptions options )
+{
+    MB_FILE *fp = mb_fopen( (int)socket, options.encodingVsqText.c_str() );
+    return readCore( fp );
+}
+
 bool vsqFileEx::read( string_t file_name, runtimeOptions options )
 {
 #ifdef _DEBUG
@@ -44,75 +50,74 @@ bool vsqFileEx::read( string_t file_name, runtimeOptions options )
     cout << "vsqFileEx::readVsqFile; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
 #endif
 
-    if( fp )
-    {
-        string_t temp, search, left, right;
-        map_t<string_t, vsqBase *>::iterator i;
+    return readCore( fp );
+}
 
-        while( mb_fgets( temp, fp ) )
-        {
+bool vsqFileEx::readCore( MB_FILE *fp )
+{
+    if( !fp ) return false;
+
+    string_t temp, search, left, right;
+    map_t<string_t, vsqBase *>::iterator i;
+
+    while( mb_fgets( temp, fp ) )
+    {
 #ifdef _DEBUG
-            string s;
-            mb_conv( temp, s );
-            cout << "vsqFileEx::readVsqFile; temp=" << s << endl;
+        string s;
+        mb_conv( temp, s );
+        cout << "vsqFileEx::readVsqFile; temp=" << s << endl;
 #endif
-            if( temp.find( _T("[") ) == 0 )
+        if( temp.find( _T("[") ) == 0 )
+        {
+            search = temp;
+            continue;
+        }
+        string_t::size_type indx_equal = temp.find( _T("=") );
+        if( indx_equal == string_t::npos )
+        {
+            left = temp;
+            right = _T("");
+        }
+        else
+        {
+            left = temp.substr( 0, indx_equal );
+            right = temp.substr( indx_equal + 1 );
+        }
+        i = objectMap.find( search );
+        if( i != objectMap.end() )
+        {
+            if( i->second )
             {
-                search = temp;
-                continue;
-            }
-            string_t::size_type indx_equal = temp.find( _T("=") );
-            if( indx_equal == string_t::npos )
-            {
-                left = temp;
-                right = _T("");
-            }
-            else
-            {
-                left = temp.substr( 0, indx_equal );
-                right = temp.substr( indx_equal + 1 );
-            }
-            i = objectMap.find( search );
-            if( i != objectMap.end() )
-            {
-                if( i->second )
+                if( search.compare( _T("[EventList]") ) == 0 )
                 {
-                    if( search.compare( _T("[EventList]") ) == 0 )
+                    string_t::size_type indx_comma = right.find( _T(",") );
+                    while( indx_comma != string_t::npos )
                     {
-                        string_t::size_type indx_comma = right.find( _T(",") );
-                        while( indx_comma != string_t::npos )
-                        {
-                            // コンマが見つからなくなるまでループ
-                            string_t tright = right.substr( 0, indx_comma );
-                            i->second->setParameter( left, tright );
-                            right = right.substr( indx_comma + 1 );
-                            indx_comma = right.find( _T(",") );
-                        }
+                        // コンマが見つからなくなるまでループ
+                        string_t tright = right.substr( 0, indx_comma );
+                        i->second->setParameter( left, tright );
+                        right = right.substr( indx_comma + 1 );
+                        indx_comma = right.find( _T(",") );
                     }
-                    i->second->setParameter( left, right );
                 }
-            }
-            else
-            {
-                string message;
-                string t_search;
-                mb_conv( search, t_search );
-                message = "vsqFileEx::readVsqFile; not found: " + t_search;
-                outputError( message.c_str() );
+                i->second->setParameter( left, right );
             }
         }
-        mb_fclose( fp );
-
-        // utau音源が無ければ合成しようがないので false.
-        int size = UtauDB::dbSize();
-        result = (size > 0);
+        else
+        {
+            string message;
+            string t_search;
+            mb_conv( search, t_search );
+            message = "vsqFileEx::readVsqFile; not found: " + t_search;
+            outputError( message.c_str() );
+        }
     }
-#ifdef _DEBUG
-    cout << "type any key to continue...";
-    int i;
-    scanf( "%d", &i );
-#endif
-    return result;
+    mb_fclose( fp );
+
+    // utau音源が無ければ合成しようがないので false.
+    int size = UtauDB::dbSize();
+    
+    return (size > 0);
 }
 
 double vsqFileEx::getEndSec()

@@ -12,7 +12,6 @@ namespace vcnctd
     {
         this->synth = new Synth();
         this->config = new Config();
-        this->cons = new Connection();
     }
 
     Server::~Server()
@@ -28,121 +27,146 @@ namespace vcnctd
         UtauDB::dbClear();
     }
     
-    void Server::startListening()
+    int Server::startListening()
     {
-        // ソケット接続を初期化．
-        this->cons->initSockets( this->config );
-        
-        /* 接続されるのを待つ listen() */
-        /* 第2引数の値を大きくする */
-        if( (listen( this->cons->get( 0 ), MAX_SOCKETS )) == -1 )
+        const int SOCK_MAX = 128;
+
+        // ソケット接続のリスト
+        Socket s[SOCK_MAX + 1];
+        for( int i = 0; i < SOCK_MAX + 1; i++ )
         {
-            perror( "listen" );
-            exit( 1 );
-        } 
-        max = 1;   /* s[0] is ready */
+            s[i] = -1;
+        }
+
+        // ソケット作る
+        if( (s[0] = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
+        {
+            // エラーなので死ぬ
+            printf( "error; create first socket\n" );
+            return 0;
+        }
         
-        /* メインループ */
+        // サーバーのアドレス情報
+        struct sockaddr_in server_addr;
+        memset( (char *)&server_addr, 0, sizeof( server_addr ) );
+        server_addr.sin_family = AF_INET;
+        server_addr.sin_addr.s_addr = INADDR_ANY;
+        server_addr.sin_port = htons( this->config->getPort() );
+
+        // ソケットとアドレスを紐付け
+        if( (bind( s[0], (struct sockaddr *)&server_addr, sizeof( server_addr ) )) == -1 )
+        {
+            // 紐付けに失敗したので死ぬ
+            printf( "error; bind first socket\n" );
+            return 0;
+        }
+        
+        // サーバーのソケットを接続待ち
+        if( (listen( s[0], SOCK_MAX )) == -1 )
+        {
+            // 待受開始に失敗したので死ぬ
+            printf( "error; listen first socket\n" );
+            return 0;
+        }
+
+        // 受信メッセージ用の文字列
+        char str[1024];
+        
+        // メインループ．無限ループ
         while( 1 )
         {
-            FD_ZERO( &readfds );    /* fdsの初期化 */
-            printf( "max: %d\n", max );
-            /* 
-             * すでにクライアントと接続されているソケットのビットを
-             * セットしてselect()の検査対象にする。
-             */
-            for( i = 0; i < max; i++ )
+            fd_set readfds;
+            FD_ZERO( &readfds );
+            
+            // 接続済みのクライアントのビットを立てる
+            for( int i = 0; i < SOCK_MAX + 1; i++ )
             {
-                if( mSockets[i] != UNUSED )
-                {
-                    FD_SET( mSockets[i], &readfds );
-                }
+                if( s[i] <= 0 ) continue;
+                FD_SET( s[i], &readfds );
             }
-            /* 
-             * メッセージが到着しているソケットがないか調べる
-             */
+            
+            // メッセージの到着をチェック
+            int n;
             if( (n = select( FD_SETSIZE, &readfds, NULL, NULL, NULL )) == -1 )
             {
-                perror( "select" );
-                exit( 1 );
+                printf( "error; select failed\n" );
+                return 0;
             }
-            printf( "select returns: %d\n", n );
-            /*   
-             *  1～maxのソケットに届くのは、すでに接続されているクライアントからの
-             *  メッセージである。
-             *  もしメッセージがあれば、接続されているすべてのクライアントに送る。
-             */
-            for( i = 1; i < max; i++ )
+
+            // 接続済みソケットからのメッセージをチェック
+            for( int i = 1; i < SOCK_MAX + 1; i++ )
             {
-                if( mSockets[i] != UNUSED )
+                // 接続済み？
+                if( s[i] <= 0 ) continue;
+                // メッセージ到着している？
+                if( !FD_ISSET( s[i], &readfds ) ) continue;
+
+                strcpy( str, "" );
+                int msg_length = read( s[i], str, sizeof( str ) );
+                if( msg_length < 0 )
                 {
-                    if( FD_ISSET( mSockets[i], &readfds ) )
-                    {
-                        /* 
-                         * mSockets[i]のビットが立っていれば、mSockets[i]にメッセージが到着している
-                         */
-                        printf( "s[%d] ready for reading\n", i );
-                        if( (msglen = read( mSockets[i], str, sizeof( str ) )) == -1 )
-                        {
-                            /* 受信失敗 */
-                            perror("read");
-                        }
-                        else if ( msglen != 0 )
-                        {
-                            /* メッセージの受信に成功 */
-                            printf( "client[%d]: %s", i, str );
-                            //Modification(str,msglen);   /* 作業 */
-                            /* 接続されているクライアントすべてにメッセージを送る */
-                            for( j = 1; j < max; j++ )
-                            {
-                                if( mSockets[j] != UNUSED )
-                                {
-                                    write( mSockets[j], str, strlen( str ) );
-                                }
-                            }
-                        }
-                        else
-                        {
-                            printf( "client[%d]: connection closed.\n", i );
-                            close( mSockets[i] );
-                            mSockets[i] = UNUSED;
-                        }
-                    }
+                    // 受信に失敗
+                    printf( "warning; read failed from #%d\n", i );
                 }
-            }	
-            /* 
-             *  新たな接続要求があった場合は、s[0]のビットが立つ。
-             *  以下では新たな接続の受け付けを行う。
-             */
-            if( FD_ISSET( mSockets[0], &readfds ) != 0 )
-            {
-                printf( "Accept New one.\n" );
-                /* 接続を確立する accept() */
-                len = sizeof( caddr );
-                mSockets[max] =
-                    accept( mSockets[0], (struct sockaddr *)&caddr, &len );
-                printf( "%d = accept()\n", mSockets[max] );
-                if( mSockets[max] == -1 )
+                else if( msg_length > 0 )
                 {
-                    perror( NULL );
-                    exit( 1 );
-                }
-                if( max < MAX_SOCKETS )
-                {
-                    printf( "client accepted(%d).\n", max );
-                    max++;
+                    // 受信に成功
+                    string s_str = str;
+                    int indx = s_str.find( "\n" );
+                    if( indx > 0 ) s_str = s_str.substr( 0, indx );
+                    printf( "info; #%d said \"%s\"\n", i, s_str.c_str() );
+                    char msg[] = "[OK]";
+                    write( s[i], (char *)msg, strlen( msg ) );
                 }
                 else
                 {
-                    printf( "refuse connection.\n" );
-                    strcpy( str, "Server is too busy.\n" );
-                    write( mSockets[max], str, strlen( str ) );
-                    close( mSockets[max] );
+                    // 接続が切られた
+                    printf( "info; %d disconnected\n", i );
+                    close( s[i] );
+                    s[i] = 0;
+                }
+            }
+            
+            // 新しい接続がないかな
+            if( FD_ISSET( s[0], &readfds ) != 0 )
+            {
+                printf( "info; new connection\n" );
+                
+                struct sockaddr_in client_addr;
+                socklen_t len = sizeof( client_addr );
+                
+                // どれがあいてるかな
+                int index = -1;
+                for( int i = 1; i < SOCK_MAX + 1; i++ )
+                {
+                    if( s[i] <= 0 )
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+                if( index < 0 )
+                {
+                    // 最大接続数をオーバーしてる
+                    printf( "warning: server too busy\n" );
+                }
+                else
+                {
+                    s[index] = accept( s[0], (struct sockaddr *)&client_addr, &len );
+                    if( s[index] == -1 )
+                    {
+                        printf( "error; accept failed\n" );
+                        return 0;
+                    }
+                    else
+                    {
+                        printf( "info; #%d connection accepted\n", index );
+                    }
                 }
             }
         }
     }
-    
+        
     void Server::analyze()
     {
         runtimeOptions opts;

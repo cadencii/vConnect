@@ -1,9 +1,9 @@
 SRC=vcnctd.cpp \
-    Connection.cpp \
     Server.cpp \
 	Config.cpp \
     ConfDB.cpp \
 	daemon.c \
+    ../stand/vsqMetaText/TextReader.cpp \
 	../stand/corpusManager.cpp \
 	../stand/matching.cpp \
 	../stand/mb_text.cpp \
@@ -33,10 +33,10 @@ SRC=vcnctd.cpp \
 	../stand/world/synthesis_v4.cpp
 
 HDR=Server.h \
-    Connection.h \
     Config.h \
 	daemon.h \
     ConfDB.h \
+    ../stand/vsqMetaText/TextReader.h \
 	../stand/mb_text.h \
 	../stand/vConnect.h \
 	../stand/standData.h \

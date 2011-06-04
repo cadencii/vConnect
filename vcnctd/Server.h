@@ -6,6 +6,10 @@
 #ifndef __Server_h__
 #define __Server_h__
 
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,8 +19,8 @@
 #define MAX_SOCKETS 5      /* 最大ソケット数をここで決めた (最大32)*/
 #define UNUSED (-1)
 
+#include "../stand/vsqMetaText/Socket.h"
 #include "Config.h"
-#include "Connection.h"
 #include "vcnctd.h"
 
 using namespace vcnctd;
@@ -44,7 +48,7 @@ namespace vcnctd
         /// <summary>
         /// ポートのLISTENを開始します．
         /// </summary>
-        void startListening();        
+        int startListening();        
         
         /// <summary>
         /// 未解析の音源について，解析を行います．
@@ -53,12 +57,7 @@ namespace vcnctd
         
 
     public:
-        
-        /// <summary>
-        /// ソケット接続を管理するインスタンス．
-        /// </summary>
-        Connection *cons;
-        
+                
         /// <summary>
         /// 合成器のインスタンスです．
         /// </summary>
@@ -77,6 +76,7 @@ namespace vcnctd
         /// </summary>
         vector<CorpusManager *> mCorpusManagers;
 
+        int mMax;
         /// <summary>
         /// ソケットのリスト
         /// </summary>

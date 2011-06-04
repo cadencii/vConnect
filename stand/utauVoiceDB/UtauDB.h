@@ -25,6 +25,7 @@ public: // public method
     /// </summary>
     /// <param name="path_oto_ini">oto.iniファイルのパス．</param>
     /// <param name="codepage">oto.iniファイルのテキスト・エンコーディング．</param>
+    /// <returns>
     int read( string_t fileName, const char *codepage );
 
     /// <summary>
@@ -48,8 +49,16 @@ public: // public method
     /// <returns>音素の数が0の場合trueを，そうでない場合はfalseを返します．</returns>
     bool empty();
 
+    /// <summary>
+    /// 音素とパラメータの紐付けを格納したマップの反復子の先頭を返します．
+    /// </summary>
+    /// <returns>反復子の先頭．</returns>
     map_t<string_t, utauParameters *>::iterator begin();
-    
+
+    /// <summary>
+    /// 音素とパラメータの紐付けを格納したマップの反復子の末尾を返します．
+    /// </summary>
+    /// <returns>反復子の末尾．</returns>
     map_t<string_t, utauParameters *>::iterator end();
     
 public: // public static method
@@ -86,8 +95,14 @@ protected: // protected field
     /// </summary>
     string_t mDBPath;
 
+    /// <summary>
+    /// 音素と音素のパラメータの紐付けを格納するマップ．
+    /// </summary>
     map_t<string_t, utauParameters *> mSettingMap;
 
+    /// <summary>
+    /// 音素のパラメータを格納したインスタンスのリスト．
+    /// </summary>
     list<utauParameters *> mSettingList;
 
 
