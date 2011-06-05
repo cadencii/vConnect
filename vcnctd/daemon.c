@@ -7,6 +7,7 @@
 
 int daemon( int nochdir, int noclose )
 {
+#ifndef WIN32
     switch( fork() )
     {
         case 0:{
@@ -48,15 +49,18 @@ int daemon( int nochdir, int noclose )
         dup( 0 );
         dup( 0 );
     }
+#endif
     return 0;
 }
 
 void closeall( int fd )
 {
+#ifndef WIN32
     int fdlimit = sysconf( _SC_OPEN_MAX );
     
     while( fd < fdlimit ){
         close( fd++ );
     }
+#endif
 }
 

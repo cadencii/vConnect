@@ -6,8 +6,10 @@
 #ifndef __daemon_h__
 #define __daemon_h__
 
-#include <fcntl.h>
-#include <unistd.h>
+#if !defined( WIN32 )
+    #include <fcntl.h>
+    #include <unistd.h>
+#endif
 
 int daemon( int nochdir, int noclose );
 

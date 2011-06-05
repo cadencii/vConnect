@@ -6,14 +6,18 @@
 #ifndef __Server_h__
 #define __Server_h__
 
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/time.h>
+#ifdef WIN32
+    #include <winsock2.h>
+#else
+    #include <netinet/in.h>
+    #include <sys/socket.h>
+    #include <sys/types.h>
+    #include <sys/time.h>
+    #include <unistd.h>
+#endif
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 #define PORT 8765       /* サーバーが使うポート番号  */
 #define MAX_SOCKETS 5      /* 最大ソケット数をここで決めた (最大32)*/

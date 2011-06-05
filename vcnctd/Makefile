@@ -1,3 +1,13 @@
+WIN=
+FFTW=lfftw3
+WINSOCK=
+LFFTW=D:\fftw
+
+ifneq ($(WIN),)
+  FFTW=lfftw3-3
+  WINSOCK=-lws2_32
+endif
+
 SRC=vcnctd.cpp \
     Server.cpp \
 	Config.cpp \
@@ -60,7 +70,7 @@ HDR=Server.h \
 	../stand/stand.h
 
 vcnctd: $(SRC) $(HDR)
-	g++ -g -w $(SRC) -D_DEBUG -o vcnctd -liconv -lfftw3 -lpthread
+	g++ -L"$(LFFTW)" -g -w $(SRC) -D_DEBUG -o vcnctd -liconv -$(FFTW) $(WINSOCK)
 
 clean:
 	rm vcnctd

@@ -331,6 +331,8 @@ MB_FILE *mb_fopen( int socket, const char *codepage )
     fp->socket = socket;
     
     mb_init_descriptor( fp, codepage );
+
+    return fp;
 }
 
 /**

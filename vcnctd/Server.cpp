@@ -31,7 +31,7 @@ namespace vcnctd
         const int SOCK_MAX = 128;
 
         // ソケット接続のリスト
-        Socket s[SOCK_MAX + 1];
+        int s[SOCK_MAX + 1];
         for( int i = 0; i < SOCK_MAX + 1; i++ )
         {
             s[i] = -1;
@@ -56,11 +56,17 @@ namespace vcnctd
             text[i] = NULL;
         }
         
+#ifdef WIN32
+        // Windows用
+        WSADATA data;
+        WSAStartup( MAKEWORD( 2, 0 ), &data );
+#endif
+
         // ソケット作る
         if( (s[0] = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
         {
             // エラーなので死ぬ
-            printf( "error; create first socket\n" );
+            printf( "error; create first socket; s[0]=%d\n", s[0] );
             return 0;
         }
         
@@ -248,7 +254,12 @@ namespace vcnctd
                 printf( "info; new connection\n" );
                 
                 struct sockaddr_in client_addr;
-                socklen_t len = sizeof( client_addr );
+#ifdef WIN32
+                int len;
+#else
+                socklen_t len;
+#endif
+                len = sizeof( client_addr );
                 
                 // どれがあいてるかな
                 int index = -1;
@@ -288,7 +299,16 @@ namespace vcnctd
         Synth synth;
         
         runtimeOptions opts;
-        bool ret = synth.synthesize( txt, wav, opts );
+        
+        string str_txt = txt;
+        string_t tstr_txt;
+        mb_conv( str_txt, tstr_txt );
+
+        string str_wav = wav;
+        string_t tstr_wav;
+        mb_conv( str_wav, tstr_wav );
+        
+        bool ret = synth.synthesize( tstr_txt, tstr_wav, opts );
         
         cout << "info; Server::synthesize; done; ret=" << (ret ? "true" : "false") << endl;
         return ret ? 1 : 0;
@@ -306,7 +326,9 @@ namespace vcnctd
             string path = conf->getPath();
             string charset = conf->getCharset();
             UtauDB *db = new UtauDB();
-            db->read( path.c_str(), charset.c_str() );
+            string_t tstr_path;
+            mb_conv( path, tstr_path );
+            db->read( tstr_path, charset.c_str() );
             
             // 登録するお
             UtauDB::dbRegist( db );
