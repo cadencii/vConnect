@@ -130,7 +130,11 @@ namespace vcnctd
                 switch( status[i] )
                 {
                     case ST_NONE:{
-                        int msg_len = read( s[i], str, STR_LEN );
+//#if defined( WIN32 )
+                        int msg_len = recv( s[i], str, STR_LEN, 0 );
+//#else
+//                        int msg_len = read( s[i], str, STR_LEN );
+//#endif
                         if( msg_len > 0 )
                         {
                             string s_str = str;
@@ -140,7 +144,8 @@ namespace vcnctd
                             {
                                 // 合成処理の指示だったばあい
                                 char msg[] = "{accepted}";
-                                write( s[i], (char *)msg, strlen( msg ) );
+                                //write( s[i], (char *)msg, strlen( msg ) );
+                                send( s[i], (char *)msg, strlen( msg ), 0 );
                                 if( text[i] ) fclose( text[i] );
                                 string work = this->config->getWorkDir();
                                 char wave_path[1024];
@@ -153,7 +158,8 @@ namespace vcnctd
                                 // その他不明な指示
                                 printf( "info; #%d said \"%s\"\n", i, s_str.c_str() );
                                 char msg[] = "{unknown}";
-                                write( s[i], (char *)msg, strlen( msg ) );
+                                //write( s[i], (char *)msg, strlen( msg ) );
+                                send( s[i], msg, strlen( msg ), 0 );
                             }
                         }
                         else if( msg_len < 0 )
@@ -165,14 +171,18 @@ namespace vcnctd
                         {
                             // 接続が切られた
                             printf( "info; %d disconnected\n", i );
+#if defined( WIN32 )
+                            closesocket( s[i] );
+#else
                             close( s[i] );
+#endif
                             s[i] = 0;
                             status[i] = ST_NONE;
                         }
                         break;
                     }
                     case ST_READ:{
-                        int msg_len = read( s[i], str, STR_LEN );
+                        int msg_len = recv( s[i], str, STR_LEN, 0 );
                         if( msg_len > 0 )
                         {
                             string s_str = str;
@@ -181,7 +191,8 @@ namespace vcnctd
                             if( s_str.find( "{synth}" ) == 0 )
                             {
                                 char msg[] = "{accepted}";
-                                write( s[i], (char *)msg, strlen( msg ) );
+                                //write( s[i], (char *)msg, strlen( msg ) );
+                                send( s[i], (char *)msg, strlen( msg ), 0 );
                                 status[i] = ST_SYNTH;
                                 FILE *fp = text[i];
                                 if( fp ) fclose( fp );
@@ -203,7 +214,8 @@ namespace vcnctd
                                     fprintf( fp, "%s\n", s_str.c_str() );
                                 }
                                 char msg[] = "{accepted}";
-                                write( s[i], (char *)msg, strlen( msg ) );
+                                //write( s[i], (char *)msg, strlen( msg ) );
+                                send( s[i], (char *)msg, strlen( msg ), 0 );
                             }
                         }
                         else if( msg_len < 0 )
