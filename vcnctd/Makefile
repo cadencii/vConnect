@@ -70,7 +70,7 @@ HDR=Server.h \
 	../stand/stand.h
 
 vcnctd: $(SRC) $(HDR)
-	g++ -L"$(LFFTW)" -g -w $(SRC) -D_DEBUG -o vcnctd -liconv -$(FFTW) $(WINSOCK)
+	g++ -L"$(LFFTW)" -g $(SRC) -D_DEBUG -o vcnctd -liconv -$(FFTW) $(WINSOCK)
 
 clean:
 	rm vcnctd

@@ -60,11 +60,11 @@ public:
     virtual ~vsqBase(){}
     virtual void                setParameter( string_t left, string_t right ){}
 protected:
-    static    double                tempo;
-    static    long                endTick;
+//    static    double                tempo;
+//    static    long                endTick;
     //static    vector<utauVoiceDataBase*> voiceDBs;
-    static    map_t<string_t, vsqBase*> objectMap;
-    static    map_t<string_t, int> singerMap;
+//    static    map_t<string_t, vsqBase*> objectMap;
+//    static    map_t<string_t, int> singerMap;
 
     static    void    outputError( const char* p ){ cout << p << endl; }
 };

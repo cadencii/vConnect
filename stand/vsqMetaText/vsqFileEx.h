@@ -58,6 +58,8 @@ public:
     /// </summary>
     vector<vsqBPList> controlCurves;
 
+public:
+
     /// <summary>
     /// シーケンス内の音符と歌手変更イベントを格納したリスト．
     /// </summary>
@@ -68,6 +70,11 @@ public:
     /// </summary>
     vsqTempo vsqTempoBp;
 
+    double tempo;
+    long endTick;
+    map_t<string_t, vsqBase *> objectMap;
+    map_t<string_t, int> singerMap;
+    
 protected:
 
 private:

@@ -29,7 +29,9 @@ vsqFileEx::vsqFileEx()
 bool vsqFileEx::read( Socket socket, runtimeOptions options )
 {
     MB_FILE *fp = mb_fopen( (int)socket, options.encodingVsqText.c_str() );
-    return readCore( fp );
+    bool ret = readCore( fp );
+    mb_fclose( fp );
+    return ret;
 }
 
 bool vsqFileEx::read( string_t file_name, runtimeOptions options )
@@ -50,7 +52,9 @@ bool vsqFileEx::read( string_t file_name, runtimeOptions options )
     cout << "vsqFileEx::read; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
 #endif
 
-    return readCore( fp );
+    bool ret = readCore( fp );
+    mb_fclose( fp );
+    return ret;
 }
 
 bool vsqFileEx::readCore( MB_FILE *fp )
@@ -100,6 +104,13 @@ bool vsqFileEx::readCore( MB_FILE *fp )
                         indx_comma = right.find( _T(",") );
                     }
                 }
+#if defined( _DEBUG )
+                string s1;
+                mb_conv( left, s1 );
+                cout << "vsqFileEx::readCore; left=" << s1 << endl;
+                mb_conv( right, s1 );
+                cout << "vsqFileEx::readCore; right=" << s1 << endl;
+#endif
                 i->second->setParameter( left, right );
             }
         }
@@ -112,7 +123,6 @@ bool vsqFileEx::readCore( MB_FILE *fp )
             outputError( message.c_str() );
         }
     }
-    mb_fclose( fp );
 
     // utau音源が無ければ合成しようがないので false.
     int size = UtauDB::dbSize();
