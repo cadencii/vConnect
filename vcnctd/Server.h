@@ -55,14 +55,16 @@ namespace vcnctd
         /// </summary>
         void analyze();
         
+        /// <summary>
+        /// VSQメタテキストを読み込み，合成処理を行います．
+        /// </summary>
+        /// <param name="txt">メタテキストファイルのパス</summary>
+        /// <param name="wav">合成結果の出力先</summary>
+        /// <returns>合成に成功した場合は0以外の値を，そうでない場合は0を返します．</returns>
+        int synthesize( char *txt, char *wav );
 
     public:
-                
-        /// <summary>
-        /// 合成器のインスタンスです．
-        /// </summary>
-        Synth *synth;
-        
+
         /// <summary>
         /// サーバーの設定値を保持するインスタンスです．
         /// </summary>

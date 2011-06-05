@@ -35,7 +35,7 @@ public: // public method
     ~vConnect();
 
     /// <summary>
-    /// 合成処理を行います．
+    /// ファイルからメタテキストを読み込み，合成処理を行います．
     /// </summary>
     /// <param name="input">読み込むメタテキスト・ファイルのパス．</param>
     /// <param name="output">出力するWAVEファイルのパス．</param>
@@ -46,6 +46,18 @@ public: // public method
         string_t output,
         runtimeOptions options );
 
+    /// <summary>
+    /// ソケットからメタテキストを読み込み，合成処理を行います．
+    /// </summary>
+    /// <param name="socket">読み込むソケット．</param>
+    /// <param name="output">出力するWAVEファイルのパス．</param>
+    /// <param name="options">合成時の設定．</param>
+    /// <returns>合成に成功した場合true，それ以外はfalseを返します．</returns>
+    bool synthesize(
+        Socket socket,
+        string_t output,
+        runtimeOptions options );
+    
     bool createWspFile(
         string_t v_path,
         string_t output,
@@ -75,11 +87,16 @@ public: // public static method
         bool fast);
 
 private: // private method
+
+    bool synthesizeCore( string_t output, runtimeOptions options );
+    
     /* 内部処理用関数 */
     void calculateVsqInfo();
+    
     void calculateF0(
         standSpecgram &dst,
         vector<double> &dynamics );
+    
     void calculateDynamics(
         vector<double> &dynamics,
         double *wave,

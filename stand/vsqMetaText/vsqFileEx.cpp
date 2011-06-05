@@ -35,19 +35,19 @@ bool vsqFileEx::read( Socket socket, runtimeOptions options )
 bool vsqFileEx::read( string_t file_name, runtimeOptions options )
 {
 #ifdef _DEBUG
-    cout << "vsqFileEx::readVsqFile" << endl;
+    cout << "vsqFileEx::read" << endl;
 #endif
     bool result = false;
     voiceDataBase.setRuntimeOptions( options );
 
     MB_FILE *fp;
 #ifdef _DEBUG
-    cout << "vsqFileEx::readVsqFile; calling mb_fopen...";
+    cout << "vsqFileEx::read; calling mb_fopen...";
 #endif
     fp = mb_fopen( file_name, options.encodingVsqText.c_str() );
 #ifdef _DEBUG
     cout << " done" << endl;
-    cout << "vsqFileEx::readVsqFile; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
+    cout << "vsqFileEx::read; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
 #endif
 
     return readCore( fp );
@@ -65,7 +65,7 @@ bool vsqFileEx::readCore( MB_FILE *fp )
 #ifdef _DEBUG
         string s;
         mb_conv( temp, s );
-        cout << "vsqFileEx::readVsqFile; temp=" << s << endl;
+        cout << "vsqFileEx::readCore; temp=" << s << endl;
 #endif
         if( temp.find( _T("[") ) == 0 )
         {
@@ -108,7 +108,7 @@ bool vsqFileEx::readCore( MB_FILE *fp )
             string message;
             string t_search;
             mb_conv( search, t_search );
-            message = "vsqFileEx::readVsqFile; not found: " + t_search;
+            message = "vsqFileEx::readCore; not found: " + t_search;
             outputError( message.c_str() );
         }
     }

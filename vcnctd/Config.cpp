@@ -12,6 +12,11 @@ using namespace std;
 
 namespace vcnctd
 {
+    string Config::getWorkDir()
+    {
+        return mWorkDir;
+    }
+    
     int Config::getPort()
     {
         return mPort;
@@ -47,6 +52,7 @@ namespace vcnctd
         // デフォルト値で埋める
         mConfPath = "/etc/vcnctd.conf";
         mPort = 52525;
+        mWorkDir = ".";
 
         // 設定ファイルを読み取りモードで開く
         FILE *fp = fopen( getConfPath().c_str(), "r" );
@@ -93,6 +99,18 @@ namespace vcnctd
                 mRawDBConf.push_back( conf );
                 if( !ret ) break;
             }
+            else if( line.find( "[work]" ) == 0 )
+            {
+                current_parse = "[work]";
+            }
+            else
+            {
+                if( current_parse.compare( "[work]" ) == 0 )
+                {
+                    mWorkDir = line;
+                    current_parse = "";
+                }
+            }
         }
         fclose( fp );
 
@@ -102,6 +120,7 @@ namespace vcnctd
             string charset = mRawDBConf[i]->getCharset();
             cout << "[#" << i << "] path=" << path << "; charset=" << charset << endl;
         }
+        cout << "mWorkDir=" << mWorkDir << endl;
         
         return;
     }

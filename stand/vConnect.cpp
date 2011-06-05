@@ -197,6 +197,15 @@ void vConnect::emptyPath( double secOffset, string_t output )
     return;
 }
 
+bool vConnect::synthesize( Socket socket, string_t output, runtimeOptions options )
+{
+    if( false == mVsq.read( socket, options ) )
+    {
+        return false;
+    }
+    synthesizeCore( output, options );
+}
+
 bool vConnect::synthesize( string_t input, string_t output, runtimeOptions options )
 {
 #ifdef _DEBUG
@@ -213,12 +222,22 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 #ifdef _DEBUG
     cout << " done, successed" << endl;
 #endif
+    synthesizeCore( output, options );
+}
 
+bool vConnect::synthesizeCore( string_t output, runtimeOptions options )
+{
+#ifdef _DEBUG
+    cout << "vConnect::synthesizeCore" << endl;
+#endif
     options.fast = false;
 
     // 空のときは空の wave を出力して終了
     if( mVsq.events.eventList.empty() )
     {
+#ifdef _DEBUG
+        cout << "vConnect::synthesizeCore; no event exists; return" << endl;
+#endif
         emptyPath( mVsq.getEndSec(), output );
         return true;
     }
@@ -233,7 +252,6 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     {
         corpusManager *p = new corpusManager;
         p->setUtauDB( UtauDB::dbGet( i ), options );
-        p->analyze( options );
         mManagerList.push_back( p );
     }
 

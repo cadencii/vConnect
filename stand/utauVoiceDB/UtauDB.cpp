@@ -65,13 +65,13 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
     int index;
 #ifdef _DEBUG
     string s2;
-    mb_conv( fileName, s2 );
+    mb_conv( path_oto_ini, s2 );
     cout << "UtauDB::read; before normalize; path_oto_ini=" << s2 << endl;
 #endif
     normalize_path_separator( path_oto_ini );
 #ifdef _DEBUG
     string s;
-    mb_conv( fileName, s );
+    mb_conv( path_oto_ini, s );
     cout << "UtauDB::read; after normalize; path_oto_ini=" << s << endl;
 #endif
     

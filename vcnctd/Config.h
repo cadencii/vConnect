@@ -59,6 +59,12 @@ namespace vcnctd
         /// <returns>アクセスを受け付けるポート番号．</returns>
         int getPort();
         
+        /// <summary>
+        /// 作業ディレクトリのパスを取得します．
+        /// </summary>
+        /// <returns>作業用ディレクトリのパス．</returns>
+        string getWorkDir();
+        
     private:
         /// <summary>
         /// vcnctd.confファイルのパス
@@ -74,6 +80,11 @@ namespace vcnctd
         /// アクセスを受け付けるポート番号．
         /// </summary>
         int mPort;
+
+        /// <summary>
+        /// 作業用ディレクトリのパス
+        /// </summary>
+        string mWorkDir;
     };
 
 }

@@ -10,7 +10,6 @@ namespace vcnctd
 
     Server::Server()
     {
-        this->synth = new Synth();
         this->config = new Config();
     }
 
@@ -38,6 +37,25 @@ namespace vcnctd
             s[i] = -1;
         }
 
+        // ソケット接続のステータスコード
+        const int ST_NONE = 0;      // 何もしてない状態
+        const int ST_READ = 1;  // メタテキストを受信中の状態
+        const int ST_SYNTH = 2;     // 合成処理中の状態
+        
+        // ソケット接続のステータス
+        int status[SOCK_MAX + 1];
+        for( int i = 0; i < SOCK_MAX + 1; i++ )
+        {
+            status[i] = ST_NONE;
+        }
+
+        // メタテキストを書き込むためのファイルポインタ
+        FILE *text[SOCK_MAX + 1];
+        for( int i = 0; i < SOCK_MAX + 1; i++ )
+        {
+            text[i] = NULL;
+        }
+        
         // ソケット作る
         if( (s[0] = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
         {
@@ -70,7 +88,8 @@ namespace vcnctd
         }
 
         // 受信メッセージ用の文字列
-        char str[1024];
+        const int STR_LEN = 1024;
+        char str[STR_LEN];
         
         // メインループ．無限ループ
         while( 1 )
@@ -102,7 +121,105 @@ namespace vcnctd
                 if( !FD_ISSET( s[i], &readfds ) ) continue;
 
                 strcpy( str, "" );
-                int msg_length = read( s[i], str, sizeof( str ) );
+                switch( status[i] )
+                {
+                    case ST_NONE:{
+                        int msg_len = read( s[i], str, STR_LEN );
+                        if( msg_len > 0 )
+                        {
+                            string s_str = str;
+                            int indx = s_str.find( "\n" );
+                            if( indx > 0 ) s_str = s_str.substr( 0, indx );
+                            if( s_str.find( "{seq_start}" ) == 0 )
+                            {
+                                // 合成処理の指示だったばあい
+                                char msg[] = "{accepted}";
+                                write( s[i], (char *)msg, strlen( msg ) );
+                                if( text[i] ) fclose( text[i] );
+                                string work = this->config->getWorkDir();
+                                char wave_path[1024];
+                                sprintf( wave_path, "%s/%d.txt", work.c_str(), i );
+                                text[i] = fopen( wave_path, "w" );
+                                status[i] = ST_READ;
+                            }
+                            else
+                            {
+                                // その他不明な指示
+                                printf( "info; #%d said \"%s\"\n", i, s_str.c_str() );
+                                char msg[] = "{unknown}";
+                                write( s[i], (char *)msg, strlen( msg ) );
+                            }
+                        }
+                        else if( msg_len < 0 )
+                        {
+                            // 受信に失敗
+                            printf( "warning; read failed from #%d\n", i );
+                        }
+                        else
+                        {
+                            // 接続が切られた
+                            printf( "info; %d disconnected\n", i );
+                            close( s[i] );
+                            s[i] = 0;
+                            status[i] = ST_NONE;
+                        }
+                        break;
+                    }
+                    case ST_READ:{
+                        int msg_len = read( s[i], str, STR_LEN );
+                        if( msg_len > 0 )
+                        {
+                            string s_str = str;
+                            int indx = s_str.find( "\n" );
+                            if( indx > 0 ) s_str = s_str.substr( 0, indx );
+                            if( s_str.find( "{synth}" ) == 0 )
+                            {
+                                char msg[] = "{accepted}";
+                                write( s[i], (char *)msg, strlen( msg ) );
+                                status[i] = ST_SYNTH;
+                                FILE *fp = text[i];
+                                if( fp ) fclose( fp );
+                                string work = this->config->getWorkDir();
+                                char txt[1024];
+                                char wav[1024];
+                                sprintf( txt, "%s/%d.txt", work.c_str(), i );
+                                sprintf( wav, "%s/%d.wav", work.c_str(), i );
+                                runtimeOptions opts;
+                                synthesize( txt, wav );
+                                status[i] = ST_NONE;
+                            }
+                            else
+                            {
+                                FILE *fp = text[i];
+                                if( fp )
+                                {
+                                    cout << "info; #" << i << " " << s_str << endl;
+                                    fprintf( fp, "%s\n", s_str.c_str() );
+                                }
+                                char msg[] = "{accepted}";
+                                write( s[i], (char *)msg, strlen( msg ) );
+                            }
+                        }
+                        else if( msg_len < 0 )
+                        {
+                            // 受信に失敗
+                            printf( "warning; read failed from #%d\n", i );
+                        }
+                        else
+                        {
+                            // 接続が切られた
+                            printf( "info; %d disconnected\n", i );
+                            close( s[i] );
+                            s[i] = 0;
+                            status[i] = ST_NONE;
+                        }
+                        break;
+                    }
+                }
+                
+                
+                
+                /*int msg_length = read( s[i], str, sizeof( str ) );
                 if( msg_length < 0 )
                 {
                     // 受信に失敗
@@ -114,9 +231,6 @@ namespace vcnctd
                     string s_str = str;
                     int indx = s_str.find( "\n" );
                     if( indx > 0 ) s_str = s_str.substr( 0, indx );
-                    printf( "info; #%d said \"%s\"\n", i, s_str.c_str() );
-                    char msg[] = "[OK]";
-                    write( s[i], (char *)msg, strlen( msg ) );
                 }
                 else
                 {
@@ -124,7 +238,8 @@ namespace vcnctd
                     printf( "info; %d disconnected\n", i );
                     close( s[i] );
                     s[i] = 0;
-                }
+                    status[i] = ST_NONE;
+                }*/
             }
             
             // 新しい接続がないかな
@@ -166,7 +281,19 @@ namespace vcnctd
             }
         }
     }
+
+    int Server::synthesize( char *txt, char *wav )
+    {
+        printf( "info; Server::synthesize; txt=%s; wav=%s\n", txt, wav );
+        Synth synth;
         
+        runtimeOptions opts;
+        bool ret = synth.synthesize( txt, wav, opts );
+        
+        cout << "info; Server::synthesize; done; ret=" << (ret ? "true" : "false") << endl;
+        return ret ? 1 : 0;
+    }
+    
     void Server::analyze()
     {
         runtimeOptions opts;

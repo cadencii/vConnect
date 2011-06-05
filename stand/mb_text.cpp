@@ -283,6 +283,10 @@ void mb_init_descriptor( MB_FILE *fp, const char *codepage )
         fp->unit_len = 1;
     }
     fp->charbuf = (char *)malloc( fp->unit_len * sizeof( char ) );
+    for( int i = 0; i < fp->unit_len; i++ )
+    {
+        fp->charbuf[i] = EOF;
+    }
 #ifdef _DEBUG
     cout << "::mb_init_descriptor; fp->unit_len=" << fp->unit_len << endl;
 #endif
@@ -571,7 +575,7 @@ int mb_fread( char *buf, int len, MB_FILE *src ){
         int i = 0;
         if( src->charbuf[0] != EOF )
         {
-            for( ;i < src->unit_len; i++ )
+            for( ; i < src->unit_len; i++ )
             {
                 buf[i] = src->charbuf[i];
                 src->charbuf[i] = EOF;
@@ -760,7 +764,7 @@ bool mb_fgets( string& line, MB_FILE *file ){
  * いろんなエンコーディングのテキストファイルを読み込むテストを実行します．
  */
 #include <iostream>
-#include <windows.h>
+//#include <windows.h>
 using namespace std;
 int mb_test(){
     //do nothing

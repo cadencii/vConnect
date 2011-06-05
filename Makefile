@@ -7,7 +7,6 @@ SRC=./stand/corpusManager.cpp ./stand/main.cpp ./stand/stand.cpp ./stand/standSp
     ./stand/vsqMetaText/vsqBase.cpp ./stand/vsqMetaText/vsqBPList.cpp \
     ./stand/vsqMetaText/vsqEventEx.cpp ./stand/vsqMetaText/vsqEventList.cpp \
     ./stand/vsqMetaText/vsqFileEx.cpp ./stand/vsqMetaText/vsqHandle.cpp \
-    ./stand/vsqMetaText/TextReader.cpp \
     ./stand/vsqMetaText/vsqTempo.cpp \
     \
     ./stand/waveFileEx/waveFileEx.cpp \
@@ -52,7 +51,7 @@ LIBFFT=fftw3
 # make install
 
 vConnect-STAND.exe: $(SRC) $(HEADER)
-	g++ -finput-charset=UTF-8 -DUNICODE -g -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -o vConnect-STAND.exe
+	g++ -finput-charset=UTF-8 -D_STND_MULTI_THREAD -D_DEBUG -DUNICODE -g -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -o vConnect-STAND.exe
 #	g++ -finput-charset=UTF-8 -D_DEBUG -DUNICODE -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -o vConnect-STAND.exe
 
 clean:
