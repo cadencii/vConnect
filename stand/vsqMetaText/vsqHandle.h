@@ -41,7 +41,11 @@ public:
     string toString()
     {
         string ret = "";
-        ret += "{iconID=" + iconID + ",IDS=" + IDS + ",lyric=" + lyric.toString() + "}";
+        string str_icon_id;
+        string str_ids;
+        mb_conv( iconID, str_icon_id );
+        mb_conv( IDS, str_ids );
+        ret += "{iconID=" + str_icon_id + ",IDS=" + str_ids + ",lyric=" + lyric.toString() + "}";
         return ret;
     }
 
