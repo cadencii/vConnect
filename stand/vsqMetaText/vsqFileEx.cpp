@@ -201,6 +201,10 @@ bool vsqFileEx::readCore( MB_FILE *fp )
         cout << "vsqFileEx::readCore; temp=" << s << endl;
 #endif
         if( !ret ) break;
+
+        // 空文字の場合は次へ
+        if( temp.size() <= 0 ) continue;
+
         if( temp.find( _T("[") ) == 0 )
         {
             search = temp;

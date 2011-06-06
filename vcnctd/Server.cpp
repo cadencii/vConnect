@@ -204,6 +204,9 @@ namespace vcnctd
                                 runtimeOptions opts;
                                 synthesize( txt, wav );
                                 status[i] = ST_NONE;
+#if defined( WIN32 )
+                                _CrtDumpMemoryLeaks();
+#endif
                             }
                             else
                             {
@@ -316,7 +319,7 @@ namespace vcnctd
         string_t tstr_txt;
         mb_conv( str_txt, tstr_txt );
 
-        string str_wav = wav;
+        string str_wav( wav );
         string_t tstr_wav;
         mb_conv( str_wav, tstr_wav );
         

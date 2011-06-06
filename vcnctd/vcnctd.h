@@ -5,6 +5,20 @@
  */
 
 #ifndef __vcnctd_h__
+#define __vcnctd_h__
+
+#if defined( WIN32 )
+    #ifdef _DEBUG
+        #define _CRTDBG_MAP_ALLOC
+        #include <stdlib.h>
+        #include <new>
+        #include <crtdbg.h>
+        /*#ifndef DBG_NEW
+            #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+            #define new DBG_NEW
+        #endif*/
+    #endif  // _DEBUG
+#endif
 
 #include "../stand/standData.h"
 #include "../stand/mb_text.h"
