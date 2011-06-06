@@ -282,11 +282,18 @@ void mb_init_descriptor( MB_FILE *fp, const char *codepage )
     if( fp->unit_len < 1 ){
         fp->unit_len = 1;
     }
+    fp->unit = (char *)malloc( fp->unit_len * sizeof( char ) );
+    for( int i = 0; i < fp->unit_len; i++ )
+    {
+        fp->unit[i] = EOF;
+    }
+    
     fp->charbuf = (char *)malloc( fp->unit_len * sizeof( char ) );
     for( int i = 0; i < fp->unit_len; i++ )
     {
         fp->charbuf[i] = EOF;
     }
+
 #ifdef _DEBUG
     cout << "::mb_init_descriptor; fp->unit_len=" << fp->unit_len << endl;
 #endif
@@ -449,6 +456,11 @@ int mb_fclose( MB_FILE *fp ){
     {
         free( fp->charbuf );
     }
+
+    if( fp->unit )
+    {
+        free( fp->unit );
+    }
     
     free( fp );
     return ret;
@@ -581,6 +593,7 @@ int mb_fread( char *buf, int len, MB_FILE *src ){
             {
                 buf[i] = src->charbuf[i];
                 src->charbuf[i] = EOF;
+                ret++;
             }
             i = src->unit_len;
         }
@@ -620,76 +633,101 @@ int mb_fread( char *buf, int len, MB_FILE *src ){
     return ret;
 }
 
-bool mb_fgets_core( char *buf, int buflen, MB_FILE *file ){
+bool mb_fgets_core( char *buf, int buflen, MB_FILE *file )
+{
     //FILE *fp = file->file;
     int unit_buflen = file->unit_len;
     int unit_bufbytes = sizeof( char ) * unit_buflen;
-    char *unit_buf = (char *)malloc( unit_bufbytes );
+    //char *unit_buf = (char *)malloc( unit_bufbytes );
     int i;
     int bufbytes = sizeof( char ) * buflen;
     memset( buf, 0, bufbytes );
     int offset = -unit_buflen;
-    for( i = 0; i < buflen - 1; i++ ){
+    for( i = 0; i < buflen - 1; i++ )
+    {
         // このループ中でbuf[offset]からbuf[offset+buflen]までを埋めます
         offset += unit_buflen;
         int j;
 
         // 1文字分読み込む
-        int len = mb_fread( unit_buf, unit_buflen, file );
+        int len = mb_fread( file->unit, unit_buflen, file );
 
-        if( len != unit_buflen ){
+        if( len != unit_buflen )
+        {
             // EOFまで読んだ場合
-            for( j = 0; j < unit_buflen; j++ ){
+            for( j = 0; j < unit_buflen; j++ )
+            {
                 buf[j + offset] = '\0';
             }
-            if( i == 0 ){
+            if( i == 0 )
+            {
                 // 最初の文字でEOFの場合
                 //free( buf );
-                free( unit_buf );
+#if defined( _DEBUG )
+                cout << "::mb_fgets_core; p1" << endl;
+#endif
                 return false;
-            }else{
+            }
+            else
+            {
                 // それ以外は単にbreakするだけ
                 break;
             }
-        }else if( mb_is_cr( unit_buf, unit_buflen ) ){
+        }
+        else if( mb_is_cr( file->unit, unit_buflen ) )
+        {
             // 読んだのがCRだった場合
             // 次の文字がLFかどうかを調べる
-            len = mb_fread( unit_buf, unit_buflen, file );
-            if( len == unit_buflen ){
-                if( mb_is_lf( unit_buf, unit_buflen ) ){
+            len = mb_fread( file->unit, unit_buflen, file );
+            if( len == unit_buflen )
+            {
+                if( mb_is_lf( file->unit, unit_buflen ) )
+                {
                     // LFのようだ
-                }else{
+                }
+                else
+                {
                     // LFでないので、ファイルポインタを戻す
-                    mb_push_charbuf( file, unit_buf );
+                    mb_push_charbuf( file, file->unit );
                     //fseek( fp, -unit_bufbytes, SEEK_CUR );
                 }
             }
             break;
-        }else if( mb_is_lf( unit_buf, unit_buflen ) ){
+        }
+        else if( mb_is_lf( file->unit, unit_buflen ) )
+        {
             // 読んだのがLFだった場合
             // 次の文字がCRかどうかを調べる
-            len = mb_fread( unit_buf, unit_buflen, file );
-            if( len == unit_buflen ){
-                if( mb_is_cr( unit_buf, unit_buflen ) ){
+            len = mb_fread( file->unit, unit_buflen, file );
+            if( len == unit_buflen )
+            {
+                if( mb_is_cr( file->unit, unit_buflen ) )
+                {
                     // CRのようだ
                     // LF-CRという改行方法があるかどうかは知らないけれどサポートしとこう
-                }else{
+                }
+                else
+                {
                     // CRでないので、ファイルポインタを戻す
-                    mb_push_charbuf( file, unit_buf );
+                    mb_push_charbuf( file, file->unit );
                     //fseek( fp, -unit_bufbytes, SEEK_CUR );
                 }
             }
             break;
-        }else{
+        }
+        else
+        {
             // 通常の処理
-            for( j = 0; j < unit_buflen; j++ ){
-                buf[offset + j] = unit_buf[j];
+            for( j = 0; j < unit_buflen; j++ )
+            {
+                buf[offset + j] = file->unit[j];
             }
         }
     }
 
-    free( unit_buf );
-
+#if defined( _DEBUG )
+    cout << "::mb_fgets_core; p2" << endl;
+#endif
     return true;
 }
 
@@ -698,7 +736,8 @@ bool mb_fgets_core( char *buf, int buflen, MB_FILE *file ){
  * ファイルはdescipterで指定したコードページとみなして読み込む．
  * 改行はCR,CRLF,LFの3種類に対応．
  */
-bool mb_fgets( wstring& line, MB_FILE *file ){
+bool mb_fgets( wstring& line, MB_FILE *file )
+{
     int unit_buflen = file->unit_len;
     int unit_bufbytes = sizeof( char ) * unit_buflen;
     int buflen = LINEBUFF_LEN;
@@ -707,7 +746,8 @@ bool mb_fgets( wstring& line, MB_FILE *file ){
     line.clear();
 
     bool ret = mb_fgets_core( buf, buflen, file );
-    if( !ret ){
+    if( !ret )
+    {
         free( buf );
         return ret;
     }
@@ -743,7 +783,7 @@ bool mb_fgets( string& line, MB_FILE *file ){
     }
 
 #ifdef _DEBUG
-    cout << "::mb_fgets(string&,MB_FILE); before mb_code_conv; buf=" << buf << endl;
+    //cout << "::mb_fgets(string&,MB_FILE); before mb_code_conv; buf=" << buf << endl;
 #endif
     // コードページの読み替え
     if( file->descripter_for_char != MB_INVALID ){
@@ -751,7 +791,7 @@ bool mb_fgets( string& line, MB_FILE *file ){
         ret = true;
     }
 #ifdef _DEBUG
-    cout << "::mb_fgets(string&,MB_FILE); after mb_code_conv; buf=" << buf << endl;
+    //cout << "::mb_fgets(string&,MB_FILE); after mb_code_conv; buf=" << buf << endl;
 #endif
 
     string s = (char *)buf;

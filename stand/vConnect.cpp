@@ -966,9 +966,10 @@ void vConnect::calculateVsqInfo( void )
 
     // コントロールカーブは vsq 管理クラスにやってもらう
     mControlCurves.resize( mVsq.controlCurves.size() );
+    double tempo = mVsq.getTempo();
     for( unsigned int i = 0; i < mControlCurves.size(); i++ )
     {
-        mVsq.controlCurves[i].getList( mControlCurves[i] );
+        mVsq.controlCurves[i].getList( mControlCurves[i], tempo );
     }
 }
 

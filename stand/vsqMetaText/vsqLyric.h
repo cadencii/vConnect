@@ -16,9 +16,22 @@
 
 #include "../stand.h" // for string_t
 
-class    vsqLyric{
+class vsqLyric
+{
 public:
+
     void setLyric( string_t right );
+
+    string toString()
+    {
+        string ret;
+        string str_lyric;
+        string str_pronounce;
+        mb_conv( lyric, str_lyric );
+        mb_conv( pronounce, str_pronounce );
+        ret += "{lyric=" + str_lyric + ",pronounce=" + str_pronounce + "}";
+        return ret;
+    }
 
     string_t    lyric;
     string_t    pronounce;

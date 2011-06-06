@@ -55,18 +55,34 @@ enum{
     GENDER
 };
 
-class vsqBase{
+const string_t OBJ_NAME_OTOINI = _T( "[oto.ini]" );
+const string_t OBJ_NAME_EVENT_LIST = _T( "[EventList]" );
+const string_t OBJ_NAME_TEMPO = _T( "[Tempo]" );
+
+/*class vsqBase
+{
 public:
-    virtual ~vsqBase(){}
-    virtual void                setParameter( string_t left, string_t right ){}
-protected:
-//    static    double                tempo;
+    
+    virtual ~vsqBase()
+    {
+    }
+    
+    virtual void setParameter( string_t left, string_t right )
+    {
+    }
+
+    static void outputError( const char* p )
+    {
+        cout << p << endl;
+    }
+
+
+    //    static    double                tempo;
 //    static    long                endTick;
     //static    vector<utauVoiceDataBase*> voiceDBs;
 //    static    map_t<string_t, vsqBase*> objectMap;
 //    static    map_t<string_t, int> singerMap;
 
-    static    void    outputError( const char* p ){ cout << p << endl; }
-};
+};*/
 
 #endif

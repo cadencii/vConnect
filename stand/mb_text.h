@@ -94,8 +94,12 @@ typedef struct{
     MB_CODEPAGE_DESCRIPTER descripter_for_wchar;
     // charに変換するための記述子
     MB_CODEPAGE_DESCRIPTER descripter_for_char;
+    // ファイルポインタ
     FILE *file;
+    // 文字列の読み込み単位．unit_lenバイトずつファイルから読んでいく
     int unit_len;
+    // ファイルからunit_lenずつ読み込むときに使うバッファ
+    char *unit;
     int socket;
     // シークして戻る操作を行った時の，バッファとして保持しておく文字
     char *charbuf;

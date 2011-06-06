@@ -5,6 +5,129 @@
  */
 #include "vsqFileEx.h"
 
+void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string_t key, string_t value )
+{
+    string_t::size_type indx_tab = key.find( _T( "\t" ) );
+    string_t singer_name, path_otoini;
+
+    if( indx_tab == string_t::npos )
+    {
+        singer_name = _T( "" );
+        path_otoini = key;
+    }
+    else
+    {
+        singer_name = key.substr( 0, indx_tab );
+        path_otoini = key.substr( indx_tab + 1 );
+    }
+
+    // 名前登録して
+    singerMap.insert( make_pair( singer_name, target->singerIndex ) );
+    // 中身読んで
+    UtauDB *p = new UtauDB;
+    p->read( path_otoini, target->_codepage_otoini.c_str() );
+    // リストに追加
+    UtauDB::dbRegist( p );
+    target->singerIndex++;
+}
+
+void vsqFileEx::setParamEvent( vsqEventEx *target, string_t left, string_t right )
+{
+    string s;
+    if( left.compare( _T("Type") ) == 0 )
+    {
+        target->type = right;
+    }
+    else if( left.compare( _T("Length") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->length = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("Note#") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->note = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("Dynamics") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->velocity = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("PMBendDepth") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->portamentoDepth = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("PMBendLength") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->portamentoLength = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("PMbPortamentoUse") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->portamentoUse = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("DEMdecGainRate") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->decay = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("DEMaccent") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->attack = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("VibratoDelay") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->vibratoDelay = atoi( s.c_str() );
+    }
+    else if( left.compare( _T("PreUtterance") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->utauSetting.msPreUtterance = (float)atof( s.c_str() );
+    }
+    else if( left.compare( _T("VoiceOverlap") ) == 0 )
+    {
+        mb_conv( right, s );
+        target->utauSetting.msVoiceOverlap = (float)atof( s.c_str() );
+    }
+    else if( left.compare( _T("LyricHandle") ) == 0 )
+    {
+        right = _T("[") + right + _T("]");
+        mMapHandles.insert( make_pair( right, &target->lyricHandle ) );
+    }
+    else if( left.compare( _T("VibratoHandle") ) == 0 )
+    {
+        right = _T("[") + right + _T("]");
+        mMapHandles.insert( make_pair( right, &target->vibratoHandle ) );
+    }
+    else if( left.compare( _T("IconHandle") ) == 0 )
+    {
+        right = _T("[") + right + _T("]");
+        mMapHandles.insert( make_pair( right, &target->iconHandle ) );
+    }
+    else
+    {
+        mb_conv( left, s );
+        string message = "warning: unknown Property in VsqEvent : " + s;
+        cout << message << endl;//outputError( message.c_str() );
+    }
+
+    return;
+}
+
+long vsqFileEx::getEndTick()
+{
+    return this->events.endTick;
+}
+
+double vsqFileEx::getTempo()
+{
+    return this->vsqTempoBp.getTempo();
+}
+
 vsqFileEx::vsqFileEx()
 {
     string_t temp;
@@ -13,17 +136,18 @@ vsqFileEx::vsqFileEx()
 
     for( unsigned int i = 0; i < controlCurves.size(); i++ )
     {
-        objectMap.insert( make_pair( controlCurveName[i], (vsqBase *)&(controlCurves[i]) ) );
+        //objectMap.insert( make_pair( controlCurveName[i], (vsqBase *)&(controlCurves[i]) ) );
         /* The note on 0 tick can be allocated before 0 tick, because of its preutterance. */
         controlCurves[i].setParameter( -10000, controlCurveDefaultValue[i] );
+        mMapCurves.insert( make_pair( controlCurveName[i], &controlCurves[i] ) );
     }
 
-    temp = _T("[EventList]");
-    objectMap.insert( make_pair( temp, (vsqBase *)&events ) );
-    temp = _T("[Tempo]");
-    objectMap.insert( make_pair( temp, (vsqBase *)&vsqTempoBp ) );
-    temp = _T("[oto.ini]");
-    objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
+    //temp = _T("[EventList]");
+    //objectMap.insert( make_pair( temp, (vsqBase *)&events ) );
+    //temp = _T("[Tempo]");
+    //objectMap.insert( make_pair( temp, (vsqBase *)&vsqTempoBp ) );
+    //temp = _T("[oto.ini]");
+    //objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
 }
 
 bool vsqFileEx::read( Socket socket, runtimeOptions options )
@@ -62,15 +186,21 @@ bool vsqFileEx::readCore( MB_FILE *fp )
     if( !fp ) return false;
 
     string_t temp, search, left, right;
-    map_t<string_t, vsqBase *>::iterator i;
+    //map_t<string_t, vsqBase *>::iterator i;
 
-    while( mb_fgets( temp, fp ) )
+    while( true )
     {
-#ifdef _DEBUG
+        bool ret = mb_fgets( temp, fp );
+#if defined( _DEBUG )
+        if( !ret )
+        {
+            cout << "vsqFileEx::readCore; mb_fgets returned false" << endl;
+        }
         string s;
         mb_conv( temp, s );
         cout << "vsqFileEx::readCore; temp=" << s << endl;
 #endif
+        if( !ret ) break;
         if( temp.find( _T("[") ) == 0 )
         {
             search = temp;
@@ -87,6 +217,73 @@ bool vsqFileEx::readCore( MB_FILE *fp )
             left = temp.substr( 0, indx_equal );
             right = temp.substr( indx_equal + 1 );
         }
+
+#if 1
+        if( search.compare( OBJ_NAME_EVENT_LIST ) == 0 )
+        {
+            // [EventList]
+            string_t::size_type indx_comma = right.find( _T(",") );
+            while( indx_comma != string_t::npos )
+            {
+                // コンマが見つからなくなるまでループ
+                string_t tright = right.substr( 0, indx_comma );
+                this->events.setParameter( left, tright, mMapIDs );
+                right = right.substr( indx_comma + 1 );
+                indx_comma = right.find( _T(",") );
+            }
+            this->events.setParameter( left, right, mMapIDs );
+        }
+        else if( search.compare( OBJ_NAME_OTOINI ) == 0 )
+        {
+            // [oto.ini]
+            setParamOtoIni( &this->voiceDataBase, left, right );
+        }
+        else if( search.compare( OBJ_NAME_TEMPO ) == 0 )
+        {
+            // [Tempo]
+            this->vsqTempoBp.setParameter( left, right );
+        }
+        else if( search.find( _T( "[ID#" ) ) == 0 )
+        {
+            // ID
+            map_t<string_t, vsqEventEx *>::iterator i;
+            i = mMapIDs.find( search );
+            if( i != mMapIDs.end() && i->second )
+            {
+                setParamEvent( i->second, left, right );
+            }
+        }
+        else if( search.find( _T( "[h#" ) ) == 0 )
+        {
+            // handle
+            map_t<string_t, vsqHandle *>::iterator i;
+            i = mMapHandles.find( search );
+            if( i != mMapHandles.end() && i->second )
+            {
+                i->second->setParameter( left, right );
+            }
+        }
+        else
+        {
+            // たぶんコントロールカーブ
+            map_t<string_t, vsqBPList *>::iterator i;
+            i = mMapCurves.find( search );
+            if( i != mMapCurves.end() && i->second )
+            {
+                i->second->setParameter( left, right );
+            }
+            else
+            {
+                // そんなセクション名知らねー
+                string message;
+                string t_search;
+                mb_conv( search, t_search );
+                message = "vsqFileEx::readCore; not found: " + t_search;
+                cout << message << endl;
+            }
+        }
+
+#else
         i = objectMap.find( search );
         if( i != objectMap.end() )
         {
@@ -120,19 +317,26 @@ bool vsqFileEx::readCore( MB_FILE *fp )
             string t_search;
             mb_conv( search, t_search );
             message = "vsqFileEx::readCore; not found: " + t_search;
-            outputError( message.c_str() );
+            vsqBase::outputError( message.c_str() );
         }
+#endif
     }
 
     // utau音源が無ければ合成しようがないので false.
     int size = UtauDB::dbSize();
     
+#if defined( _DEBUG )
+    dumpEvents();
+    dumpMapIDs();
+    dumpMapHandles();
+#endif
+
     return (size > 0);
 }
 
 double vsqFileEx::getEndSec()
 {
-     return this->vsqTempoBp.tickToSecond( endTick );
+     return this->vsqTempoBp.tickToSecond( getEndTick() );
 }
 
 int vsqFileEx::getSingerIndex( string_t t_search )

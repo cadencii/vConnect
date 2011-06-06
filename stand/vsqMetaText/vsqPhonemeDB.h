@@ -18,9 +18,13 @@
 #include "vsqBase.h"
 #include "../runtimeOptions.h"
 
-class vsqPhonemeDB : public vsqBase{
+class vsqPhonemeDB// : public vsqBase
+{
+
 public:
-    vsqPhonemeDB(){
+
+    vsqPhonemeDB()
+    {
         isInitialized = false;
         singerIndex = 0;
     }
@@ -33,37 +37,23 @@ public:
         voiceDBs.clear();*/
     }
 
-    void setParameter( string_t key, string_t value ){
-        string_t::size_type indx_tab = key.find( _T( "\t" ) );
-        string_t singer_name, path_otoini;
-
-        if( indx_tab == string_t::npos ){
-            singer_name = _T( "" );
-            path_otoini = key;
-        }else{
-            singer_name = key.substr( 0, indx_tab );
-            path_otoini = key.substr( indx_tab + 1 );
-        }
-    
-        // –¼‘O“o˜^‚µ‚Ä
-        singerMap.insert( make_pair( singer_name, singerIndex ) );
-        // ’†g“Ç‚ñ‚Å
-        UtauDB *p = new UtauDB;
-        p->read( path_otoini, _codepage_otoini.c_str() );
-        // ƒŠƒXƒg‚É’Ç‰Á
-        UtauDB::dbRegist( p );
-        singerIndex++;
-    }
-
-    void setRuntimeOptions( runtimeOptions options ){
+    void setRuntimeOptions( runtimeOptions options )
+    {
         _codepage_otoini = options.encodingOtoIni;
     }
 
-private:
-    bool isInitialized;
+
+public:
+    
+    int singerIndex;
+
     string _codepage_otoini;
 
-    int singerIndex;
+
+private:
+    
+    bool isInitialized;
+
 
 };
 

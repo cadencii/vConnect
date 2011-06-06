@@ -35,98 +35,147 @@ void vsqLyric::setLyric( string_t right )
     protectFlag = atoi( s.c_str() );
 }
 
-void vsqHandle::setParameter( string_t left, string_t right ){
+void vsqHandle::setParameter( string_t left, string_t right )
+{
     string s;
-    if( left.compare( _T("IconID") ) == 0 ){
+    if( left.compare( _T("IconID") ) == 0 )
+    {
         iconID = right;
-    }else if( left.compare( _T("IDS") ) == 0){
+    }
+    else if( left.compare( _T("IDS") ) == 0)
+    {
         IDS = right;
-    }else if( left.compare( _T("Caption") ) == 0 ){
+    }
+    else if( left.compare( _T("Caption") ) == 0 )
+    {
         caption = right;
-    }else if( left.compare( _T("Length") ) == 0 ){
+    }
+    else if( left.compare( _T("Length") ) == 0 )
+    {
         mb_conv( right, s );
         length = atoi( s.c_str() );
-    }else if( left.compare( _T("Language") ) == 0 ){
+    }
+    else if( left.compare( _T("Language") ) == 0 )
+    {
         mb_conv( right, s );
         language = atoi( s.c_str() );
-    }else if( left.compare( _T("Program") ) == 0 ){
+    }
+    else if( left.compare( _T("Program") ) == 0 )
+    {
         mb_conv( right, s );
         program = atoi( s.c_str() );
-    }else if( left.compare( _T("Original") ) == 0 ){
+    }
+    else if( left.compare( _T("Original") ) == 0 )
+    {
         mb_conv( right, s );
         original = atoi( s.c_str() );
-    }else if( left.compare( _T("StartDepth") ) == 0 ){
+    }
+    else if( left.compare( _T("StartDepth") ) == 0 )
+    {
         vsqVibratoBP point;
         mb_conv( right, s );
         point.value = atoi( s.c_str() );
         point.position = -1.0;
-        if( vibratoDepth.size() <= 0 ){
+        if( vibratoDepth.size() <= 0 )
+        {
             vibratoDepth.resize( 1 );
         }
         vibratoDepth[0] = point;
-    }else if( left.compare( _T("DepthBPNum") ) == 0 ){
+    }
+    else if( left.compare( _T("DepthBPNum") ) == 0 )
+    {
         parseBPNum( vibratoDepth, right );
-    }else if( left.compare( _T("DepthBPX") ) == 0 ){
+    }
+    else if( left.compare( _T("DepthBPX") ) == 0 )
+    {
         parseBP( vibratoDepth, right, true );
-    }else if( left.compare( _T("DepthBPY") ) == 0 ){
+    }
+    else if( left.compare( _T("DepthBPY") ) == 0 )
+    {
         parseBP( vibratoDepth, right, false );
-    }else if( left.compare( _T("StartRate") ) == 0 ){
+    }
+    else if( left.compare( _T("StartRate") ) == 0 )
+    {
         vsqVibratoBP point;
         mb_conv( right, s );
         point.value = atoi( s.c_str() );
         point.position = -1.0;
-        if( vibratoRate.size() <= 0 ){
+        if( vibratoRate.size() <= 0 )
+        {
             vibratoRate.resize( 1 );
         }
         vibratoRate[0] = point;
-    }else if( left.compare( _T("RateBPNum") ) == 0 ){
+    }
+    else if( left.compare( _T("RateBPNum") ) == 0 )
+    {
         parseBPNum( vibratoRate, right );
-    }else if( left.compare( _T("RateBPX") ) == 0 ){
+    }
+    else if( left.compare( _T("RateBPX") ) == 0 )
+    {
         parseBP( vibratoRate, right, true );
-    }else if( left.compare( _T("RateBPY") ) == 0 ){
+    }
+    else if( left.compare( _T("RateBPY") ) == 0 )
+    {
         parseBP( vibratoRate, right, false );
-    }else if( left.find( _T("L") ) != string_t::npos ){
+    }
+    else if( left.find( _T("L") ) != string_t::npos )
+    {
         lyric.setLyric( right );
-    }else{
+    }
+    else
+    {
         mb_conv( left, s );
         string Message = "warning: unknown Property in VsqHandle : " + s;
-        outputError( Message.c_str() );
+        cout << Message << endl;//outputError( Message.c_str() );
     }
 }
 
-void vsqHandle::parseBPNum( vector<vsqVibratoBP>& list, string_t str ){
+void vsqHandle::parseBPNum( vector<vsqVibratoBP> &list, string_t str )
+{
     string s;
     mb_conv( str, s );
     vector<vsqVibratoBP>::size_type new_size = atoi( s.c_str() ) + 1;
     list.resize( new_size );
 }
 
-void vsqHandle::parseBP( vector<vsqVibratoBP>& list, string_t str, bool parse_x ){
+void vsqHandle::parseBP( vector<vsqVibratoBP> &list, string_t str, bool parse_x )
+{
     string s;
     string_t::size_type indx_comma = str.find( _T(",") );
     int indx = 1;
-    while( indx_comma != string_t::npos ){
+    while( indx_comma != string_t::npos )
+    {
         mb_conv( str.substr( 0, indx_comma ), s );
-        if( list.size() <= indx ){
+        if( list.size() <= indx )
+        {
             list.resize( indx + 1 );
         }
-        if( parse_x ){
+        
+        if( parse_x )
+        {
             list[indx].position = (float)atof( s.c_str() );
-        }else{
+        }
+        else
+        {
             list[indx].value = atoi( s.c_str() );
         }
         str = str.substr( indx_comma + 1 );
         indx_comma = str.find( _T(",") );
         indx++;
     }
-    if( str.size() > 0 ){
-        if( list.size() <= indx ){
+    if( str.size() > 0 )
+    {
+        if( list.size() <= indx )
+        {
             list.resize( indx + 1 );
         }
         mb_conv( str, s );
-        if( parse_x ){
+        if( parse_x )
+        {
             list[indx].position = (float)atof( s.c_str() );
-        }else{
+        }
+        else
+        {
             list[indx].value = atoi( s.c_str() );
         }
     }
@@ -137,15 +186,20 @@ short vsqHandle::getVibratoDepth( double position )
     short ret;
     vector<vsqVibratoBP>::size_type i;
     vector<vsqVibratoBP>::size_type c = vibratoDepth.size();
-    for( i = 0; i < c; i++ ){
-        if( vibratoDepth[i].position > position ){
+    for( i = 0; i < c; i++ )
+    {
+        if( vibratoDepth[i].position > position )
+        {
             break;
         }
     }
-    if( i != 0 ){
+    if( i != 0 )
+    {
         i--;
         ret = vibratoDepth[i].value;
-    }else{
+    }
+    else
+    {
         ret = 0;
     }
 
@@ -157,15 +211,20 @@ short vsqHandle::getVibratoRate( double position )
     short ret = 0;
     vector<vsqVibratoBP>::size_type i;
     vector<vsqVibratoBP>::size_type c = vibratoRate.size();
-    for( i = 0; i < c; i++ ){
-        if( vibratoRate[i].position > position ){
+    for( i = 0; i < c; i++ )
+    {
+        if( vibratoRate[i].position > position )
+        {
             break;
         }
     }
-    if( i != 0 ){
+    if( i != 0 )
+    {
         i--;
         ret = vibratoRate[i].value;
-    }else{
+    }
+    else
+    {
         ret = 0;
     }
 

@@ -16,14 +16,43 @@
 
 #include "vsqBase.h"
 
-class vsqTempo : public vsqBase {
+class vsqTempo// : public vsqBase
+{
+
 public:
-    vsqTempo(){ tempo = 120.0; }
+    vsqTempo()
+    {
+        tempo = DEFAULT_TEMPO;
+    }
 
     void setParameter( string_t left, string_t right );
 
     long secondToTick( double second );
     double tickToSecond( long tick );
+
+    /// <summary>
+    /// テンポ値を取得します．
+    /// </summary>
+    double getTempo()
+    {
+        return tempo;
+    }
+
+public:
+
+    /// <summary>
+    /// デフォルトのテンポ値です
+    /// </summary>
+    static const double DEFAULT_TEMPO;
+
+
+private:
+
+    /// <summary>
+    /// テンポ値
+    /// </summary>
+    double tempo;
+
 };
 
 #endif

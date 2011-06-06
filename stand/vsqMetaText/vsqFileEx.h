@@ -16,7 +16,7 @@
 /// <summary>
 /// VSQメタテキストが表現するシーケンスを取り扱うクラスです．
 /// </summary>
-class vsqFileEx : public vsqBase
+class vsqFileEx
 {
 public:
     /// <summary>
@@ -54,11 +54,24 @@ public:
     int getSingerIndex( string_t singer_name );
 
     /// <summary>
+    /// テンポ値を取得します．
+    /// </summary>
+    double getTempo();
+
+    /// <summary>
+    /// シーケンスの長さ（tick単位）を取得します．
+    /// </summary>
+    /// <returns>シーケンスの長さ（tick単位）</returns>
+    long getEndTick();
+
+public:
+
+    /// <summary>
     /// ダイナミクスなどのコントロールカーブを格納したvector．
     /// </summary>
     vector<vsqBPList> controlCurves;
 
-public:
+    map_t<string_t, vsqBPList *> mMapCurves;
 
     /// <summary>
     /// シーケンス内の音符と歌手変更イベントを格納したリスト．
@@ -70,11 +83,29 @@ public:
     /// </summary>
     vsqTempo vsqTempoBp;
 
-    double tempo;
-    long endTick;
-    map_t<string_t, vsqBase *> objectMap;
+    /// <summary>
+    /// [ID#]の文字列と，その中身との紐付けを保持するマップ．
+    /// </summary>
+    map_t<string_t, vsqEventEx *> mMapIDs;
+
+    /// <summary>
+    /// [h#]の文字列と，その中身との紐付けを保持するマップ．
+    /// </summary>
+    map_t<string_t, vsqHandle *> mMapHandles;
+
+    /// <summary>
+    /// メタテキストのセクション名（[]で囲われた部分）と，
+    /// その内部の値を保持したオブジェクトとの紐付けを保持する．
+    /// </summary>
+    //map_t<string_t, vsqBase *> objectMap;
+
+    /// <summary>
+    /// 歌手の名称（だったけ？IDSのぶぶんだったかIconIDの部分だったか忘れた）と，
+    /// 歌手のインデックスとの紐付けを保持する．
+    /// </summary>
     map_t<string_t, int> singerMap;
-    
+
+
 protected:
 
 private:
@@ -86,6 +117,69 @@ private:
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
     bool readCore( MB_FILE *fp );
     
+    /// <summary>
+    /// 指定したイベントの内容を，メタテキストの行データを元に設定します．
+    /// </summary>
+    /// <param name="target>設定対象のイベント</param>
+    /// <param name="left">メタテキストの"="の左側部分</param>
+    /// <param name="right">メタテキストの"="の右側部分</param>
+    void setParamEvent( vsqEventEx *target, string_t left, string_t right );
+
+    void setParamOtoIni( vsqPhonemeDB *target, string_t left, string_t right );
+
+private:
+
+    /// <summary>
+    /// eventsの中身をダンプします
+    /// </summary>
+    void dumpEvents()
+    {
+        cout << "vsqFileEx::dumpEvents" << endl;
+        int size = events.eventList.size();
+        for( int i = 0; i < size; i++ )
+        {
+            vsqEventEx *item = events.eventList[i];
+            cout << "[" << i << "]" << " tick=" << item->tick << endl;
+        }
+    }
+
+    /// <summary>
+    /// mMapIDsの中身をダンプします．
+    /// </summary>
+    void dumpMapIDs()
+    {
+        cout << "vsqFileEx::dumpMapIDs" << endl;
+        map_t<string_t, vsqEventEx *>::iterator i;
+        int j = 0;
+        for( i = mMapIDs.begin(); i != mMapIDs.end(); i++ )
+        {
+            string s;
+            mb_conv( i->first, s );
+            cout << s << endl;
+        }
+    }
+
+    /// <summary>
+    /// mMapHandlesの中身をダンプします．
+    /// </summary>
+    void dumpMapHandles()
+    {
+        cout << "vsqFileEx::dumpMapHandles" << endl;
+        map_t<string_t, vsqHandle *>::iterator i;
+        for( i = mMapHandles.begin(); i != mMapHandles.end(); i++ )
+        {
+            string s;
+            mb_conv( i->first, s );
+            cout << s << ":" << i->second->toString() << endl;
+        }
+    }
+
+private:
+
+    //double tempo;
+
+    //long endTick;
+
     vsqPhonemeDB voiceDataBase;
 };
 
