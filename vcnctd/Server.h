@@ -3,10 +3,10 @@
  *
  * Copyright © 2011 kbinani.
  */
-#ifndef __Server_h__
+#if !defined( __Server_h__ )
 #define __Server_h__
 
-#ifdef WIN32
+#if defined( WIN32 )
     #include <winsock2.h>
 #else
     #include <netinet/in.h>
@@ -67,6 +67,14 @@ namespace vcnctd
         /// <returns>合成に成功した場合は0以外の値を，そうでない場合は0を返します．</returns>
         int synthesize( char *txt, char *wav );
 
+        /// <summary>
+        /// 指定したwaveファイルをソケットに送信します．
+        /// </summary>
+        /// <param name="socket">送信対象のソケット</param>
+        /// <param name="wav">送信するwaveファイルのパス</param>
+        /// <returns>全ての送信に成功した場合は0以外の値を，そうでない場合は0を返します．</returns>
+        int sendWave( Socket socket, char *wav );
+        
     public:
 
         /// <summary>

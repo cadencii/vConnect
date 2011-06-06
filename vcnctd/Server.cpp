@@ -38,9 +38,10 @@ namespace vcnctd
         }
 
         // ソケット接続のステータスコード
-        const int ST_NONE = 0;      // 何もしてない状態
+        const int ST_NONE = 0;  // 何もしてない状態
         const int ST_READ = 1;  // メタテキストを受信中の状態
-        const int ST_SYNTH = 2;     // 合成処理中の状態
+        const int ST_SYNTH = 2; // 合成処理中の状態
+        const int ST_SEND = 3;  // 結果のwaveを送信している状態
         
         // ソケット接続のステータス
         int status[SOCK_MAX + 1];
@@ -191,7 +192,6 @@ namespace vcnctd
                             if( s_str.find( "{synth}" ) == 0 )
                             {
                                 char msg[] = "{accepted}";
-                                //write( s[i], (char *)msg, strlen( msg ) );
                                 send( s[i], (char *)msg, strlen( msg ), 0 );
                                 status[i] = ST_SYNTH;
                                 FILE *fp = text[i];
@@ -203,6 +203,8 @@ namespace vcnctd
                                 sprintf( wav, "%s/%d.wav", work.c_str(), i );
                                 runtimeOptions opts;
                                 synthesize( txt, wav );
+                                status[i] = ST_SEND;
+                                sendWave( s[i], wav );
                                 status[i] = ST_NONE;
 #if defined( WIN32 )
                                 _CrtDumpMemoryLeaks();
@@ -308,6 +310,69 @@ namespace vcnctd
         }
     }
 
+    int Server::sendWave( Socket socket, char *wav )
+    {
+        // ソケットが生きていないと死ぬ
+        if( socket <= 0 ) return 0;
+
+        FILE *fp = fopen( wav, "r" );
+        // ファイルが開けないと死ぬ
+        if( !fp ) return 0;
+        
+        // ファイルサイズを調べる
+        fpos_t size = 0;
+        fseek( fp, 0, SEEK_END );
+        fgetpos( fp, &size );
+        fseek( fp, 0, SEEK_SET );
+        
+        const int BUFLEN = 1024;
+        char buffer[BUFLEN];
+        fpos_t remain = size;
+        while( remain > 0 )
+        {
+            fpos_t len = (fpos_t)fread( buffer, sizeof( char ), BUFLEN, fp );
+            
+            int sock_remain = (int)len;
+            int sock_error = 0;
+            while( sock_remain > 0 )
+            {
+                int sock_send_len = send( socket, buffer, sock_remain, 0 );
+                if( sock_send_len == -1 )
+                {
+                    sock_error = 1;
+                    break;
+                }
+                else
+                {
+                    sock_remain -= sock_send_len;
+                }
+                if( sock_remain > 0 )
+                {
+                    // 1回では送れなかったので，データをシフトする
+                    for( int i = 0; i < sock_send_len; i++ )
+                    {
+                        buffer[i] = buffer[i + sock_send_len];
+                    }
+                }
+            }
+            if( sock_error )
+            {
+                // 送信に失敗
+                fclose( fp );
+                return 0;
+            }
+            remain -= len;
+            if( remain > 0 && len < BUFLEN )
+            {
+                // まだ残りがあるのに読み込めていない
+                fclose( fp );
+                return 0;
+            }
+        }
+        
+        return 1;
+    }
+    
     int Server::synthesize( char *txt, char *wav )
     {
         printf( "info; Server::synthesize; txt=%s; wav=%s\n", txt, wav );
