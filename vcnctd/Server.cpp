@@ -8,6 +8,17 @@
 namespace vcnctd
 {
 
+    int Server::closeSocket( Socket socket )
+    {
+        if( socket < 0 ) return 0;
+#if defined( WIN32 )
+        closesocket( socket );
+#else
+        close( socket );
+#endif
+        return 0;
+    }
+    
     Server::Server()
     {
         this->config = new Config();
@@ -70,7 +81,11 @@ namespace vcnctd
             printf( "error; create first socket; s[0]=%d\n", s[0] );
             return 0;
         }
-        
+
+        // ポートの再利用をOKにする
+        int on = 1;
+        setsockopt( s[0], SOL_SOCKET, SO_REUSEADDR, &on, sizeof( on ) );
+
         // サーバーのアドレス情報
         struct sockaddr_in server_addr;
         memset( (char *)&server_addr, 0, sizeof( server_addr ) );
@@ -131,11 +146,7 @@ namespace vcnctd
                 switch( status[i] )
                 {
                     case ST_NONE:{
-//#if defined( WIN32 )
                         int msg_len = recv( s[i], str, STR_LEN, 0 );
-//#else
-//                        int msg_len = read( s[i], str, STR_LEN );
-//#endif
                         if( msg_len > 0 )
                         {
                             string s_str = str;
@@ -145,12 +156,12 @@ namespace vcnctd
                             {
                                 // 合成処理の指示だったばあい
                                 char msg[] = "{accepted}";
-                                //write( s[i], (char *)msg, strlen( msg ) );
                                 send( s[i], (char *)msg, strlen( msg ), 0 );
                                 if( text[i] ) fclose( text[i] );
                                 string work = this->config->getWorkDir();
                                 char wave_path[1024];
                                 sprintf( wave_path, "%s/%d.txt", work.c_str(), i );
+                                remove( wave_path );
                                 text[i] = fopen( wave_path, "w" );
                                 status[i] = ST_READ;
                             }
@@ -159,7 +170,6 @@ namespace vcnctd
                                 // その他不明な指示
                                 printf( "info; #%d said \"%s\"\n", i, s_str.c_str() );
                                 char msg[] = "{unknown}";
-                                //write( s[i], (char *)msg, strlen( msg ) );
                                 send( s[i], msg, strlen( msg ), 0 );
                             }
                         }
@@ -172,11 +182,7 @@ namespace vcnctd
                         {
                             // 接続が切られた
                             printf( "info; %d disconnected\n", i );
-#if defined( WIN32 )
-                            closesocket( s[i] );
-#else
-                            close( s[i] );
-#endif
+                            closeSocket( s[i] );
                             s[i] = 0;
                             status[i] = ST_NONE;
                         }
@@ -196,16 +202,24 @@ namespace vcnctd
                                 status[i] = ST_SYNTH;
                                 FILE *fp = text[i];
                                 if( fp ) fclose( fp );
+
                                 string work = this->config->getWorkDir();
                                 char txt[1024];
                                 char wav[1024];
                                 sprintf( txt, "%s/%d.txt", work.c_str(), i );
                                 sprintf( wav, "%s/%d.wav", work.c_str(), i );
-                                runtimeOptions opts;
+                                remove( wav );
                                 synthesize( txt, wav );
                                 status[i] = ST_SEND;
+                                
                                 sendWave( s[i], wav );
-                                status[i] = ST_NONE;
+                                closeSocket( s[i] );
+                                
+                                remove( txt );
+                                remove( wav );
+                                
+                                status[i] = 0;
+                                s[i] = 0;
 #if defined( WIN32 )
                                 _CrtDumpMemoryLeaks();
 #endif
@@ -219,7 +233,6 @@ namespace vcnctd
                                     fprintf( fp, "%s\n", s_str.c_str() );
                                 }
                                 char msg[] = "{accepted}";
-                                //write( s[i], (char *)msg, strlen( msg ) );
                                 send( s[i], (char *)msg, strlen( msg ), 0 );
                             }
                         }
@@ -232,37 +245,13 @@ namespace vcnctd
                         {
                             // 接続が切られた
                             printf( "info; %d disconnected\n", i );
-                            close( s[i] );
+                            closeSocket( s[i] );
                             s[i] = 0;
                             status[i] = ST_NONE;
                         }
                         break;
                     }
-                }
-                
-                
-                
-                /*int msg_length = read( s[i], str, sizeof( str ) );
-                if( msg_length < 0 )
-                {
-                    // 受信に失敗
-                    printf( "warning; read failed from #%d\n", i );
-                }
-                else if( msg_length > 0 )
-                {
-                    // 受信に成功
-                    string s_str = str;
-                    int indx = s_str.find( "\n" );
-                    if( indx > 0 ) s_str = s_str.substr( 0, indx );
-                }
-                else
-                {
-                    // 接続が切られた
-                    printf( "info; %d disconnected\n", i );
-                    close( s[i] );
-                    s[i] = 0;
-                    status[i] = ST_NONE;
-                }*/
+                }                
             }
             
             // 新しい接続がないかな
@@ -310,6 +299,35 @@ namespace vcnctd
         }
     }
 
+    int Server::sendBuffer( Socket socket, char *buffer, int length )
+    {
+        int sock_remain = (int)length;
+        int ret = 0;
+        while( sock_remain > 0 )
+        {
+            int sock_send_len = send( socket, buffer, sock_remain, 0 );
+            if( sock_send_len == -1 )
+            {
+                ret = -1;
+                break;
+            }
+            else
+            {
+                sock_remain -= sock_send_len;
+                ret += sock_send_len;
+            }
+            if( sock_remain > 0 )
+            {
+                // 1回では送れなかったので，データをシフトする
+                for( int i = 0; i < sock_send_len; i++ )
+                {
+                    buffer[i] = buffer[i + sock_send_len];
+                }
+            }
+        }
+        return ret;
+    }
+    
     int Server::sendWave( Socket socket, char *wav )
     {
         // ソケットが生きていないと死ぬ
@@ -325,6 +343,7 @@ namespace vcnctd
         fgetpos( fp, &size );
         fseek( fp, 0, SEEK_SET );
         
+        // waveデータを送信
         const int BUFLEN = 1024;
         char buffer[BUFLEN];
         fpos_t remain = size;
@@ -332,30 +351,9 @@ namespace vcnctd
         {
             fpos_t len = (fpos_t)fread( buffer, sizeof( char ), BUFLEN, fp );
             
-            int sock_remain = (int)len;
-            int sock_error = 0;
-            while( sock_remain > 0 )
-            {
-                int sock_send_len = send( socket, buffer, sock_remain, 0 );
-                if( sock_send_len == -1 )
-                {
-                    sock_error = 1;
-                    break;
-                }
-                else
-                {
-                    sock_remain -= sock_send_len;
-                }
-                if( sock_remain > 0 )
-                {
-                    // 1回では送れなかったので，データをシフトする
-                    for( int i = 0; i < sock_send_len; i++ )
-                    {
-                        buffer[i] = buffer[i + sock_send_len];
-                    }
-                }
-            }
-            if( sock_error )
+            int sock_send_len = sendBuffer( socket, buffer, (int)len );
+            
+            if( sock_send_len < (int)len )
             {
                 // 送信に失敗
                 fclose( fp );

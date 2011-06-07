@@ -86,15 +86,29 @@ namespace vcnctd
     private:
         
         /// <summary>
+        /// ソケットにバッファーを書き込みます．
+        /// バッファーを1回で書ききれない場合，複数回に分けて書き込みます．
+        /// </summary>
+        /// <param name="socket">書込み先のソケット</param>
+        /// <param name="buffer">書きこむバッファ</param>
+        /// <param name="length">書きこむバッファの長さ</param>
+        /// <returns>書き込んだバッファーの長さ．書き込みに失敗した場合は-1を返します．
+        /// 途中で失敗した場合，書き込みが完了したバッファーの長さを返します．</returns>
+        int sendBuffer( Socket socket, char *buffer, int length );
+        
+        /// <summary>
+        /// ソケットを閉じます
+        /// </summary>
+        /// <param name="socket">閉じるソケット</param>
+        /// <returns>閉じる操作に成功した場合は0以外の値を，そうでない場合は0を返します．</returns>
+        int closeSocket( Socket socket );
+        
+    private:
+        
+        /// <summary>
         /// 解析済み音源を保持するインスタンスのリスト．
         /// </summary>
         vector<CorpusManager *> mCorpusManagers;
-
-        int mMax;
-        /// <summary>
-        /// ソケットのリスト
-        /// </summary>
-        //int mSockets[MAX_SOCKETS];
         
     };
     
