@@ -16,6 +16,7 @@
  *
  */
 #include "vConnect.h"
+#include "vConnectConverter.h"
 #include <locale>
 //#define __TEST__
 
@@ -33,7 +34,6 @@ int main( int argc, char *argv[] ){
 #endif
     string input = "";
     string output = "";
-    string alias = "";
     vConnect vC;
     runtimeOptions options;
     bool print_list_charset = false; // サポートするキャラクタセットのリストをプリントアウトするかどうか
@@ -44,20 +44,11 @@ int main( int argc, char *argv[] ){
         string s = argv[i];
         if( s.substr( 0, 1 ) == "-" ){
             // "-"で始まるので
-            if( s == "-s" ){
-                options.fast = false;
+            if( s == "-c" ){
+                options.convert = true;
                 current_parse = "";
             }else if( s == "-list-charset" ){
                 print_list_charset = true;
-                current_parse = "";
-            }else if( s == "-nf0" ){
-                options.f0Transform = false;
-                current_parse = "";
-            }else if( s == "-nvn" ){
-                options.volumeNormalization = false;
-                current_parse = "";
-            }else if( s == "-w" ){
-                options.wspMode = true;
                 current_parse = "";
             }else{
                 // 次の引数で、オプションsの項目を設定するよ
@@ -73,8 +64,6 @@ int main( int argc, char *argv[] ){
                 options.encodingOtoIni = s;
             }else if( current_parse == "-charset-vxt" ){
                 options.encodingVsqText = s;
-            }else if( current_parse == "-l" ){
-                alias = s;
             }else{
                 cout << "unknown argument: " << s << endl;
             }
@@ -112,24 +101,18 @@ int main( int argc, char *argv[] ){
     cout << "::main; options.encodingVsqText=" << options.encodingVsqText << endl;
 #endif
 
-    if( ( ( options.wspMode && alias == "" ) || input == "" || output == "" ) && !print_list_charset ){
+    if( ( input == "" || output == "" ) && !print_list_charset ){
         // ファイルの指定のどちらかが欠けている場合
-        // あるいはwsp 生成オプションが立っているがエイリアス指定の無い場合
         // 説明文を表示してbailout
         cout << VCONNECT_VERSION << endl;
         cout << "usage:" << endl;
         cout << "    vConnect -i [vsq_meta_text_path] -o [out_wave_path] {options}" << endl;
         cout << "    vConnect [vsq_meta_text_path] [out_wave_path]" << endl;
         cout << "      or" << endl;
-        cout << "    vConnect -w -i [utau_oto_ini_path] -l [alias_to_analyze] -o [out_wsp_path] {options}" << endl;
+        cout << "    vConnect -c -i [utau_oto_ini_path] -o [out_stand_path]" << endl;
         cout << "options:" << endl;
         cout << "    -i [path]                       path of input-file" << endl;
         cout << "    -o [path]                       path of output-file" << endl;
-        cout << "    -s                              slow synthesize mode" << endl;
-        cout << "    -nf0                            no spectral transform by f0" << endl;
-        cout << "    -nvn                            no volume normalization" << endl;
-        cout << "    -w                              wsp output mode" << endl;
-        cout << "    -l [alias]                      alias of oto.ini with -w option" << endl;
         cout << "    -charset-otoini [charset-name]  charset of oto.ini (default: Shift_JIS)" << endl;
         cout << "    -charset-vxt [charset-name]     charset of input-file (default: Shift_JIS)" << endl;
         cout << "    -list-charset                   print supported charset list" << endl;
@@ -137,24 +120,21 @@ int main( int argc, char *argv[] ){
     }
 #endif
 
-    if( options.wspMode == false ){
-        string_t tinput, toutput;
-        mb_conv( input, tinput );
-        mb_conv( output, toutput );
+    string_t tinput, toutput;
+    mb_conv( input, tinput );
+    mb_conv( output, toutput );
 #ifdef _DEBUG
-        string mbs_input, mbs_output;
-        mb_conv( tinput, mbs_input );
-        mb_conv( toutput, mbs_output );
-        cout << "::main; input=" << input << "; mbs_input=" << mbs_input << endl;
-        cout << "::main; output=" << output << "; mbs_output=" << mbs_output << endl;
+    string mbs_input, mbs_output;
+    mb_conv( tinput, mbs_input );
+    mb_conv( toutput, mbs_output );
+    cout << "::main; input=" << input << "; mbs_input=" << mbs_input << endl;
+    cout << "::main; output=" << output << "; mbs_output=" << mbs_output << endl;
 #endif
+    if(options.convert == false ) {
         vC.synthesize( tinput, toutput, options );
-    }else{
-        string_t tinput, toutput, talias;
-        mb_conv( input, tinput );
-        mb_conv( output, toutput );
-        mb_conv( alias, talias );
-        vC.createWspFile( tinput, toutput, talias, options );
+    } else {
+        vConnectConverter converter;
+        converter.convert(input.c_str(), output.c_str());
     }
 
     return 0;

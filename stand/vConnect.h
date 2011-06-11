@@ -16,14 +16,14 @@
 
 #include <limits.h>
 #include <string.h>
-#include "standSpecgram.h"
 #include "corpusManager.h"
-#include "vowelTable.h"
 #include "vsqMetaText/vsqFileEx.h"
 #include "runtimeOptions.h"
 
 #define NOTE_NUM 128
 #define VIB_NUM 128
+
+class vConnectPhoneme;
 
 /// <summary>
 /// vConnect-STANDの合成器です．
@@ -35,7 +35,7 @@ public: // public method
     ~vConnect();
 
     /// <summary>
-    /// ファイルからメタテキストを読み込み，合成処理を行います．
+    /// 合成処理を行います．
     /// </summary>
     /// <param name="input">読み込むメタテキスト・ファイルのパス．</param>
     /// <param name="output">出力するWAVEファイルのパス．</param>
@@ -46,62 +46,20 @@ public: // public method
         string_t output,
         runtimeOptions options );
 
-    /// <summary>
-    /// ソケットからメタテキストを読み込み，合成処理を行います．
-    /// </summary>
-    /// <param name="socket">読み込むソケット．</param>
-    /// <param name="output">出力するWAVEファイルのパス．</param>
-    /// <param name="options">合成時の設定．</param>
-    /// <returns>合成に成功した場合true，それ以外はfalseを返します．</returns>
-    bool synthesize(
-        Socket socket,
-        string_t output,
-        runtimeOptions options );
-    
-    bool createWspFile(
-        string_t v_path,
-        string_t output,
-        string_t alias,
-        runtimeOptions options );
-
 public: // public static method
-    static void calculateAperiodicity(
-        double *dst,
-        const double *src1,
-        const double *src2,
-        int aperiodicityLength,
-        double morphRatio,
-        double noiseRatio,
-        double breRate,
-        bool fast);
 
-    static void getOneFrame(
-        standFrame &dst,
-        standData &src,
-        int position,
-        int consonantEndFrame,
-        double velocity,
-        utauParameters &params,
-        double f0,
-        double briRate,
-        bool fast);
+    static corpusManager::phoneme *getPhoneme(
+        string_t lyric,
+        int singerIndex,
+        vector<corpusManager *> *managers
+        );
 
 private: // private method
-
-    bool synthesizeCore( string_t output, runtimeOptions options );
-    
     /* 内部処理用関数 */
     void calculateVsqInfo();
-    
     void calculateF0(
-        standSpecgram &dst,
-        vector<double> &dynamics );
-    
-    void calculateDynamics(
-        vector<double> &dynamics,
-        double *wave,
-        long wave_len,
-        bool volumeNormalization );
+        double *f0,
+        double *dynamics );
     
 private: // private static method
     // vConnect内でしか使わない関数．

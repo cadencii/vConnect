@@ -271,77 +271,6 @@ void mb_init(){
     }
 }
 
-/// <summary>
-/// マルチバイト変換用のデスクリプタの初期化を行います．
-/// </summary>
-/// <param name="fp">初期化を行う対象となるファイルポインタ</param>
-/// <param name="codepage">コードページの名前</param>
-void mb_init_descriptor( MB_FILE *fp, const char *codepage )
-{
-    fp->unit_len = mb_unitlen_from_charset_name( codepage );
-    if( fp->unit_len < 1 ){
-        fp->unit_len = 1;
-    }
-    fp->unit = (char *)malloc( fp->unit_len * sizeof( char ) );
-    for( int i = 0; i < fp->unit_len; i++ )
-    {
-        fp->unit[i] = EOF;
-    }
-    
-    fp->charbuf = (char *)malloc( fp->unit_len * sizeof( char ) );
-    for( int i = 0; i < fp->unit_len; i++ )
-    {
-        fp->charbuf[i] = EOF;
-    }
-
-#ifdef _DEBUG
-    cout << "::mb_init_descriptor; fp->unit_len=" << fp->unit_len << endl;
-#endif
-#ifdef MB_USE_ICONV
-    fp->descripter_for_wchar = iconv_open( mb_charset_wchar.c_str(), codepage );
-    fp->descripter_for_char = iconv_open( mb_charset_char.c_str(), codepage );
-#else // MB_USE_ICONV
-    fp->descripter_for_wchar = MB_INVALID;
-    if( strcmp( codepage, "UTF-8" ) == 0 || 
-       strcmp( codepage, "UTF8" ) == 0 ){
-        fp->descripter_for_wchar = CP_UTF8;
-    }else if( strcmp( codepage, "UTF-7" ) == 0 || 
-             strcmp( codepage, "UTF7" ) == 0 ){
-        fp->descripter_for_wchar = CP_UTF7;
-    }else if( strcmp( codepage, "SJIS" ) == 0 ||
-             strcmp( codepage, "Shift_JIS" ) == 0 ){
-        fp->descripter_for_wchar = 932;
-    }else if( strcmp( codepage, "JIS" ) == 0 ||
-             strcmp( codepage, "ISO-2022-JP" ) == 0 ){
-        fp->descripter_for_wchar = 50220;
-    }else if( strcmp( codepage, "UTF-16" ) == 0 ||
-             strcmp( codepage, "UTF16" ) == 0 ){
-        fp->descripter_for_wchar = 1200;
-    }else{
-        fp->descripter_for_wchar = CP_ACP;
-    }
-    if( !IsValidCodePage( fp->descripter_for_wchar ) ){
-        fp->descripter_for_wchar = MB_INVALID;
-    }
-    fp->descripter_for_char = fp->descripter_for_wchar;
-#endif // MB_USE_ICONV
-}
-
-/// <summary>
-/// 指定したコードページを使って，ソケットを読み込む
-/// </summary>
-MB_FILE *mb_fopen( int socket, const char *codepage )
-{
-    mb_init();
-    MB_FILE *fp = (MB_FILE *)malloc( sizeof( MB_FILE ) );
-    fp->file = 0;
-    fp->socket = socket;
-    
-    mb_init_descriptor( fp, codepage );
-
-    return fp;
-}
-
 /**
  * 指定したコードページを使って、読込み専用のテキストファイルを開く。
  * MB_FILEから1行ずつ読み込むのは多重定義されたmb_fgetsを使うが、
@@ -355,7 +284,6 @@ MB_FILE *mb_fopen( int socket, const char *codepage )
 MB_FILE *mb_fopen( const char *file_name, const char *codepage ){
     mb_init();
     MB_FILE *fp = (MB_FILE *)malloc( sizeof( MB_FILE ) );
-    fp->socket = 0;
 #ifdef __GNUC__
     fp->file = fopen( file_name, "rb" );
 #else
@@ -368,9 +296,42 @@ MB_FILE *mb_fopen( const char *file_name, const char *codepage ){
         free( fp );
         return NULL;
     }
+    fp->unit_len = mb_unitlen_from_charset_name( codepage );
+    if( fp->unit_len < 1 ){
+        fp->unit_len = 1;
+    }
+#ifdef _DEBUG
+    cout << "::mb_fopen; fp->unit_len=" << fp->unit_len << endl;
+#endif
+#ifdef MB_USE_ICONV
+    fp->descripter_for_wchar = iconv_open( mb_charset_wchar.c_str(), codepage );
+    fp->descripter_for_char = iconv_open( mb_charset_char.c_str(), codepage );
+#else // MB_USE_ICONV
+    fp->descripter_for_wchar = MB_INVALID;
+    if( strcmp( codepage, "UTF-8" ) == 0 || 
+        strcmp( codepage, "UTF8" ) == 0 ){
+        fp->descripter_for_wchar = CP_UTF8;
+    }else if( strcmp( codepage, "UTF-7" ) == 0 || 
+              strcmp( codepage, "UTF7" ) == 0 ){
+        fp->descripter_for_wchar = CP_UTF7;
+    }else if( strcmp( codepage, "SJIS" ) == 0 ||
+              strcmp( codepage, "Shift_JIS" ) == 0 ){
+        fp->descripter_for_wchar = 932;
+    }else if( strcmp( codepage, "JIS" ) == 0 ||
+              strcmp( codepage, "ISO-2022-JP" ) == 0 ){
+        fp->descripter_for_wchar = 50220;
+    }else if( strcmp( codepage, "UTF-16" ) == 0 ||
+              strcmp( codepage, "UTF16" ) == 0 ){
+        fp->descripter_for_wchar = 1200;
+    }else{
+        fp->descripter_for_wchar = CP_ACP;
+    }
+    if( !IsValidCodePage( fp->descripter_for_wchar ) ){
+        fp->descripter_for_wchar = MB_INVALID;
+    }
+    fp->descripter_for_char = fp->descripter_for_wchar;
+#endif // MB_USE_ICONV
 
-    mb_init_descriptor( fp, codepage );
-    
     // BOMがある場合は読み飛ばす
     unsigned int codepage_number = mb_codepage_from_charset_name( codepage );
     if( codepage_number == 1208 || codepage_number == 1209 ){
@@ -451,17 +412,6 @@ int mb_fclose( MB_FILE *fp ){
     if( fp->file ){
         ret = fclose( fp->file );
     }
-
-    if( fp->charbuf )
-    {
-        free( fp->charbuf );
-    }
-
-    if( fp->unit )
-    {
-        free( fp->unit );
-    }
-    
     free( fp );
     return ret;
 }
@@ -563,171 +513,106 @@ bool mb_is_lf( char *buf, int len ){
     return mb_code_check( buf, len, 0x0A );
 }
 
-void mb_push_charbuf( MB_FILE *file, char *chars )
-{
-    for( int i = 0; i < file->unit_len; i++ )
-    {
-        // やばい
-        file->charbuf[i] = chars[i];
-    }
-}
-
 /**
  * ファイルから指定されたバイト数を読み込みます。
  * 読込の途中でEOFになった場合true、それ以外はfalseを返します
  */
-int mb_fread( char *buf, int len, MB_FILE *src ){
+int mb_fread( char *buf, int len, FILE *fp ){
     int ret = 0;
-
-    if( src->file )
-    {
-        FILE *fp = src->file;
 #ifdef _DEBUG
-        //cout << "::mb_fread; len=" << len << ";\"";
+    //cout << "::mb_fread; len=" << len << ";\"";
 #endif
-        memset( buf, 0, len * sizeof( char ) );
-        int i = 0;
-        if( src->charbuf[0] != EOF )
-        {
-            for( ; i < src->unit_len; i++ )
-            {
-                buf[i] = src->charbuf[i];
-                src->charbuf[i] = EOF;
-                ret++;
-            }
-            i = src->unit_len;
+    memset( buf, 0, len * sizeof( char ) );
+    for( int i = 0; i < len; i++ ){
+        int c = fgetc( fp );
+        if( c == EOF ){
+            return ret;
         }
-        for( ; i < len; i++ ){
-            int c = fgetc( fp );
-            if( c == EOF ){
-                return ret;
-            }
-            buf[i] = (char)c;
-            ret++;
+        buf[i] = (char)c;
+        ret++;
 #ifdef _DEBUG
-            //cout << "c=" << c << ";";
-            //char pch[2];
-            //pch[0] = (char)c;
-            //pch[1] = 0;
-            //string s( pch );
-            //cout << s;
-#endif
-        }
-#ifdef _DEBUG
-        //cout << "\"" << endl;
+        //cout << "c=" << c << ";";
+        //char pch[2];
+        //pch[0] = (char)c;
+        //pch[1] = 0;
+        //string s( pch );
+        //cout << s;
 #endif
     }
-    else if( src->socket )
-    {
-        int socket = src->socket;
-        int read_length = read( socket, buf, len );
-        if( read_length < len )
-        {
-            ret = 1;
-        }
-        else
-        {
-            ret = 0;
-        }
-    }
+#ifdef _DEBUG
+    //cout << "\"" << endl;
+#endif
     return ret;
 }
 
-bool mb_fgets_core( char *buf, int buflen, MB_FILE *file )
-{
-    //FILE *fp = file->file;
+bool mb_fgets_core( char *buf, int buflen, MB_FILE *file ){
+    FILE *fp = file->file;
     int unit_buflen = file->unit_len;
     int unit_bufbytes = sizeof( char ) * unit_buflen;
-    //char *unit_buf = (char *)malloc( unit_bufbytes );
+    char *unit_buf = (char *)malloc( unit_bufbytes );
     int i;
     int bufbytes = sizeof( char ) * buflen;
     memset( buf, 0, bufbytes );
     int offset = -unit_buflen;
-    for( i = 0; i < buflen - 1; i++ )
-    {
+    for( i = 0; i < buflen - 1; i++ ){
         // このループ中でbuf[offset]からbuf[offset+buflen]までを埋めます
         offset += unit_buflen;
         int j;
 
         // 1文字分読み込む
-        int len = mb_fread( file->unit, unit_buflen, file );
+        int len = mb_fread( unit_buf, unit_buflen, fp );
 
-        if( len != unit_buflen )
-        {
+        if( len != unit_buflen ){
             // EOFまで読んだ場合
-            for( j = 0; j < unit_buflen; j++ )
-            {
+            for( j = 0; j < unit_buflen; j++ ){
                 buf[j + offset] = '\0';
             }
-            if( i == 0 )
-            {
+            if( i == 0 ){
                 // 最初の文字でEOFの場合
                 //free( buf );
-#if defined( _DEBUG )
-                cout << "::mb_fgets_core; p1" << endl;
-#endif
+                free( unit_buf );
                 return false;
-            }
-            else
-            {
+            }else{
                 // それ以外は単にbreakするだけ
                 break;
             }
-        }
-        else if( mb_is_cr( file->unit, unit_buflen ) )
-        {
+        }else if( mb_is_cr( unit_buf, unit_buflen ) ){
             // 読んだのがCRだった場合
             // 次の文字がLFかどうかを調べる
-            len = mb_fread( file->unit, unit_buflen, file );
-            if( len == unit_buflen )
-            {
-                if( mb_is_lf( file->unit, unit_buflen ) )
-                {
+            len = mb_fread( unit_buf, unit_buflen, fp );
+            if( len == unit_buflen ){
+                if( mb_is_lf( unit_buf, unit_buflen ) ){
                     // LFのようだ
-                }
-                else
-                {
+                }else{
                     // LFでないので、ファイルポインタを戻す
-                    mb_push_charbuf( file, file->unit );
-                    //fseek( fp, -unit_bufbytes, SEEK_CUR );
+                    fseek( fp, -unit_bufbytes, SEEK_CUR );
                 }
             }
             break;
-        }
-        else if( mb_is_lf( file->unit, unit_buflen ) )
-        {
+        }else if( mb_is_lf( unit_buf, unit_buflen ) ){
             // 読んだのがLFだった場合
             // 次の文字がCRかどうかを調べる
-            len = mb_fread( file->unit, unit_buflen, file );
-            if( len == unit_buflen )
-            {
-                if( mb_is_cr( file->unit, unit_buflen ) )
-                {
+            len = mb_fread( unit_buf, unit_buflen, fp );
+            if( len == unit_buflen ){
+                if( mb_is_cr( unit_buf, unit_buflen ) ){
                     // CRのようだ
                     // LF-CRという改行方法があるかどうかは知らないけれどサポートしとこう
-                }
-                else
-                {
+                }else{
                     // CRでないので、ファイルポインタを戻す
-                    mb_push_charbuf( file, file->unit );
-                    //fseek( fp, -unit_bufbytes, SEEK_CUR );
+                    fseek( fp, -unit_bufbytes, SEEK_CUR );
                 }
             }
             break;
-        }
-        else
-        {
+        }else{
             // 通常の処理
-            for( j = 0; j < unit_buflen; j++ )
-            {
-                buf[offset + j] = file->unit[j];
+            for( j = 0; j < unit_buflen; j++ ){
+                buf[offset + j] = unit_buf[j];
             }
         }
     }
 
-#if defined( _DEBUG )
-    cout << "::mb_fgets_core; p2" << endl;
-#endif
+    free( unit_buf );
+
     return true;
 }
 
@@ -736,8 +621,7 @@ bool mb_fgets_core( char *buf, int buflen, MB_FILE *file )
  * ファイルはdescipterで指定したコードページとみなして読み込む．
  * 改行はCR,CRLF,LFの3種類に対応．
  */
-bool mb_fgets( wstring& line, MB_FILE *file )
-{
+bool mb_fgets( wstring& line, MB_FILE *file ){
     int unit_buflen = file->unit_len;
     int unit_bufbytes = sizeof( char ) * unit_buflen;
     int buflen = LINEBUFF_LEN;
@@ -746,8 +630,7 @@ bool mb_fgets( wstring& line, MB_FILE *file )
     line.clear();
 
     bool ret = mb_fgets_core( buf, buflen, file );
-    if( !ret )
-    {
+    if( !ret ){
         free( buf );
         return ret;
     }
@@ -783,7 +666,7 @@ bool mb_fgets( string& line, MB_FILE *file ){
     }
 
 #ifdef _DEBUG
-    //cout << "::mb_fgets(string&,MB_FILE); before mb_code_conv; buf=" << buf << endl;
+    cout << "::mb_fgets(string&,MB_FILE); before mb_code_conv; buf=" << buf << endl;
 #endif
     // コードページの読み替え
     if( file->descripter_for_char != MB_INVALID ){
@@ -791,7 +674,7 @@ bool mb_fgets( string& line, MB_FILE *file ){
         ret = true;
     }
 #ifdef _DEBUG
-    //cout << "::mb_fgets(string&,MB_FILE); after mb_code_conv; buf=" << buf << endl;
+    cout << "::mb_fgets(string&,MB_FILE); after mb_code_conv; buf=" << buf << endl;
 #endif
 
     string s = (char *)buf;
@@ -806,7 +689,7 @@ bool mb_fgets( string& line, MB_FILE *file ){
  * いろんなエンコーディングのテキストファイルを読み込むテストを実行します．
  */
 #include <iostream>
-//#include <windows.h>
+#include <windows.h>
 using namespace std;
 int mb_test(){
     //do nothing

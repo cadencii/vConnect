@@ -21,24 +21,19 @@
 class runtimeOptions{
 public:
     runtimeOptions(){
-        fast = true;
-        wspMode = false;
-        f0Transform = true;
-        volumeNormalization = true;
+        convert = false;
         encodingOtoIni = "Shift_JIS";
         encodingVsqText = "Shift_JIS";
         encodingVowelTable = "Shift_JIS";
         encodingVoiceTexture = "Shift_JIS";
     }
 
-    bool fast;
-    bool wspMode;
-    bool f0Transform;
-    bool volumeNormalization;
     string encodingOtoIni;
     string encodingVsqText;
     string encodingVowelTable;
     string encodingVoiceTexture;
+
+    bool convert;
 };
 
 #endif // __runtimeOptions_h__

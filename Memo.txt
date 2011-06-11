@@ -1,5 +1,19 @@
 v.Connect-STAND v.2.0
 
-ToDo:
--texture 周りの実装
--v.Connect用設定ファイルの形式の決定
+'11/06/12
+サーバ向けに省メモリ化したものの仮実装を行いました．
+Ogg Vorbis周りのライブラリをインストールしてください．
+
+http://www.xiph.org/
+
+からlibOgg, libVorbisのライブラリを使用しています．
+これらは修正 BSD ライセンスで提供されている模様．
+
+
+とりあえず事前分析が必要になるので，自作のライブラリの分析済みファイルをアップしておきます．
+http://hal-the-cat.music.coocan.jp/library/LibraryTest.zip
+
+なお，コンバートを行う場合は
+v.Connect-STAND -c -i [oto.ini path] -o [dst. path]
+v.Connect-STAND -c -i c:\hoge\oto.ini -o c:\foo\
+の形で行えます．こちらは簡易版なので文字コードには対応していません．

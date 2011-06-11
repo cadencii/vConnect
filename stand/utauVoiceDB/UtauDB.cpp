@@ -37,9 +37,7 @@ void UtauDB::dbClear()
 {
     for( unsigned int i = 0; i < UtauDB::mDBs.size(); i++ )
     {
-        UtauDB *db = UtauDB::mDBs[i];
-        UtauDB::mDBs[i] = NULL;
-        if( db ) delete db;
+        SAFE_DELETE( UtauDB::mDBs[i] );
     }
     UtauDB::mDBs.clear();
 }
@@ -56,29 +54,29 @@ UtauDB::~UtauDB()
     }
 }
 
-// TODO: 読み込みが成功したとき0以外の値，失敗したとき0を返すように変更したい．
 int UtauDB::read( string_t path_oto_ini, const char *codepage )
 {
     int result = 2;
     MB_FILE *fp;
+    //char buf[LINEBUFF_LEN];
     string_t temp;
     int index;
 #ifdef _DEBUG
     string s2;
-    mb_conv( path_oto_ini, s2 );
-    cout << "UtauDB::read; before normalize; path_oto_ini=" << s2 << endl;
+    mb_conv( fileName, s2 );
+    cout << "utauVoiceDataBase::readUtauVoiceDataBase; before normalize; path_oto_ini=" << s2 << endl;
 #endif
     normalize_path_separator( path_oto_ini );
 #ifdef _DEBUG
     string s;
-    mb_conv( path_oto_ini, s );
-    cout << "UtauDB::read; after normalize; path_oto_ini=" << s << endl;
+    mb_conv( fileName, s );
+    cout << "utauVoiceDataBase::readUtauVoiceDataBase; after normalize; path_oto_ini=" << s << endl;
 #endif
     
     fp = mb_fopen( path_oto_ini, codepage );
 
 #ifdef _DEBUG
-    cout << "UtauDB::read; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
+    cout << "utauVoiceDataBase::readUtauVoiceDataBase; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
 #endif
     if( fp )
     {
@@ -87,18 +85,18 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
         while( mb_fgets( temp, fp ) )
         {
 #ifdef _DEBUG
-            string t_temp;
-            mb_conv( temp, t_temp );
-            cout << "UtauDB::read; t_temp=" << t_temp << endl;
+            string ts;
+            mb_conv( temp, ts );
+            //cout << "utauVoiceDataBase::readUtauVoiceDataBase; temp=" << ts << endl;
 #endif
-            utauParameters *current = new utauParameters;
+            utauParameters* current = new utauParameters;
             if( current )
             {
                 if( ( index = temp.find( _T(".wav") ) ) == string_t::npos )
                 {
                     if( ( index = temp.find( _T(".stf") ) ) == string_t::npos )
                     {
-                        index = temp.find( _T(".") );
+                        index = temp.find( _T("=") );
                     }
                 }
 
@@ -113,8 +111,7 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
                 else
                 {
                     current->lyric = temp.substr( temp.find( _T("=") ) + 1 );
-                    current->lyric =
-                        current->lyric.substr( 0, current->lyric.find( _T(",") ) );
+                    current->lyric = current->lyric.substr( 0, current->lyric.find( _T(",") ) );
                 }
 
                 string t;
@@ -163,7 +160,7 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
 
 int UtauDB::getParams( utauParameters &parameters, string_t search )
 {
-    int result = 0;
+    int    result = 0;
     map_t<string_t, utauParameters *>::iterator i = mSettingMap.find( search );
     if( i != mSettingMap.end() )
     {

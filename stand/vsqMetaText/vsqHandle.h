@@ -17,8 +17,7 @@
 #include "vsqVibratoBP.h"
 #include "vsqLyric.h"
 
-class vsqHandle// : public vsqBase 
-{
+class vsqHandle : public vsqBase {
 public:
     void    setParameter( string_t left, string_t right );
 
@@ -37,19 +36,6 @@ public:
      * @return 指定した位置でのビブラート速さの値
      */
     short    getVibratoRate( double position );
-
-    string toString()
-    {
-        string ret = "";
-        string str_icon_id;
-        string str_ids;
-        mb_conv( iconID, str_icon_id );
-        mb_conv( IDS, str_ids );
-        ret += "{iconID=" + str_icon_id + ",IDS=" + str_ids + ",lyric=" + lyric.toString() + "}";
-        return ret;
-    }
-
-
 private:
     string_t    iconID;
     string_t    IDS;

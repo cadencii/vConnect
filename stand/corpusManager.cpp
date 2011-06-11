@@ -13,42 +13,37 @@
  *
  */
 #include "corpusManager.h"
+#include "utauVoiceDB/UtauDB.h"
+#include "vConnectPhoneme.h"
+#include "vsqMetaText/vsqFileEx.h"
 
-void corpusManager::analyze( runtimeOptions &options )
+void corpusManager::analyze(void *p)
 {
+    itemForAnalyze *items = (itemForAnalyze*)p;
     map_t<string_t, utauParameters *>::iterator itr;
-    for( itr = mUtauDB->begin(); itr != mUtauDB->end(); itr++ )
+    for( list<vsqEventEx*>::iterator i = items->itemList.begin(); i != items->itemList.end(); i++ )
     {
-        string_t lyric = itr->first;
-        this->getStandData( lyric, options );
-        string str_lyric;
-        mb_conv( lyric, str_lyric );
-        cout << "corpusManager::analyze; lyric=" << str_lyric << endl;
+        string_t lyric = (*i)->lyricHandle.getLyric();
+        this->getPhoneme( lyric );
+        cout << "corpusManager::analyze; lyric=" << lyric << endl;
     }
 }
 
 corpusManager::~corpusManager()
 {
-    map_t<string_t, standData *>::iterator i;
-    map_t<string_t, standMelCepstrum *>::iterator j;
+    map_t<string_t, phoneme *>::iterator i;
     for( i = objectMap.begin(); i != objectMap.end(); i++ )
     {
-        SAFE_DELETE( (i->second)->specgram );
+        SAFE_DELETE( i->second->p );
         SAFE_DELETE( i->second );
-    }
-    for( j = textureMap.begin(); j != textureMap.end(); j++ )
-    {
-        SAFE_DELETE( j->second );
     }
 }
 
-standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options )
+corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
 {
-    standData *ret = NULL;
-    map_t<string_t, standData *>::iterator i;
-    map_t<string_t, standMelCepstrum *>::iterator j;
+    phoneme *ret = NULL;
+    map_t<string_t, phoneme *>::iterator i;
     string_t alphabet, vtd_path;
-    bool fast = options.fast;
 
 #ifdef STND_MULTI_THREAD
     if( hMutex )
@@ -57,13 +52,12 @@ standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options 
     }
 #endif
 
-    // まず standData の有無をチェック．
+    // まず vConnectPhoneme の有無をチェック．
     i = objectMap.find( lyric );
 
     if( i != objectMap.end() )         // 希望のデータが存在するのでそれを返す．
     {
 #ifdef STND_MULTI_THREAD
-        // うーん．
         if( hMutex )
         {
             stnd_mutex_unlock( hMutex );
@@ -76,8 +70,6 @@ standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options 
                 // ロックが取得できたってことは分析終了なので即解放
                 stnd_mutex_unlock( i->second->waitHandle );
                 stnd_mutex_destroy( i->second->waitHandle );
-                //WaitForSingleObject( i->second->waitHandle, INFINITE );
-                //CloseHandle( i->second->waitHandle );
             }
             i->second->waitHandle = NULL;
         }
@@ -95,7 +87,7 @@ standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options 
     else
     {                              // 希望するデータが存在しないので作成する．
         utauParameters parameters;
-        standData *target = new standData;  // ハッシュには先に突っ込んでしまう．
+        phoneme *target = new phoneme;  // ハッシュには先に突っ込んでしまう．
         objectMap.insert( make_pair( lyric, target ) );
 
 #ifdef STND_MULTI_THREAD
@@ -108,16 +100,16 @@ standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options 
         }
 #endif
 
+        // UTAU の原音設定が無ければ読み込みを行わない．
         if( mUtauDB->getParams( parameters, lyric ) )
         {
-            target->specgram = new standSpecgram;
-            if( target->specgram->computeWaveFile( mDBPath + parameters.fileName, parameters, fast ) )
+            target->p = new vConnectPhoneme;
+            if( target->p->readPhoneme( (mDBPath + parameters.fileName).c_str() ) )
             {
                 target->isValid = true;
+                target->fixedLength = parameters.msFixedLength;
                 ret = target;
             }
-            // 設定が読み込めていてかつ拡張ライブラリを一つでも読み込めた場合は拡張を有効化する．
-            target->enableExtention = target->readMelCepstrum( setting, lyric );
         }
         target->isProcessing = false;
 
@@ -131,6 +123,7 @@ standData *corpusManager::getStandData( string_t lyric, runtimeOptions &options 
     return ret;
 }
 
+
 void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
 {
     string_t tmp;
@@ -141,8 +134,6 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
     }
     tmp = _T("vConnect.ini");
     enableExtention = setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
-    //tmp = voicePath + _T("vowelTable.txt");
-    //vowels.readVowelTable( tmp, options );
 }
 
 bool corpusManager::checkEnableExtention()

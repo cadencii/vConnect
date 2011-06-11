@@ -33,7 +33,7 @@ void getOneFrameResidualSpec(double *x, int xLen, int fs, int positionIndex, dou
                             double *residualSpec, fftw_plan *forwardFFT, fftw_complex *tmpSpec, fftw_complex *starSpec, fftw_complex *ceps, double *tmpWave,
                             fftw_plan minForward, fftw_plan minInverse)
 {
-    int i, j;
+    int i;
     double T0;
     int index, tmpIndex, wLen;
 
@@ -59,18 +59,14 @@ void getOneFrameResidualSpec(double *x, int xLen, int fs, int positionIndex, dou
         return;
     }
 
-    for(j = 0;j < (fftl - wLen) / 2; j++)
-    {
-        tmpWave[j] = 0.0;
-    }
-    for(i = 0;i < wLen;i++, j++)
+    for(i = 0;i < wLen;i++)
     {
         tmpIndex = i+index - (int)(0.5+T0);
-        tmpWave[j] = x[min( xLen-1, max(0, tmpIndex))] * 
+        tmpWave[i] = x[max(0, tmpIndex)] * 
         (0.5 - 0.5*cos(2.0*PI*(double)(i+1)/((double)(wLen+1))));
     }
-    for(;j < fftl;j++)
-        tmpWave[j] = 0.0;
+    for(;i < fftl;i++)
+        tmpWave[i] = 0.0;
 
     getMinimumPhaseSpectrum(specgram, starSpec, ceps, fftl, minForward, minInverse);
 

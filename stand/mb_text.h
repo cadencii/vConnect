@@ -21,7 +21,6 @@
 #include <clocale>
 #include <locale>
 #include <iostream>
-#include "Socket.h"
 
 using namespace std;
 
@@ -94,15 +93,8 @@ typedef struct{
     MB_CODEPAGE_DESCRIPTER descripter_for_wchar;
     // charに変換するための記述子
     MB_CODEPAGE_DESCRIPTER descripter_for_char;
-    // ファイルポインタ
     FILE *file;
-    // 文字列の読み込み単位．unit_lenバイトずつファイルから読んでいく
     int unit_len;
-    // ファイルからunit_lenずつ読み込むときに使うバッファ
-    char *unit;
-    int socket;
-    // シークして戻る操作を行った時の，バッファとして保持しておく文字
-    char *charbuf;
 } MB_FILE;
 
 /**
@@ -145,17 +137,10 @@ MB_FILE *mb_fopen( string file_name, const char *codepage );
  */
 MB_FILE *mb_fopen( wstring file_name, const char *codepage );
 
-/// <summary>
-/// 指定したコードページを使って，ソケットを読み込む
-/// </summary>
-MB_FILE *mb_fopen( int socket, const char *codepage );
-
 /**
  * ファイルを閉じる
  */
 int mb_fclose( MB_FILE *fp );
-
-
 
 /**
  * 内部関数

@@ -13,8 +13,7 @@
  */
 #include "vsqBPList.h"
 
-void vsqBPList::setParameter( string_t left, string_t right )
-{
+void vsqBPList::setParameter( string_t left, string_t right ){
     vsqBP current;
     string s;
     mb_conv( left, s );
@@ -33,18 +32,15 @@ void vsqBPList::setParameter( long tick, int value )
     data.push_back( current );
 }
 
-void vsqBPList::getList( vector<standBP>& dst, double tempo )
+void vsqBPList::getList( vector<standBP>& dst )
 {
-    int size = data.size();
     dst.clear();
-    dst.resize( size );
-    for( long i = 0; i < size; i++ )
-    {
+    dst.resize( data.size() );
+    for( long i = 0; i < data.size(); i++ ){
         dst[i].value = data[i].value;
         dst[i].frameTime = INT_MAX;                // the value will continue till this time.
-        if( i )
-        {
-            dst[i - 1].frameTime = (long)(1000.0 * (double)(data[i].tick) / 480.0 * 60.0 / tempo / framePeriod);
+        if( i ){
+            dst[i-1].frameTime = (long)( 1000.0 * (double)( data[i].tick ) / 480.0 * 60.0 / tempo / framePeriod );
         }
     }
 }

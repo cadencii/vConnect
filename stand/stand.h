@@ -215,8 +215,7 @@ void normalize_path_separator( string_t& path );
 
 // マルチスレッドにするかどうか
 // シングルスレッドにする場合コメントアウト
-//#define STND_MULTI_THREAD
-//  ↑プロジェクトのプロパティに移動しました
+#define STND_MULTI_THREAD
 
 #ifdef STND_MULTI_THREAD
   #ifdef STND_OS_WIN

@@ -14,8 +14,12 @@
  */
 #include "vConnect.h"
 #include "stand.h"
-#include "matching.h"
 #include <time.h>
+
+#include <vorbis/vorbisfile.h>
+
+#include "vConnectPhoneme.h"
+#include "vConnectUtility.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];
@@ -25,140 +29,35 @@ double temporary3[TRANS_MAX];
 double vConnect::mNoteFrequency[NOTE_NUM];
 double vConnect::mVibrato[VIB_NUM];
 
-__stnd_thread_start_retval __stnd_declspec calculateSpecgram( void *arg );
+__stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg );
 
-struct vConnectArg{
-    long beginFrame;
-    long frameLength;
-    long offset;
-    int  fftLength;
-    int  aperiodicityLength;
-    vsqFileEx *vsq;
-    standSpecgram *specgram;
-    vector<double> *dynamics;
-    vector<vector<standBP> > *controlCurves;
-    runtimeOptions *options;
-    vector<corpusManager*> *managers;
+struct vConnectData {
+    vConnectPhoneme *phoneme;
+    int index;
+    double morphRatio;
 };
 
-double vConnect::getPitchFluctuation( double second )
-{
-    double result = 1.0 + ( sin( 12.7 * ST_PI * second ) + sin ( 7.1 * ST_PI * second ) + sin( 4.7 * ST_PI * second ) / 3.0 ) / 300.0;
+struct vConnectFrame {
+    list<vConnectData *> dataList;
+};
 
-    return result;
-}
+struct vConnectArg {
+    double *f0;
+    double *wave;
+    double *dynamics;
+    int beginFrame;
+    int endFrame;
+    int waveLength;
+    int fftLength;
+    vector<vConnectFrame *> *data;
+    vector<vConnectPhoneme *> *phonemes;
+    vsqEventList *eventList;
+};
 
-bool vConnect::createWspFile(
-    string_t v_path, 
-    string_t output, 
-    string_t alias,
-    runtimeOptions options )
-{
-    UtauDB utauDB;
-    utauParameters parameters;
-    standData *data;
-    standFrame frame;
-
-    // 強制的に platinum 使用とする．
-    options.fast = true;
-
-    // 初期化
-    if( utauDB.read( v_path, options.encodingOtoIni.c_str() ) != 1 )
-    {
-        return false;
-    }
-
-    utauDB.getParams( parameters, alias );
-
-    // 読み込み
-    mManager.setUtauDB( &utauDB, options );
-    data = mManager.getStandData( alias, options );
-
-    if( data == NULL ){
-        // 失敗
-        return false;
-    }
-
-    // 成功
-    double *spectrum = new double[2048];
-    double *aperiodicity = new double[4];
-    double f0;
-    int index, begin, end, c = 0;
-
-    memset( spectrum, 0, sizeof( double ) * 2048 );
-    memset( aperiodicity, 0, sizeof( double ) * 4 );
-    // 固定長以下 100 フレームが代表点．
-    begin = (int)(parameters.msFixedLength / framePeriod);
-    end = begin + 100;
-    if( end >= data->specgram->getTimeLength() )
-    {
-        end = data->specgram->getTimeLength() - 1;
-    }
-
-    double w = (double)(end - begin);
-    f0 = 0.0;
-
-    for( index = begin; index < end; index++ )
-    {
-        data->specgram->getFramePointer( index, frame );
-        if( !( *frame.f0 ) )
-        {
-            continue;
-        }
-        c++;
-        for( int i = 0; i < 1024; i++ )
-        {
-            spectrum[i] += frame.spectrum[i];
-        }
-        for( int i = 0; i < 4; i ++ )
-        {
-            aperiodicity[i] += frame.aperiodicity[i];
-        }
-        f0 += *(frame.f0) / w;
-    }
-    for( int i = 0; i < 1024; i++ )
-    {
-        spectrum[i] /= (double)c;
-    }
-    for( int i = 0; i < 4; i++ )
-    {
-        aperiodicity[i] /= (double)c;
-    }
-    for( int i = 1024; i < 2048; i++ )
-    {
-        spectrum[i] = frame.spectrum[i];
-    }
-    // spectrum, aperiodicity, f0 の順に格納．
-    string buf;//char buf[2048];
-    mb_conv( output, buf );
-    //sprintf( buf, "%s", output.c_str() );  // うーん....
-    FILE *fp = fopen( buf.c_str(), "w" );          // うーん．．．．
-    if( fp )
-    {
-        for( int i = 0; i < 2048; i++ )
-        {
-            fprintf( fp, "%.10e\n", spectrum[i] );
-        }
-        for( int i = 0; i < 4; i++ )
-        {
-            fprintf( fp, "%.10e\n", aperiodicity[i] );
-        }
-        fprintf( fp, "%lf\n", f0 );
-    }
-    else
-    {
-        SAFE_DELETE_ARRAY( spectrum );
-        SAFE_DELETE_ARRAY( aperiodicity );
-        return false;
-    }
-
-    fclose( fp );
-
-    SAFE_DELETE_ARRAY( spectrum );
-    SAFE_DELETE_ARRAY( aperiodicity );
-
-    return true;
-}
+struct vorbisFile {
+    OggVorbis_File ovf;
+    int pos;
+};
 
 vConnect::vConnect()
 {
@@ -187,6 +86,13 @@ vConnect::~vConnect()
     }
 }
 
+double vConnect::getPitchFluctuation( double second )
+{
+    double result = 1.0 + ( sin( 12.7 * ST_PI * second ) + sin ( 7.1 * ST_PI * second ) + sin( 4.7 * ST_PI * second ) / 3.0 ) / 300.0;
+
+    return result;
+}
+
 void vConnect::emptyPath( double secOffset, string_t output )
 {
     waveFileEx wave;
@@ -197,13 +103,59 @@ void vConnect::emptyPath( double secOffset, string_t output )
     return;
 }
 
-bool vConnect::synthesize( Socket socket, string_t output, runtimeOptions options )
+void calculateFrameData(vector<vConnectFrame *> &dst, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, int beginFrame)
 {
-    if( false == mVsq.read( socket, options ) )
-    {
-        return false;
+    vsqEventEx *itemPrev = NULL;
+    for(int i = 0; i < vsq.events.eventList.size(); i++) {
+        vsqEventEx *itemThis = vsq.events.eventList[i], *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
+        string_t lyric = itemThis->lyricHandle.getLyric();
+        corpusManager::phoneme *p = managers[itemThis->singerIndex]->getPhoneme(lyric);
+        double vel = pow(2.0, (double)(64 - itemThis->velocity) / 64);
+
+        if(!p || !p->isValid){ continue; }
+
+        vConnectPhoneme *phoneme = p->p;
+        bool newPhoneme = true;
+        for(int j = 0; j < phonemes.size(); j++)
+        {
+            if(phonemes[j] == phoneme) {
+                newPhoneme = false;
+                break;
+            }
+        }
+        if(newPhoneme) {
+            phonemes.push_back(phoneme);
+        }
+        int nextBeginFrame;
+        if(itemNext) {
+            if(itemPrev) {
+                nextBeginFrame = max(itemNext->beginFrame, itemPrev->endFrame);
+            } else {
+                nextBeginFrame = itemNext->beginFrame;
+            }
+        }
+
+        for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame; j++, index++) {
+            int frameIndex = (j - itemThis->beginFrame) * vel;
+            if(dst[index] == NULL) {
+                dst[index] = new vConnectFrame;
+            }
+            vConnectData *data = new vConnectData;
+            frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
+            data->index = frameIndex;
+            data->phoneme = phoneme;
+            if(itemThis->isContinuousBack && nextBeginFrame < j) {
+                data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame);
+            } else {
+                data->morphRatio = 1.0;
+                for(list<vConnectData *>::iterator itr = dst[index]->dataList.begin(); itr != dst[index]->dataList.end(); itr++) {
+                    data->morphRatio -= (*itr)->morphRatio;
+                }
+            }
+            dst[index]->dataList.push_back(data);
+        }
+        itemPrev = itemThis;
     }
-    synthesizeCore( output, options );
 }
 
 bool vConnect::synthesize( string_t input, string_t output, runtimeOptions options )
@@ -222,615 +174,290 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 #ifdef _DEBUG
     cout << " done, successed" << endl;
 #endif
-    synthesizeCore( output, options );
-}
-
-bool vConnect::synthesizeCore( string_t output, runtimeOptions options )
-{
-#ifdef _DEBUG
-    cout << "vConnect::synthesizeCore" << endl;
-#endif
-    options.fast = false;
 
     // 空のときは空の wave を出力して終了
-    if( mVsq.events.eventList.empty() )
+    if( mVsq.events.eventList.empty() && UtauDB::dbSize() == 0 )
     {
-#ifdef _DEBUG
-        cout << "vConnect::synthesizeCore; no event exists; return" << endl;
-#endif
         emptyPath( mVsq.getEndSec(), output );
         return true;
     }
 
     long beginFrame, frameLength, waveLength;
     int  fftLength, aperiodicityLength;
-    standSpecgram specgram;
+    double *f0, *dynamics;
+
     double *wave;
 
-    //vector<UtauDB*> *pDBs = this->vsq.getVoiceDBs();
+    corpusManager::itemForAnalyze items;
     for( int i = 0; i < UtauDB::dbSize(); i++ )
     {
         corpusManager *p = new corpusManager;
         p->setUtauDB( UtauDB::dbGet( i ), options );
+        items.itemList.clear();
+        for(int j = 0; j < mVsq.events.eventList.size(); j++) {
+            if( mVsq.events.eventList[j]->singerIndex == i ) {
+                items.itemList.push_back(mVsq.events.eventList[j]);
+            }
+        }
+        p->analyze(&items);
         mManagerList.push_back( p );
     }
 
     // 準備１．先行発音などパラメータの適用，及びコントロールカーブをフレーム時刻へ変換
     this->calculateVsqInfo();
 
+    aperiodicityLength = fftLength = getFFTLengthForStar(fs);
+
     // 準備２．合成に必要なローカル変数の初期化
     beginFrame = mVsq.events.eventList[0]->beginFrame;
     frameLength = mEndFrame - beginFrame;
+    waveLength = frameLength * framePeriod * fs / 1000;
 
-    specgram.setFrameLength( frameLength, options.fast );
-    fftLength = specgram.getFFTLength();
-    aperiodicityLength = specgram.getAperiodicityLength();
-    vector<double> dynamics( frameLength, 0.0 );
+    wave = new double[waveLength];
+    memset(wave, 0, sizeof(double) * waveLength);
+    f0 = new double[frameLength];
+    dynamics = new double[frameLength];
 
     // 準備３．振幅・基本周波数・時刻 t を計算する．
-    this->calculateF0( specgram, dynamics );
+    this->calculateF0( f0, dynamics );
 
-    vConnectArg arg1, arg2;
+    // 準備４．合成時刻に必要な情報を整理．
+    vector<vConnectFrame *> data(frameLength, NULL);
+    vector<vConnectPhoneme *> phonemes;
+    calculateFrameData(data, phonemes, mVsq, mManagerList, beginFrame);
 
-    arg1.aperiodicityLength = aperiodicityLength;
-    arg1.beginFrame = beginFrame;
-    arg1.dynamics = &dynamics;
-    arg1.fftLength = fftLength;
-    arg1.managers = &mManagerList;
-    arg1.offset = 0;
-    arg1.frameLength = frameLength;
-    arg1.options = &options;
-    arg1.vsq = &mVsq;
-    arg1.specgram = &specgram;
-    arg1.controlCurves = &mControlCurves;
-#ifdef STND_MULTI_THREAD
-#ifdef _DEBUG
-    cout << "vConnect::synthesize; STND_MULTI_THREAD" << endl;
-#endif
-    thread_t hThread[2];
-    hMutex = stnd_mutex_create();// CreateMutex(NULL, FALSE, NULL);
-    hFFTWMutex = stnd_mutex_create();// CreateMutex(NULL, FALSE, NULL);
-#ifdef _DEBUG
-    cout << "vConnect::synthesize; mutex created: hFFTWMutex" << endl;
-#endif
-    memcpy( &arg2, &arg1, sizeof( vConnectArg ) );
-    arg1.frameLength /= 2;
-    arg2.offset = arg1.frameLength;
+    // 実際の合成．
+    vConnectArg arg;
+    arg.data = &data;
+    arg.phonemes = &phonemes;
+    arg.beginFrame = 0;
+    arg.endFrame = frameLength;
+    arg.f0 = f0;
+    arg.dynamics = dynamics;
+    arg.fftLength = fftLength;
+    arg.wave = wave;
+    arg.waveLength = waveLength;
+    arg.eventList = &(mVsq.events);
+    printf("begin synthesis..\n");
+    clock_t cl = clock();
+    synthesizeFromList(&arg);
+    printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / 1000.0, framePeriod * frameLength / 1000.0); 
 
-    hThread[0] = stnd_thread_create( calculateSpecgram, &arg1 );
-    hThread[1] = stnd_thread_create( calculateSpecgram, &arg2 );
-
-    stnd_thread_join( hThread[0] );
-    stnd_thread_join( hThread[1] );
-
-    stnd_thread_destroy( hThread[0] );
-    stnd_thread_destroy( hThread[1] );
-    stnd_mutex_destroy( hMutex );
-    hMutex = NULL;
-
-#else
-#ifdef _DEBUG
-    cout << "vConnect::synthesize; not STND_MULTI_THREAD" << endl;
-#endif
-    calculateSpecgram(&arg1);
-#endif
-
-    // 二段階に分けた．
-    wave = specgram.synthesizeWave( &waveLength );
-    /* 波形自体の編集をここに書く． */
-    //calculateDynamics( dynamics, wave, waveLength, options.volumeNormalization );
-
-    specgram.writeWaveFile( output, beginFrame, &dynamics );
-
-#ifdef STND_MULTI_THREAD
-    // FFTW 用の mutex は合成時にも使うので最後に解放．
-    stnd_mutex_destroy( hFFTWMutex );
-    hFFTWMutex = NULL;
-#endif
+    // ファイルに書き下す．
+    waveFileEx waveFile;
+    waveFile.setWaveBuffer(wave, waveLength);
+    waveFile.normalize();
+    waveFile.setOffset((double)beginFrame * framePeriod / 1000.0);
+    waveFile.writeWaveFile(output);
+    delete[] wave;
+    delete[] f0;
+    delete[] dynamics;
 
     return true;
 }
 
-/**
- * 固定長以降の位置を計算する．
- * position = actualPosition - consonantEndPosition
- */
-int calculatePhoneticTime( float msFixedLength, int tLen, int position, bool fast )
+corpusManager::phoneme* vConnect::getPhoneme(string_t lyric, int singerIndex, vector<corpusManager *> *managers)
 {
-    // うーん．．．
-    //return (int)(msFixedLength/framePeriod);
-
-    // 真ん中を繰り返し使うようにしよう．
-    tLen -= 20;  // 後半 20[frames] は信用しない
-    int ret;
-    int fixedLength = (int)(msFixedLength / framePeriod);
-    int segment = (tLen - fixedLength) / 2;
-    int times = position / segment;
-    int rest = position % segment;
-
-    if( times == 0 )
+    corpusManager::phoneme *ret = NULL;
+    if(singerIndex < managers->size())
     {
-        ret = fixedLength + rest;
+        ret = (*managers)[singerIndex]->getPhoneme(lyric);
     }
-    else
-    {
-        if( times % 2 )
-        {
-            ret = fixedLength + segment + rest;
-        }
-        else
-        {
-            ret = fixedLength + segment * 2 - rest;
-        }
-    }
-
     return ret;
 }
 
-__stnd_thread_start_retval __stnd_declspec calculateSpecgram( void *arg )
+int getFirstItem(vsqEventEx **p1, vsqEventEx **p2, 
+                 corpusManager::phoneme **ph1, 
+                 corpusManager::phoneme **ph2,
+                 vsqFileEx *vsq, vector<corpusManager *> &managers, int beginFrame)
 {
-    vConnectArg *p = (vConnectArg *)arg;
-    long beginFrame, frameLength, index;
-    int  fftLength, aperiodicityLength;
-    vector<double> *dynamics;
-    vector<vector<standBP> > *controlCurves;
-    vector<corpusManager *> *managers;
-    runtimeOptions options;
-
-    //// 引数のコピー．
-    //
-    options.encodingOtoIni       = p->options->encodingOtoIni;
-    options.encodingVoiceTexture = p->options->encodingVoiceTexture;
-    options.encodingVowelTable   = p->options->encodingVowelTable;
-    options.encodingVsqText      = p->options->encodingVsqText;
-    options.f0Transform          = p->options->f0Transform;
-    options.fast                 = p->options->fast;
-    options.volumeNormalization  = p->options->volumeNormalization;
-    options.wspMode              = p->options->wspMode;
-
-    fftLength               = p->fftLength;
-    aperiodicityLength      = p->aperiodicityLength;
-    beginFrame              = p->beginFrame;
-    vsqFileEx *vsq          = p->vsq;
-    standSpecgram *specgram = p->specgram;
-    index                   = p->offset;
-    dynamics                = p->dynamics;
-    controlCurves           = p->controlCurves;
-    frameLength             = p->frameLength;
-    managers                = p->managers;
-    //
-    //// コピーここまで．
-
-    double *aperiodicity;
-    double *spectrum;
-    double *trans = new double[fftLength];
-    double *temporary = new double[fftLength];
-
-    standData *present, *next = NULL;
-    standFrame target, presentFrame, nextFrame;
-    presentFrame.createCepstrum( 2 );
-    nextFrame.createCepstrum( 2 );
-
-    int briIndex, breIndex, cleIndex, genIndex, opeIndex;
-    double presentVelocity, nextVelocity, consonantEndFrame, nextConsonantEndFrame, tmp;
-    double breRate, genRate, briRate, cleRate;
-
-    briIndex = breIndex = cleIndex = genIndex = opeIndex = 0;
-
-    fftw_plan inverseFFT, forwardFFT;
-    double *melSpectrum = new double[fftLength];
-    fftw_complex *melCepstrum = new fftw_complex[fftLength];
-
-#ifdef STND_MULTI_THREAD
-    if( hFFTWMutex )
+    int ret = vsq->events.eventList.size();
+    for(int i = 0; i < vsq->events.eventList.size(); i++)
     {
-        stnd_mutex_lock(hFFTWMutex);
-    }
-#endif
-    inverseFFT = fftw_plan_dft_r2c_1d(fftLength, melSpectrum, melCepstrum, FFTW_ESTIMATE);
-    forwardFFT = fftw_plan_dft_c2r_1d(fftLength, melCepstrum, melSpectrum, FFTW_ESTIMATE);
-#ifdef STND_MULTI_THREAD
-    if( hFFTWMutex )
-    {
-        stnd_mutex_unlock(hFFTWMutex);
-    }
-#endif
-    for( int i = 0; i < fftLength; i++ )
-    {
-        melCepstrum[i][0] = melCepstrum[i][1] = 0.0;
-    }
-
-    // 合成開始．長くなってしまうのはどうにもならんのか
-    int num_events = vsq->events.eventList.size();
-    vsqEventEx *itemNext = NULL;
-
-    itemNext = vsq->events.eventList[0];
-    int beginItemNumber;
-
-    // 合成開始するノート番号を計算．
-    for( int i = 0; i < num_events; i++ )
-    {
-        if( index < vsq->events.eventList[i]->endFrame - beginFrame )
+        if(vsq->events.eventList[i]->beginFrame <= beginFrame
+            && beginFrame < vsq->events.eventList[i]->endFrame)
         {
-            itemNext = vsq->events.eventList[i];
-            beginItemNumber = i;
+            *p1 = vsq->events.eventList[i];
+            *p2 = (i + 1 < vsq->events.eventList.size()) ? vsq->events.eventList[i+1] : NULL;
+            ret = i;
+            if(*p1) {
+                *ph1 = managers[(*p1)->singerIndex]->getPhoneme((*p1)->lyricHandle.getLyric());
+            }
+            if(*p2) {
+                *ph2 = managers[(*p2)->singerIndex]->getPhoneme((*p2)->lyricHandle.getLyric());
+            }
             break;
         }
     }
-    for( int i = beginItemNumber; i < num_events && index < frameLength; i++ )
-    {
-        vsqEventEx *itemThis = itemNext;
-        int morphBeginFrame = INT_MAX;
-        if( i + 1 < num_events )
-        {
-            itemNext = vsq->events.eventList[i + 1];
-        }
+    return ret;
+}
 
-        // 合成範囲外は合成範囲になるまで無音を与える
-        if( itemThis->beginFrame > beginFrame + index )
-        {
-            for( ; index < itemThis->beginFrame - beginFrame; index++ )
-            {
-                specgram->getFramePointer( index, target );
-                (*dynamics)[index] = 0.0;
-                *(target.f0) = -1.0;
-            }
+int calculateMelCepstrum(float *dst, int fftLength, list<vConnectData *> &frames)
+{
+    int ret = 0;
+    memset(dst, 0, sizeof(float) * fftLength);
+    for(list<vConnectData *>::iterator i = frames.begin(); i != frames.end(); i++) {
+        int length;
+        float *data;
+        data = (*i)->phoneme->getMelCepstrum((*i)->index, &length);
+        for(int j = 0; j < length; j++) {
+            dst[j] += (*i)->morphRatio * data[j];
         }
-        // 合成可能範囲内なので wav ファイルを検索，適宜 WORLD で分析．
-        if( 0 <= itemThis->singerIndex && itemThis->singerIndex < managers->size() )
-        {
-            present =
-                (*managers)[itemThis->singerIndex]->getStandData(
-                    itemThis->lyricHandle.getLyric(),
-                    options );
-            (*managers)[itemThis->singerIndex]->checkEnableExtention();
+        ret = max(ret, length);
+    }
+    return ret;
+}
 
-            if( !present || !present->specgram )
-            {
-                // 見つからない場合は次に行こう．
+void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames, map_t<vConnectPhoneme *, OggVorbis_File *> &vorbisMap)
+{
+    memset(dst, 0, sizeof(double) * fftLength);
+    float **pcm_channels;
+    for(list<vConnectData *>::iterator i = frames.begin(); i != frames.end(); i++) {
+        int count = 0;
+        map_t<vConnectPhoneme *, OggVorbis_File *>::iterator itr = vorbisMap.find((*i)->phoneme);
+        if(itr != vorbisMap.end()) {
+            if(ov_pcm_seek_lap(itr->second, (*i)->index * fftLength)) {
+                // シークに失敗
                 continue;
             }
-            // 固定長が分析長より長い場合は分析長にしておく．
-            if( itemThis->utauSetting.msFixedLength / framePeriod >= present->specgram->getTimeLength() )
-            {
-                itemThis->utauSetting.msFixedLength = (double)(present->specgram->getTimeLength()-1) * framePeriod;
-            }
-            presentVelocity = pow( 2.0, (double)(64 - itemThis->velocity) / 64.0);
-            consonantEndFrame = itemThis->utauSetting.msFixedLength * presentVelocity / framePeriod;
-        }
-        else
-        {
-            // ありえない歌手番号の際は次に行ってしまう．
-            continue;
-        }
-        if( itemThis->isContinuousBack )
-        {
-            if( 0 <= itemNext->singerIndex && itemNext->singerIndex < managers->size() )
-            {
-                next = (*managers)[itemNext->singerIndex]->getStandData( itemNext->lyricHandle.getLyric(), options );
-                (*managers)[itemNext->singerIndex]->checkEnableExtention();
-            }
-            if( next && next->specgram )
-            {
-                // 固定長が分析長より長い場合は分析長にしておく．
-                if(itemNext->utauSetting.msFixedLength / framePeriod >= next->specgram->getTimeLength())
-                {
-                    itemNext->utauSetting.msFixedLength = (double)(next->specgram->getTimeLength()-1) * framePeriod;
+            while(count < fftLength) {
+                int bitStream;
+                long samples = ov_read_float(itr->second, &pcm_channels, fftLength - count, &bitStream);
+                // 読み込み失敗．
+                if(samples <= 0){ break; }
+                for(int j = 0, k = count; j < samples && k < fftLength; j++, k++) {
+                    dst[k] += pcm_channels[0][j] * (*i)->morphRatio;
                 }
-                // モーフ開始位置は読み込めたら設定する．
-                morphBeginFrame = max(itemThis->beginFrame, itemNext->beginFrame) - beginFrame;
-            }
-            nextVelocity = pow( 2.0, (double)( 64 - itemNext->velocity ) / 64.0 );
-            nextConsonantEndFrame = itemNext->utauSetting.msFixedLength * nextVelocity / framePeriod;
-        }
-
-        for( ; index < itemThis->endFrame - beginFrame && index < frameLength; index++ )
-        {
-            double morphRatio = 0.0;
-            double noiseRatio = 1.0;
-            specgram->getFramePointer( index, target );
-            spectrum = target.spectrum;
-            aperiodicity = target.aperiodicity;
-
-            // コントロールトラックのインデックスを進める
-            while( index + beginFrame > (*controlCurves)[BRETHINESS][breIndex].frameTime )
-            {
-                breIndex++;
-            }
-            while( index + beginFrame > (*controlCurves)[CLEARNESS][cleIndex].frameTime )
-            {
-                cleIndex++;
-            }
-            while( index + beginFrame > (*controlCurves)[GENDER][genIndex].frameTime )
-            {
-                genIndex++;
-            }
-            while( index + beginFrame > (*controlCurves)[BRIGHTNESS][briIndex].frameTime )
-            {
-                briIndex++;
-            }
-
-            /* BRE / BRI / CLE */
-            breRate = (double)(*controlCurves)[BRETHINESS][breIndex].value / 128.0;
-            briRate = (double)((*controlCurves)[BRIGHTNESS][briIndex].value - 64) / 64.0;
-            cleRate = (double)(*controlCurves)[CLEARNESS][cleIndex].value / 128.0;
-
-            // 1Frame の合成に必要なデータを取ってくる．
-            vConnect::getOneFrame(
-                presentFrame,
-                *present,
-                index - itemThis->beginFrame + beginFrame,
-                consonantEndFrame,
-                presentVelocity,
-                itemThis->utauSetting,
-                *(target.f0),
-                briRate,
-                options.fast );
-
-            // 現在注目しているフレームが無声音の場合それを優先する．
-            if( *(presentFrame.f0) == 0.0 )
-            {
-                *(target.f0) = 0.0;
-                nextFrame.f0 = presentFrame.f0;
-                nextFrame.spectrum = presentFrame.spectrum;
-                nextFrame.aperiodicity = presentFrame.aperiodicity;
-
-                // 音符末尾の場合 morphRatioを計算．
-            }
-            else if( morphBeginFrame <= index )
-            {
-
-                // 1Frame の合成に必要なデータを取ってくる．
-                vConnect::getOneFrame(
-                    nextFrame,
-                    *next,
-                    index - itemNext->beginFrame + beginFrame,
-                    nextConsonantEndFrame,
-                    nextVelocity,
-                    itemNext->utauSetting,
-                    *(target.f0),
-                    briRate,
-                    options.fast );
-
-                morphRatio = (double)(index - morphBeginFrame) / (double)(itemThis->endFrame - beginFrame - morphBeginFrame);
-                morphRatio = 0.5 - 0.5 * cos( ST_PI * morphRatio );
-
-                if( *(nextFrame.f0) == 0.0 && options.fast )
-                {
-                    morphRatio = 1.0;
-                    *(target.f0) = 0.0;
-                }
-
-            }
-            else
-            {          // これはエラー防止用．
-                nextFrame.f0 = presentFrame.f0;
-                nextFrame.spectrum = presentFrame.spectrum;
-                nextFrame.aperiodicity = presentFrame.aperiodicity;
-            }
-
-            // morphRatio にしたがって spectrum 計算．
-            for( int k = 0; k <= fftLength / 2; k++ )
-            {
-                spectrum[k] = pow( presentFrame.spectrum[k], 1.0 - morphRatio ) * pow( nextFrame.spectrum[k],morphRatio );
-            }
-
-            // aperiodicity の計算
-            vConnect::calculateAperiodicity(
-                aperiodicity,
-                presentFrame.aperiodicity,
-                nextFrame.aperiodicity,
-                presentFrame.aperiodicityLength,
-                morphRatio,
-                noiseRatio,
-                breRate,
-                options.fast );
-
-            /* 声質変換 */
-            if( *(target.f0) || options.fast == false )
-            {
-                // 差分メルケプストラムの和を求める．
-                memset( melCepstrum, 0, sizeof( fftw_complex ) * fftLength );
-                bool existsCepstrum = false;
-
-                if( presentFrame.cepstrumLengths[1] > 0 )
-                {
-                    existsCepstrum = true;
-                    for( int k = 0; k < presentFrame.cepstrumLengths[1]; k++ )
-                    {
-                        melCepstrum[k][0] = presentFrame.melCepstra[1][k].re * (1.0 - morphRatio) * presentFrame.mixRatio[1];
-                    }
-                }
-                if( morphRatio > 0.0 && nextFrame.cepstrumLengths[1] > 0 )
-                {
-                    existsCepstrum = true;
-                    for( int k = 0; k < nextFrame.cepstrumLengths[1]; k++ )
-                    {
-                        melCepstrum[k][0] += nextFrame.melCepstra[1][k].re * morphRatio * nextFrame.mixRatio[1];
-                    }
-                }
-                if( presentFrame.cepstrumLengths[0] > 0 )
-                {
-                    existsCepstrum = true;
-                    for( int k = 0; k < presentFrame.cepstrumLengths[0]; k++ )
-                    {
-                        melCepstrum[k][0] += presentFrame.melCepstra[0][k].re * (1.0 - morphRatio) * briRate;
-                    }
-                }
-                if( morphRatio > 0.0 && nextFrame.cepstrumLengths[0] > 0 )
-                {
-                    existsCepstrum = true;
-                    for( int k = 0; k < nextFrame.cepstrumLengths[0]; k++ )
-                    {
-                        melCepstrum[k][0] += nextFrame.melCepstra[0][k].re * morphRatio * briRate;
-                    }
-                }
-
-
-                if( existsCepstrum )
-                {
-                    // 差分メルケプストラムの適用
-                    fftw_execute(forwardFFT);
-                    standMelCepstrum::stretchFromMelScale(temporary, melSpectrum, fftLength / 2 + 1, fs / 2);
-                    for( int k = 0; k <= fftLength / 2; k++ )
-                    {
-                        spectrum[k] *= exp( temporary[k] );
-                    }
-                }
-                else if( *target.f0 )
-                {
-                    // 普通の Brightness 処理
-                    for( int k = 0; k <= fftLength / 2; k++ )
-                    {
-                        double freq = (double)k / (double)fftLength * (double)fs;
-                        if( freq < *target.f0 * 2 )
-                        {
-                            spectrum[k] /= pow( 4.0, briRate );
-                        }
-                        else if( freq > *target.f0 * 4 )
-                        {
-                            spectrum[k] *= pow( 4.0, briRate );
-                        }
-                        else
-                        {
-                            spectrum[k] /= pow( 4.0, briRate * cos( (freq - *target.f0 * 2.0) / *target.f0 * ST_PI ) );
-                        }
-                    }
-                }
-
-                /* GEN 適用 */
-                genRate = pow( 2.0, (double)((*controlCurves)[GENDER][genIndex].value - 64) / 64.0 );
-
-                for( int k = 0; k <= fftLength / 2; k++ )
-                {
-                    tmp = genRate * (double)k;
-                    if( tmp > fftLength / 2 )
-                    {
-                        temporary[k] = spectrum[fftLength / 2];
-                    }
-                    else
-                    {
-                        temporary[k] = interpolateArray( tmp, spectrum );
-                    }
-                }
-
-                memcpy( spectrum, temporary, sizeof( double ) * (fftLength / 2 + 1) );
+                count += samples;
             }
         }
     }
+}
 
-    SAFE_DELETE_ARRAY( melSpectrum );
-    SAFE_DELETE_ARRAY( melCepstrum );
-    SAFE_DELETE_ARRAY( temporary );
-    SAFE_DELETE_ARRAY( trans );
+__stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
+{
+    vConnectArg *p = (vConnectArg*)arg;
+
+    // 波形の復元時に FFTW を使う上で必要なメモリの確保．
+    fftw_complex *spectrum = new fftw_complex[p->fftLength];
+    fftw_complex *cepstrum = new fftw_complex[p->fftLength];
+    fftw_complex *residual = new fftw_complex[p->fftLength];
+    double *starSpec = new double[p->fftLength];
+    double *impulse  = new double[p->fftLength];
+    float *melCepstrum = new float[p->fftLength];
+    int cepstrumLength;
+
+    // この処理はスレッドセーフでない．
+#ifdef STND_MULTI_THREAD
+    if(hMutex) {
+        stnd_mutex_lock(hMutex);
+    }
+#endif
+    fftw_plan forward = fftw_plan_dft_1d(p->fftLength, spectrum, cepstrum, FFTW_FORWARD,  FFTW_ESTIMATE);
+    fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(p->fftLength, starSpec, residual, FFTW_ESTIMATE);
+    fftw_plan inverse = fftw_plan_dft_1d(p->fftLength, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_plan inverse_c2r = fftw_plan_dft_c2r_1d(p->fftLength, spectrum, impulse, FFTW_ESTIMATE);
+#ifdef STND_MULTI_THREAD
+    if(hMutex) {
+        stnd_mutex_unlock(hMutex);
+    }
+#endif
+
+    // 検索用ハッシュ
+    map_t<vConnectPhoneme *, OggVorbis_File *> vorbisMap;
+    for(int i = 0; i < p->phonemes->size(); i++) {
+        if(!(*(p->phonemes))[i]) { continue; }
+        OggVorbis_File *ovf = new OggVorbis_File;
+        if((*(p->phonemes))[i]->vorbisOpen(ovf)) {
+            vorbisMap.insert(make_pair((*(p->phonemes))[i], ovf));
+        } else {
+            delete ovf;
+        }
+    }
+    //================================================================================================= ↑前処理
+
+    int currentPosition, currentFrame = p->beginFrame;
+    double currentTime = 0.0, T;
+
+    // 合成処理
+    while(currentFrame < p->endFrame)
+    {
+        if(p->f0[currentFrame] < 0) {
+            currentFrame++;
+            currentTime = (double)currentFrame * framePeriod / 1000.0;
+            continue;
+        }
+        p->f0[currentFrame] = (p->f0[currentFrame] == 0.0) ? DEFAULT_F0 : p->f0[currentFrame];
+
+        /* ToDo : MelCepstrum の合成結果を melCepstrum に書き込む．
+                  残差波形の合成結果を starSpec に書き込む．      */
+        cepstrumLength = calculateMelCepstrum(melCepstrum, p->fftLength, (*(p->data))[currentFrame]->dataList);
+        calculateResidual(starSpec, p->fftLength, (*(p->data))[currentFrame]->dataList, vorbisMap);
+
+        // starSpec -> residual DFT を実行する．
+        fftw_execute(forward_r2c);
+        // メルケプストラムをstraSpecに展開．
+        vConnectUtility::extractMelCepstrum(starSpec, p->fftLength, melCepstrum, cepstrumLength, spectrum, impulse, inverse_c2r ,fs);
+        // 合成パワースペクトルから最小位相応答を計算．
+        getMinimumPhaseSpectrum(starSpec, spectrum, cepstrum, p->fftLength, forward, inverse);
+
+        // 励起信号スペクトルと周波数領域での掛け算．
+        for(int k = 0; k <= p->fftLength / 2; k++)
+        {
+            double real = spectrum[k][0] * residual[k][0] - spectrum[k][1] * residual[k][1];
+            double imag = spectrum[k][1] * residual[k][0] + spectrum[k][0] * residual[k][1];
+            spectrum[k][0] = real;
+            spectrum[k][1] = imag;
+        }
+
+        // 実波形に直す．
+        fftw_execute(inverse_c2r);
+        currentPosition = currentTime * fs;
+        for(int k = 0; k < p->fftLength / 2 && currentPosition < p->waveLength; k++, currentPosition++) {
+            p->wave[currentPosition] += impulse[k] * p->dynamics[currentFrame];
+        }
+
+        T = 1.0 / p->f0[currentFrame];
+        currentTime += T;
+        currentFrame = currentTime * 1000.0 / framePeriod;
+    }
+
+    //================================================================================================= ↓後処理
+    for(map_t<vConnectPhoneme *, OggVorbis_File*>::iterator i = vorbisMap.begin(); i != vorbisMap.end(); i++) {
+        ov_clear(i->second);
+        delete i->second;
+    }
+
+    delete[] melCepstrum;
+    delete[] impulse;
+    delete[] starSpec;
+    delete[] residual;
+    delete[] cepstrum;
+    delete[] spectrum;
+
+    // この処理はスレッドセーフでない．
+#ifdef STND_MULTI_THREAD
+    if(hMutex) {
+        stnd_mutex_lock(hMutex);
+    }
+#endif
+    fftw_destroy_plan(forward);
+    fftw_destroy_plan(forward_r2c);
+    fftw_destroy_plan(inverse);
+    fftw_destroy_plan(inverse_c2r);
+#ifdef STND_MULTI_THREAD
+    if(hMutex) {
+        stnd_mutex_unlock(hMutex);
+    }
+#endif
 
 #ifdef STND_MULTI_THREAD
 #ifndef USE_PTHREADS
-    _endthreadex( 0 );
+    //_endthreadex( 0 );
+    return NULL;
 #endif
     return NULL;
 #endif
-}
-
-void vConnect::getOneFrame(
-    standFrame &dst,
-    standData &src, 
-    int position, 
-    int consonantEndFrame,
-    double velocity, 
-    utauParameters &params, 
-    double f0, 
-    double briRate, 
-    bool fast )
-{
-    if( position < consonantEndFrame )
-    {
-        position = (long)((double)position / velocity);
-    }
-    else
-    {
-        position =
-            calculatePhoneticTime(
-                params.msFixedLength,
-                src.specgram->getTimeLength(),
-                position - consonantEndFrame,
-                fast );
-    }
-
-    // fatal::STAR スペクトルの末端 fftLength 分のデータは信用出来ない
-    if( position < (double)dst.fftl / (double)fs * 1000.0 / framePeriod )
-    {
-        position = (double)dst.fftl / (double)fs * 1000.0 / framePeriod;
-    }
-
-    position = src.getPosition(position, f0, briRate);
-
-    src.getBrightness(position, &dst.melCepstra[0], &dst.cepstrumLengths[0], f0, &dst.noiseRatio[0]);
-    src.getFreqInterp(position, &dst.melCepstra[1], &dst.cepstrumLengths[1], f0, &dst.mixRatio[1], &dst.noiseRatio[1]);
-
-    src.specgram->getFramePointer( position, dst );
-}
-
-void vConnect::calculateAperiodicity(double *dst, const double *src1, const double *src2, int aperiodicityLength,
-                                     double morphRatio, double noiseRatio, double breRate, bool fast)
-{
-    double *temporary = new double[aperiodicityLength];
-    breRate = pow(3.0, breRate);
-    // とりあえず線形補間
-    for(int k = 0; k < aperiodicityLength; k++)
-    {
-        dst[k] = src1[k] * (1.0 - morphRatio) + src2[k] * morphRatio;
-    }
-    // WORLD のバージョンが 0.0.4 の場合はパワースペクトルから補間を修正
-    if(fast)
-    {
-        // WORLD 0.0.1 における非周期性パラメタはシグモイド関数のパラメタであり，
-        // それぞれ以下のパラメタを決定する．
-        // ap[0] = u :: 非周期性指標のダイナミックレンジ
-        // ap[1] = b :: 非周期性指標の最大値 max = 1.0 - b で決定する．
-        // ap[2] = fc:: 非周期性指標の値が(u + b) / 2になる f の値
-        // ap[3] = w :: シグモイド関数の傾き
-        // 値は再考の余地大有り．
-        dst[0] = 0.1 + 0.4 * breRate;
-        dst[1] = 0.9 - 0.7 * breRate;
-        dst[2] *= pow(2.0, breRate); // うーん...
-        dst[3] *= pow(4.0, 0.5 - breRate);
-        //
-        // なお非周期性指標は周波数軸上で
-        // noiseSpectrum[i] = spectrum[i] * aperiodicityRatio[i]
-        // の形でスペクトル中に含まれるノイズの量を決定す
-    }
-    else
-    {
-        // 励起信号パワースペクトルの平均を得ておく．
-        double aperiodicityAverage = 0.0;
-        for(int k = 1; k < aperiodicityLength / 2; k++){
-            double r = dst[k*2] * dst[k*2] + dst[k*2-1] * dst[k*2-1];
-            r = sqrt(r);
-            aperiodicityAverage += r;
-            temporary[k] = r;
-        }
-        aperiodicityAverage /= (aperiodicityLength / 2 - 1);
-        // noiseRatio と breRate に従って非周期性成分のパワーを増幅
-        for(int k = 1; k < 189; k++)
-        {
-            double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate + aperiodicityAverage) / temporary[k];
-            coefficient = min(12.0, fabs(coefficient));
-            coefficient = pow(coefficient, 0.5 - 0.5 * cos(ST_PI * k / 189));
-            dst[k*2] *= coefficient;
-            dst[k*2-1] *= coefficient;
-        }
-        for(int k = 189; k < aperiodicityLength /2; k++)
-        {
-            //double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate * noiseRatio + aperiodicityAverage) / temporary[k];
-            double coefficient = ( (temporary[k] - aperiodicityAverage) * breRate + aperiodicityAverage) / temporary[k];
-            coefficient = min(12.0, fabs(coefficient));
-            dst[k*2] *= coefficient;
-            dst[k*2-1] *= coefficient;
-        }
-    }
-
-    delete[] temporary;
 }
 
 void vConnect::calculateVsqInfo( void )
@@ -966,28 +593,21 @@ void vConnect::calculateVsqInfo( void )
 
     // コントロールカーブは vsq 管理クラスにやってもらう
     mControlCurves.resize( mVsq.controlCurves.size() );
-    double tempo = mVsq.getTempo();
     for( unsigned int i = 0; i < mControlCurves.size(); i++ )
     {
-        mVsq.controlCurves[i].getList( mControlCurves[i], tempo );
+        mVsq.controlCurves[i].getList( mControlCurves[i] );
     }
 }
 
-void vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
+void vConnect::calculateF0( double *f0, double *dynamics )
 {
-    standFrame frame;
-    double *f0, *t, pitch_change, tmp, vibratoTheta = 0.0, vibratoRate, vibratoDepth;
+    double pitch_change, tmp, vibratoTheta = 0.0, vibratoRate, vibratoDepth;
     long beginFrame = mVsq.events.eventList[0]->beginFrame;
     long frameLength = mEndFrame - beginFrame;
     long index = 0;
     long portamentoBegin, portamentoLength;
 	long previousEndFrame = LONG_MIN, vibratoBeginFrame = 0, noteBeginFrame;
     int  pitIndex = 0, pbsIndex = 0, dynIndex = 0; // ControlCurve Index
-
-    // 仕様依存．f0 と t は連続した配列でなければならない．
-    dst.getFramePointer( 0, frame );
-    f0 = frame.f0;
-    t = frame.t;
 
     for( unsigned int i = 0; i < mVsq.events.eventList.size(); i++ )
     {
@@ -997,7 +617,6 @@ void vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
         for( ; index < itemi->beginFrame - beginFrame && index < frameLength; index++ )
         {
             f0[index] = -1.0;//0.0;
-            t[index] = (double)index * framePeriod / 1000.0;
             dynamics[index] = 0.0;
         }
 
@@ -1048,7 +667,6 @@ void vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
             }
             pitch_change = pow( 2, (double)mControlCurves[PITCH_BEND][pitIndex].value / 8192.0 * (double)mControlCurves[PITCH_BEND_SENS][pbsIndex].value / 12.0 );
             f0[index] = mNoteFrequency[itemi->note] * pitch_change * getPitchFluctuation( (double)index * framePeriod / 1000.0 );
-            t[index] = (double)index * framePeriod / 1000.0;
             dynamics[index] = (double)mControlCurves[DYNAMICS][dynIndex].value / 64.0;
             if( index > portamentoBegin )
             {
@@ -1114,143 +732,20 @@ void vConnect::calculateF0( standSpecgram& dst, vector<double>& dynamics )
         portamentoLength = itemi->endFrame - portamentoBegin;
         double inv_portamentoLength = 1.0 / (double)portamentoLength;
         long frameOffset = portamentoBegin - beginFrame;
-        for( long j = 0; j < portamentoLength && j + frameOffset < dynamics.size(); j++ )
+        for( long j = 0; j < portamentoLength && j + frameOffset < frameLength; j++ )
         {
-            if( j + frameOffset >= frameLength )
-            {
-                break;
-            }
             double x = (double)j * inv_portamentoLength;
             double portamentoChangeRate = (sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5);
             f0[j + frameOffset] *= pow( tmp, 0.5 * (1.0 - cos( ST_PI * x )) - (double)itemi->portamentoDepth / 100.0 * portamentoChangeRate);
             dynamics[j + frameOffset] *= pow(tmp / fabs(tmp) * 3.0, - (double)itemi->decay / 100.0 * portamentoChangeRate);
         }
-        for( long j = portamentoLength; j < portamentoLength * 3 / 2; j++ )
+        for( long j = portamentoLength; j < portamentoLength * 3 / 2 && j + frameOffset < frameLength; j++ )
         {
-            if( j + frameOffset >= frameLength )
-            {
-                break;
-            }
             double x = (double)j * inv_portamentoLength;
             double portamentoChangeRate = (sin( ST_PI * 4.0 / 3.0 * x ) * (1.5 - x) / 1.5);
             f0[j + frameOffset] *= pow( tmp, - (double)itemi->portamentoDepth / 100.0 * portamentoChangeRate );
             dynamics[j + frameOffset] *= pow(tmp / fabs(tmp) * 3.0, - (double)itemi->attack / 100.0 * portamentoChangeRate);
         }
         previousEndFrame = itemi->endFrame;
-    }
-}
-
-void vConnect::calculateDynamics(
-    vector<double> &dynamics, 
-    double *wave, 
-    long wave_len, 
-    bool volumeNormalization )
-{
-    vector<long>   decayFrame( mVsq.events.eventList.size() );
-    vector<long>   attackFrame( mVsq.events.eventList.size() );
-    double presentVelocity;
-    long noteBeginFrame;
-    long previousEndFrame = LONG_MIN;
-    long beginFrame = mVsq.events.eventList[0]->beginFrame;
-    long consonantEndFrame, preutterance;
-
-    /*== 適用する位置を計算する ==*/
-    for( unsigned int i = 0; i < mVsq.events.eventList.size(); i++ )
-    {
-        vsqEventEx *itemi = mVsq.events.eventList[i];
-
-        /*============= 固定長終了時を attack, 真ん中か，可能であれば， attack + 100[ms] の位置を decay とする．============*/
-
-        // 準備
-        presentVelocity = pow( 2.0, (double)(64 - itemi->velocity ) / 64.0);
-        consonantEndFrame = (long)(itemi->utauSetting.msFixedLength * presentVelocity / framePeriod);
-        preutterance = (long)(itemi->utauSetting.msPreUtterance * presentVelocity / framePeriod);
-
-        // 音符の開始位置は固定長終了位置か, 直前の音符が終了した位置.
-        if( previousEndFrame > itemi->beginFrame + consonantEndFrame - beginFrame ){
-            noteBeginFrame = previousEndFrame;
-        }else{
-            noteBeginFrame = itemi->beginFrame + consonantEndFrame - beginFrame;
-        }
-
-        // attack 位置の計算
-        if( itemi->isVCV ){
-            attackFrame[i] = itemi->beginFrame + preutterance - beginFrame;
-        }else{
-            attackFrame[i] = itemi->beginFrame + consonantEndFrame - beginFrame;
-        }
-
-        // decay 位置の計算
-        // attack + 100ms はあまりよろしくない位置のとき．
-        if( itemi->endFrame - beginFrame < attackFrame[i] + 100 / framePeriod )
-            decayFrame[i] = ( noteBeginFrame + itemi->endFrame - beginFrame ) / 2;
-        else
-            decayFrame[i] = attackFrame[i] + 100 / framePeriod;
-
-        previousEndFrame = itemi->endFrame - beginFrame;
-
-    }
-
-    /*== 抽出した音量と音符情報から音量遷移曲線を描画 ==*/
-    previousEndFrame = LONG_MIN;
-    // 取り扱っている音符が直前の音符と連続しているかどうか
-    // (直前の音符のisContinuousBackフラグが起ってるかどうか)
-    bool   isContinuousFront = false;
-    int    previousFrame, tmpLength;
-    double previousValue, tmpValue;
-    for( unsigned int i = 0; i < mVsq.events.eventList.size(); i++ ){
-        vsqEventEx* itemi = mVsq.events.eventList[i];
-
-        // 明示的休符は無視する．
-        if( itemi->isRest ){
-            continue;
-        }
-
-        double attackRate = pow( 2.0, (double)( itemi->attack - 50 ) / 50.0 );
-        double decayRate  = pow( 2.0, (double)( itemi->decay  - 50 ) / 50.0 );
-
-        if( isContinuousFront ){
-            noteBeginFrame = previousFrame;
-        } else {
-            noteBeginFrame = itemi->beginFrame - beginFrame;
-            previousValue = attackRate;
-        }
-
-        // 前回終了位置から attack の開始（固定長終了）位置までを余弦関数で接続．
-        int frameOffset = noteBeginFrame;
-        tmpLength = attackFrame[i] - frameOffset;
-        if( tmpLength + frameOffset >= (int)dynamics.size() ){
-            // dynamicsのout of range例外を回避
-            tmpLength = dynamics.size() - frameOffset;
-        }
-        tmpValue = attackRate - previousValue;
-        for( int index = 0; index < tmpLength; index++ ){
-            dynamics[index + frameOffset] *= ( previousValue + tmpValue * ( 0.5 - 0.5 * cos( ST_PI * (double)index / (double)tmpLength ) ) );
-        }
-
-        // attack の開始（固定長終了）位置から decay 位置まで．
-        frameOffset = attackFrame[i];
-        tmpLength = decayFrame[i] - frameOffset;
-        if( tmpLength + frameOffset >= (int)dynamics.size() ){
-            // dynamicsのout of range例外を回避
-            tmpLength = dynamics.size() - frameOffset;
-        }
-        tmpValue = decayRate - attackRate;
-        for( int index = 0; index < tmpLength; index++ ){
-            dynamics[index + frameOffset] *= ( attackRate + tmpValue * ( 0.5 - 0.5 * cos( ST_PI * (double)index / (double)tmpLength ) ) );
-        }
-
-        if( !itemi->isContinuousBack || mVsq.events.eventList[i+1]->isRest ){
-            /* 後続音は存在しないか明示的休符なので最低限の正規化 */
-            for( int index = decayFrame[i]; index < itemi->endFrame - beginFrame; index++ ){
-                dynamics[index] *= decayRate;
-            }
-            isContinuousFront = false;
-        } else {
-            /* 次の音符用に準備 */
-            previousFrame = decayFrame[i];
-            previousValue = decayRate;
-            isContinuousFront = true;
-        }
     }
 }
