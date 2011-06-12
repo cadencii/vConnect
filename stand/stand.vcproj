@@ -59,6 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisenc.lib libvorbisfile.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -130,7 +131,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iconv.lib libfftw3-3.lib ogg_static.lib vorbis_static.lib vorbisenc_static.lib"
+				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisenc.lib libvorbisfile.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
@@ -201,6 +202,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisenc.lib libvorbisfile.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"

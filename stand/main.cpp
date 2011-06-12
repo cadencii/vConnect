@@ -96,7 +96,6 @@ int main( int argc, char *argv[] ){
     }
 
 #ifdef _DEBUG
-    cout << "::main; options.fast=" << (options.fast ? "true" : "false") << endl;
     cout << "::main; options.encodingOtoIni=" << options.encodingOtoIni << endl;
     cout << "::main; options.encodingVsqText=" << options.encodingVsqText << endl;
 #endif
