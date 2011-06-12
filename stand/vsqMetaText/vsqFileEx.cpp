@@ -325,6 +325,7 @@ bool vsqFileEx::readCore( MB_FILE *fp )
     dumpEvents();
     dumpMapIDs();
     dumpMapHandles();
+    cout << "vsqFileEx::readCore; size=" << size << endl;
 #endif
 
     return (size > 0);

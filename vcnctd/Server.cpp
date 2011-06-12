@@ -85,6 +85,9 @@ namespace vcnctd
         // ポートの再利用をOKにする
         int on = 1;
         setsockopt( s[0], SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof( on ) );
+        // SIGPIPEの発生を回避
+        on = 1;
+        setsockopt( s[0], SOL_SOCKET, SO_NOSIGPIPE, (char *)&on, sizeof( on ) );
 
         // サーバーのアドレス情報
         struct sockaddr_in server_addr;
@@ -214,9 +217,11 @@ namespace vcnctd
                                 
                                 sendWave( s[i], wav );
                                 closeSocket( s[i] );
-                                
+
+#if !defined( _DEBUG )
                                 remove( txt );
                                 remove( wav );
+#endif
                                 
                                 status[i] = 0;
                                 s[i] = 0;

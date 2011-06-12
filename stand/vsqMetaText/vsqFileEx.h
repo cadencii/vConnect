@@ -1,7 +1,7 @@
 /**
  * vsqFileEx.h
  * Copyright (C) 2009-2011 HAL,
- * Copyright (C) 2011 kbinani
+ * Copyright (C) 2011 kbinani.
  */
 #ifndef __vsqFileEx_h__
 #define __vsqFileEx_h__
@@ -129,6 +129,9 @@ private:
 
 private:
 
+#if defined( _DEBUG )
+public:
+#endif
     /// <summary>
     /// eventsの中身をダンプします
     /// </summary>
@@ -155,7 +158,8 @@ private:
         {
             string s;
             mb_conv( i->first, s );
-            cout << s << endl;
+            vsqEventEx *item = i->second;
+            cout << s << ":" << item->toString() << endl;
         }
     }
 

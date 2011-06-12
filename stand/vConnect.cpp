@@ -167,12 +167,12 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     if( false == mVsq.read( input, options ) )
     {
 #ifdef _DEBUG
-        cout << " done, failed" << endl;
+        cout << "vConnect::synthesize; calling vsq.readVsqFile...done, failed";
 #endif
         return false;
     }
 #ifdef _DEBUG
-    cout << " done, successed" << endl;
+    cout << "vConnect::synthesize; calling vsq.readVsqFile...done, successed";
 #endif
 
     // 空のときは空の wave を出力して終了
@@ -205,7 +205,12 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 
     // 準備１．先行発音などパラメータの適用，及びコントロールカーブをフレーム時刻へ変換
     this->calculateVsqInfo();
-
+#if defined( _DEBUG )
+    cout << "vConnect::synthesize; calling mVsq.dumpMapIDs..." << endl;
+    mVsq.dumpMapIDs();
+    cout << "vConnect::synthesize; calling mVsq.dumpMapIDs...done" << endl;
+#endif
+    
     aperiodicityLength = fftLength = getFFTLengthForStar(fs);
 
     // 準備２．合成に必要なローカル変数の初期化
@@ -245,7 +250,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     printf("begin synthesis..\n");
     clock_t cl = clock();
     synthesizeFromList(&arg);
-    printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / 1000.0, framePeriod * frameLength / 1000.0); 
+    printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / CLOCKS_PER_SEC, framePeriod * frameLength / 1000.0); 
 
     // ファイルに書き下す．
     waveFileEx waveFile;
@@ -265,31 +270,37 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 corpusManager::phoneme* vConnect::getPhoneme(string_t lyric, int singerIndex, vector<corpusManager *> *managers)
 {
     corpusManager::phoneme *ret = NULL;
-    if(singerIndex < managers->size())
+    if( singerIndex < managers->size() )
     {
-        ret = (*managers)[singerIndex]->getPhoneme(lyric);
+        ret = (*managers)[singerIndex]->getPhoneme( lyric );
     }
     return ret;
 }
 
-int getFirstItem(vsqEventEx **p1, vsqEventEx **p2, 
-                 corpusManager::phoneme **ph1, 
-                 corpusManager::phoneme **ph2,
-                 vsqFileEx *vsq, vector<corpusManager *> &managers, int beginFrame)
+int getFirstItem(
+    vsqEventEx **p1,
+    vsqEventEx **p2, 
+    corpusManager::phoneme **ph1, 
+    corpusManager::phoneme **ph2,
+    vsqFileEx *vsq,
+    vector<corpusManager *> &managers,
+    int beginFrame )
 {
     int ret = vsq->events.eventList.size();
-    for(int i = 0; i < vsq->events.eventList.size(); i++)
+    for( int i = 0; i < vsq->events.eventList.size(); i++ )
     {
-        if(vsq->events.eventList[i]->beginFrame <= beginFrame
-            && beginFrame < vsq->events.eventList[i]->endFrame)
+        if( vsq->events.eventList[i]->beginFrame <= beginFrame &&
+            beginFrame < vsq->events.eventList[i]->endFrame )
         {
             *p1 = vsq->events.eventList[i];
             *p2 = (i + 1 < vsq->events.eventList.size()) ? vsq->events.eventList[i+1] : NULL;
             ret = i;
-            if(*p1) {
+            if( *p1 )
+            {
                 *ph1 = managers[(*p1)->singerIndex]->getPhoneme((*p1)->lyricHandle.getLyric());
             }
-            if(*p2) {
+            if( *p2 )
+            {
                 *ph2 = managers[(*p2)->singerIndex]->getPhoneme((*p2)->lyricHandle.getLyric());
             }
             break;
@@ -298,18 +309,21 @@ int getFirstItem(vsqEventEx **p1, vsqEventEx **p2,
     return ret;
 }
 
-int calculateMelCepstrum(float *dst, int fftLength, list<vConnectData *> &frames)
+int calculateMelCepstrum( float *dst, int fftLength, list<vConnectData *> &frames )
 {
     int ret = 0;
-    memset(dst, 0, sizeof(float) * fftLength);
-    for(list<vConnectData *>::iterator i = frames.begin(); i != frames.end(); i++) {
+    memset( dst, 0, sizeof( float ) * fftLength );
+    list<vConnectData *>::iterator i;
+    for( i = frames.begin(); i != frames.end(); i++ )
+    {
         int length;
         float *data;
-        data = (*i)->phoneme->getMelCepstrum((*i)->index, &length);
-        for(int j = 0; j < length; j++) {
+        data = (*i)->phoneme->getMelCepstrum( (*i)->index, &length );
+        for( int j = 0; j < length; j++ )
+        {
             dst[j] += (*i)->morphRatio * data[j];
         }
-        ret = max(ret, length);
+        ret = max( ret, length );
     }
     return ret;
 }
@@ -342,7 +356,7 @@ void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames,
 
 __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 {
-    vConnectArg *p = (vConnectArg*)arg;
+    vConnectArg *p = (vConnectArg *)arg;
 
     // 波形の復元時に FFTW を使う上で必要なメモリの確保．
     fftw_complex *spectrum = new fftw_complex[p->fftLength];
@@ -355,28 +369,37 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
     // この処理はスレッドセーフでない．
 #ifdef STND_MULTI_THREAD
-    if(hMutex) {
-        stnd_mutex_lock(hMutex);
+    if( hMutex )
+    {
+        stnd_mutex_lock( hMutex );
     }
 #endif
-    fftw_plan forward = fftw_plan_dft_1d(p->fftLength, spectrum, cepstrum, FFTW_FORWARD,  FFTW_ESTIMATE);
+    fftw_plan forward = fftw_plan_dft_1d( p->fftLength, spectrum, cepstrum, FFTW_FORWARD,  FFTW_ESTIMATE);
     fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(p->fftLength, starSpec, residual, FFTW_ESTIMATE);
     fftw_plan inverse = fftw_plan_dft_1d(p->fftLength, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_plan inverse_c2r = fftw_plan_dft_c2r_1d(p->fftLength, spectrum, impulse, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
-    if(hMutex) {
-        stnd_mutex_unlock(hMutex);
+    if( hMutex )
+    {
+        stnd_mutex_unlock( hMutex );
     }
 #endif
 
     // 検索用ハッシュ
     map_t<vConnectPhoneme *, OggVorbis_File *> vorbisMap;
-    for(int i = 0; i < p->phonemes->size(); i++) {
-        if(!(*(p->phonemes))[i]) { continue; }
+    for( int i = 0; i < p->phonemes->size(); i++ )
+    {
+        if( !(*(p->phonemes))[i] )
+        {
+            continue;
+        }
         OggVorbis_File *ovf = new OggVorbis_File;
-        if((*(p->phonemes))[i]->vorbisOpen(ovf)) {
-            vorbisMap.insert(make_pair((*(p->phonemes))[i], ovf));
-        } else {
+        if( (*(p->phonemes))[i]->vorbisOpen( ovf ) )
+        {
+            vorbisMap.insert( make_pair( (*(p->phonemes))[i], ovf ) );
+        } 
+        else
+        {
             delete ovf;
         }
     }
@@ -386,7 +409,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     double currentTime = 0.0, T;
 
     // 合成処理
-    while(currentFrame < p->endFrame)
+    while( currentFrame < p->endFrame )
     {
         if(p->f0[currentFrame] < 0) {
             currentFrame++;
@@ -397,15 +420,42 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
         /* ToDo : MelCepstrum の合成結果を melCepstrum に書き込む．
                   残差波形の合成結果を starSpec に書き込む．      */
-        cepstrumLength = calculateMelCepstrum(melCepstrum, p->fftLength, (*(p->data))[currentFrame]->dataList);
-        calculateResidual(starSpec, p->fftLength, (*(p->data))[currentFrame]->dataList, vorbisMap);
+        list<vConnectData *> *frames = &(*(p->data))[currentFrame]->dataList;
+        if( NULL == frames )
+        {
+            currentFrame++;
+            currentTime = (double)currentFrame * framePeriod / 1000.0;
+            continue;
+        }
+        cepstrumLength = 
+            calculateMelCepstrum( melCepstrum, 
+                                 p->fftLength, 
+                                 *frames );
+        calculateResidual( starSpec, 
+                          p->fftLength, 
+                          *frames, 
+                          vorbisMap );
 
         // starSpec -> residual DFT を実行する．
         fftw_execute(forward_r2c);
         // メルケプストラムをstraSpecに展開．
-        vConnectUtility::extractMelCepstrum(starSpec, p->fftLength, melCepstrum, cepstrumLength, spectrum, impulse, inverse_c2r ,fs);
+        vConnectUtility::extractMelCepstrum(
+            starSpec,
+            p->fftLength,
+            melCepstrum,
+            cepstrumLength,
+            spectrum,
+            impulse,
+            inverse_c2r,
+            fs );
         // 合成パワースペクトルから最小位相応答を計算．
-        getMinimumPhaseSpectrum(starSpec, spectrum, cepstrum, p->fftLength, forward, inverse);
+        getMinimumPhaseSpectrum(
+            starSpec,
+            spectrum,
+            cepstrum,
+            p->fftLength,
+            forward,
+            inverse );
 
         // 励起信号スペクトルと周波数領域での掛け算．
         for(int k = 0; k <= p->fftLength / 2; k++)
@@ -419,7 +469,8 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         // 実波形に直す．
         fftw_execute(inverse_c2r);
         currentPosition = currentTime * fs;
-        for(int k = 0; k < p->fftLength / 2 && currentPosition < p->waveLength; k++, currentPosition++) {
+        for( int k = 0; k < p->fftLength / 2 && currentPosition < p->waveLength; k++, currentPosition++ )
+        {
             p->wave[currentPosition] += impulse[k] * p->dynamics[currentFrame];
         }
 
@@ -429,8 +480,9 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     }
 
     //================================================================================================= ↓後処理
-    for(map_t<vConnectPhoneme *, OggVorbis_File*>::iterator i = vorbisMap.begin(); i != vorbisMap.end(); i++) {
-        ov_clear(i->second);
+    map_t<vConnectPhoneme *, OggVorbis_File*>::iterator i;
+    for( i = vorbisMap.begin(); i != vorbisMap.end(); i++) {
+        ov_clear( i->second );
         delete i->second;
     }
 
@@ -443,17 +495,19 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
     // この処理はスレッドセーフでない．
 #ifdef STND_MULTI_THREAD
-    if(hMutex) {
-        stnd_mutex_lock(hMutex);
+    if( hMutex )
+    {
+        stnd_mutex_lock( hMutex );
     }
 #endif
-    fftw_destroy_plan(forward);
-    fftw_destroy_plan(forward_r2c);
-    fftw_destroy_plan(inverse);
-    fftw_destroy_plan(inverse_c2r);
+    fftw_destroy_plan( forward );
+    fftw_destroy_plan( forward_r2c );
+    fftw_destroy_plan( inverse );
+    fftw_destroy_plan( inverse_c2r );
 #ifdef STND_MULTI_THREAD
-    if(hMutex) {
-        stnd_mutex_unlock(hMutex);
+    if( hMutex )
+    {
+        stnd_mutex_unlock( hMutex );
     }
 #endif
 
@@ -494,19 +548,23 @@ void vConnect::calculateVsqInfo( void )
             // 自分を消して
             vector<vsqEventEx*>::iterator it = events->begin();
             int j = 0;
-            while( it != events->end() ){
+            while( it != events->end() )
+            {
                 if( itemi == (*it) ) break;
                 j++;
                 it++;
             }
-            if( it != events->end() ){
+            if( it != events->end() )
+            {
                 events->erase( it );
                 SAFE_DELETE( itemi );
             }
 
             // （ i 番目今消しちゃったから次に進んでるのと一緒だから ）
             if( i >= events->size() )
+            {
                 break;
+            }
             // 次の音符へ
             itemi = mVsq.events.eventList[i];
         }

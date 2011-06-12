@@ -1,7 +1,7 @@
 /*
- *
- *    vsqHandle.cpp
- *                        (c) HAL 2010-
+ * vsqPhonemeDB.h
+ * Copyright (C) 2010- HAL,
+ * Copyright (C) 2011 kbinani.
  *
  *  This files is a part of v.Connect.
  * vsqPhonemeDB inherits utauVoiceDataBase class.
@@ -30,7 +30,7 @@ public:
     }
 
     ~vsqPhonemeDB(){
-        UtauDB::dbClear();
+        //UtauDB::dbClear();
         /*for( unsigned int i = 0; i < voiceDBs.size(); i++ ){
             SAFE_DELETE( voiceDBs[i] );
         }

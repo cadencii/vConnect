@@ -1,7 +1,7 @@
 /*
- *
- *    vsqEventEx.h
- *                        (c) HAL 2010-
+ * vsqEventEx.h
+ * Copyright (C) 2010- HAL,
+ * Copyright (C) 2011 kbinani.
  *
  *  This files is a part of v.Connect.
  * vsqEventEx contains vsq-event's properties
@@ -44,6 +44,15 @@ public:
     }
     //void    setParameter( string_t left, string_t right );
 
+    string toString()
+    {
+        char buff[1024];
+        buff[0] = '\n';
+        sprintf( buff, "%d", singerIndex );
+        string str_buff = buff;
+        return "{singerIndex=" + str_buff + "}";
+    }
+    
     vsqHandle    vibratoHandle;
     vsqHandle    lyricHandle;
     vsqHandle    iconHandle;
