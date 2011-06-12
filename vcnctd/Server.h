@@ -7,7 +7,7 @@
 #define __Server_h__
 
 #if defined( WIN32 )
-    #include <winsock2.h>
+    #include <windows.h>
 #else
     #include <netinet/in.h>
     #include <sys/socket.h>

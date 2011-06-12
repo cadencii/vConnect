@@ -18,7 +18,8 @@
 #include "vsqBase.h"
 #include "vsqHandle.h"
 
-class vsqEventEx : public vsqBase {
+class vsqEventEx// : public vsqBase 
+{
 public:
 
     vsqEventEx(){
@@ -41,7 +42,7 @@ public:
 
         singerIndex = 0;
     }
-    void    setParameter( string_t left, string_t right );
+    //void    setParameter( string_t left, string_t right );
 
     vsqHandle    vibratoHandle;
     vsqHandle    lyricHandle;

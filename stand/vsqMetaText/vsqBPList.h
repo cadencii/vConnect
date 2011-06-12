@@ -17,15 +17,24 @@
 #include "vsqBase.h"
 #include "vsqBP.h"
 
-class vsqBPList : vsqBase{
+class vsqBPList// : vsqBase
+{
 public:
-    vsqBPList(){}
-    void    getList( vector<standBP>& dst );
-    void    setParameter( long tick, int value );
-protected:
-    void    setParameter( string_t left, string_t right );
+
+    void getList( vector<standBP> &dst, double tempo );
+
+    void setParameter( long tick, int value );
+
+
+//protected:
+
+    void setParameter( string_t left, string_t right );
+
+
 private:
+
     vector<vsqBP> data;
+
 };
 
 #endif

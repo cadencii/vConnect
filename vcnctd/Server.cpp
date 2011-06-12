@@ -84,7 +84,7 @@ namespace vcnctd
 
         // ポートの再利用をOKにする
         int on = 1;
-        setsockopt( s[0], SOL_SOCKET, SO_REUSEADDR, &on, sizeof( on ) );
+        setsockopt( s[0], SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof( on ) );
 
         // サーバーのアドレス情報
         struct sockaddr_in server_addr;

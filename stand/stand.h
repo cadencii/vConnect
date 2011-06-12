@@ -213,10 +213,6 @@ void normalize_path_separator( string_t& path );
    10. linux/multi-thread/posix-thread       OK
 */
 
-// マルチスレッドにするかどうか
-// シングルスレッドにする場合コメントアウト
-#define STND_MULTI_THREAD
-
 #ifdef STND_MULTI_THREAD
   #ifdef STND_OS_WIN
     //pthreadを使わない場合コメントアウト
@@ -349,7 +345,7 @@ extern mutex_t hFFTWMutex;
 #endif
 
 //#define DEBUG
-#define ST_PI 3.141592653589793238462643383279
+#define ST_PI (3.141592653589793238462643383279)
 #define SAFE_DELETE_ARRAY(x) if(x){ delete[] (x); x = NULL; }
 #define SAFE_DELETE(x) if(x){ delete(x); x = NULL; }
 

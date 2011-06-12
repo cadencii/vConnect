@@ -34,14 +34,18 @@ public:
             p = NULL;
             isProcessing = false;
             isValid = false;
+#if defined( STND_MULTI_THREAD )
             waitHandle = NULL;
+#endif
             fixedLength = 0;
         }
         vConnectPhoneme *p;
         bool isProcessing;
         bool isValid;
         float fixedLength;
+#if defined( STND_MULTI_THREAD )
         mutex_t waitHandle;
+#endif
     };
 
     struct itemForAnalyze {

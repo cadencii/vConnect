@@ -665,17 +665,11 @@ bool mb_fgets( string& line, MB_FILE *file ){
         return ret;
     }
 
-#ifdef _DEBUG
-    cout << "::mb_fgets(string&,MB_FILE); before mb_code_conv; buf=" << buf << endl;
-#endif
     // コードページの読み替え
     if( file->descripter_for_char != MB_INVALID ){
         mb_code_conv( buf, bufbytes, file->descripter_for_char );
         ret = true;
     }
-#ifdef _DEBUG
-    cout << "::mb_fgets(string&,MB_FILE); after mb_code_conv; buf=" << buf << endl;
-#endif
 
     string s = (char *)buf;
     line += s;

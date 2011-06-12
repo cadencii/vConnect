@@ -13,8 +13,8 @@
  */
 #include "vsqBase.h"
 
-long                       vsqBase::endTick = 0;
-double                     vsqBase::tempo = 120.0;
+//long                       vsqBase::endTick = 0;
+//double                     vsqBase::tempo = 120.0;
 //vector<utauVoiceDataBase*> vsqBase::voiceDBs;
-map_t<string_t, int>       vsqBase::singerMap;
-map_t<string_t, vsqBase*>  vsqBase::objectMap;
+//map_t<string_t, int>       vsqBase::singerMap;
+//map_t<string_t, vsqBase*>  vsqBase::objectMap;
