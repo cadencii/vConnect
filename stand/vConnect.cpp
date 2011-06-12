@@ -188,18 +188,18 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 
     double *wave;
 
-    corpusManager::itemForAnalyze items;
+    vector<string_t> analyze_list;
     for( int i = 0; i < UtauDB::dbSize(); i++ )
     {
         corpusManager *p = new corpusManager;
         p->setUtauDB( UtauDB::dbGet( i ), options );
-        items.itemList.clear();
-        for(int j = 0; j < mVsq.events.eventList.size(); j++) {
+        analyze_list.clear();
+        for( int j = 0; j < mVsq.events.eventList.size(); j++) {
             if( mVsq.events.eventList[j]->singerIndex == i ) {
-                items.itemList.push_back(mVsq.events.eventList[j]);
+                analyze_list.push_back( mVsq.events.eventList[j]->lyricHandle.getLyric() );
             }
         }
-        p->analyze(&items);
+        p->analyze( analyze_list );
         mManagerList.push_back( p );
     }
 
@@ -222,7 +222,11 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     this->calculateF0( f0, dynamics );
 
     // 準備４．合成時刻に必要な情報を整理．
-    vector<vConnectFrame *> data(frameLength, NULL);
+    vector<vConnectFrame *> data( frameLength );
+    for( int i = 0; i < frameLength; i++ )
+    {
+        data[i] = NULL;
+    }
     vector<vConnectPhoneme *> phonemes;
     calculateFrameData(data, phonemes, mVsq, mManagerList, beginFrame);
 
@@ -248,7 +252,9 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     waveFile.setWaveBuffer(wave, waveLength);
     waveFile.normalize();
     waveFile.setOffset((double)beginFrame * framePeriod / 1000.0);
-    waveFile.writeWaveFile(output);
+    string str_output;
+    mb_conv( output, str_output );
+    waveFile.writeWaveFile( str_output );
     delete[] wave;
     delete[] f0;
     delete[] dynamics;

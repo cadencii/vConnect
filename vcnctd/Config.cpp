@@ -84,6 +84,9 @@ namespace vcnctd
                     break;
                 }
             }
+
+            if( line.find( "#" ) == 0 ) continue;
+            
             cout << "Config::load; line=" << line << endl;
             int indx_cr = line.find( "\n" );
             if( indx_cr != string::npos )

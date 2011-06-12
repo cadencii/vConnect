@@ -14,23 +14,19 @@ SRC=vcnctd.cpp \
     ConfDB.cpp \
 	daemon.c \
 	../stand/corpusManager.cpp \
-	../stand/matching.cpp \
 	../stand/mb_text.cpp \
 	../stand/stand.cpp \
-	../stand/standData.cpp \
-	../stand/standFrame.cpp \
-	../stand/standMelCepstrum.cpp \
-	../stand/standSpecgram.cpp \
 	../stand/utauVoiceDB/UtauDB.cpp \
 	../stand/vConnect.cpp \
 	../stand/vConnectSetting.cpp \
+	../stand/vConnectPhoneme.cpp \
+	../stand/vConnectUtility.cpp \
 	../stand/vsqMetaText/vsqBase.cpp \
 	../stand/vsqMetaText/vsqEventList.cpp \
 	../stand/vsqMetaText/vsqEventEx.cpp \
 	../stand/vsqMetaText/vsqFileEx.cpp \
 	../stand/vsqMetaText/vsqHandle.cpp \
 	../stand/vsqMetaText/vsqTempo.cpp \
-	../stand/vowelTable.cpp \
 	../stand/vsqMetaText/vsqBPList.cpp \
 	../stand/waveFileEx/waveFileEx.cpp \
 	../stand/world/dio.cpp \
@@ -47,9 +43,7 @@ HDR=Server.h \
     ConfDB.h \
 	../stand/mb_text.h \
 	../stand/vConnect.h \
-	../stand/standData.h \
 	../stand/corpusManager.h \
-	../stand/standFrame.h \
 	../stand/vsqMetaText/vsqBase.h \
 	../stand/vsqMetaText/vsqTempo.h \
 	../stand/vsqMetaText/vsqPhonemeDB.h \
@@ -59,18 +53,16 @@ HDR=Server.h \
 	../stand/vsqMetaText/vsqEventList.h \
 	../stand/vsqMetaText/vsqLyric.h \
 	../stand/vsqMetaText/vsqEventEx.h \
-	../stand/vowelTable.h \
 	../stand/vsqMetaText/vsqBPList.h \
-	../stand/standSpecgram.h \
 	../stand/world/world.h \
 	../stand/waveFileEx/waveFileEx.h \
-	../stand/matching.h \
 	../stand/vConnectSetting.h \
-	../stand/standMelCepstrum.h \
+	../stand/vConnectPhoneme.h \
+	../stand/vConnectUtility.h \
 	../stand/stand.h
 
 vcnctd: $(SRC) $(HDR)
-	g++ -L"$(LFFTW)" -g $(SRC) -D_DEBUG -o vcnctd -liconv -$(FFTW) $(WINSOCK)
+	g++ -L"$(LFFTW)" -g $(SRC) -D_DEBUG -o vcnctd -liconv -logg -lvorbis -lvorbisenc -lvorbisfile -$(FFTW) $(WINSOCK)
 
 clean:
 	rm vcnctd

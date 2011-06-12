@@ -415,7 +415,16 @@ namespace vcnctd
             CorpusManager *man = new CorpusManager();
             mCorpusManagers.push_back( man );
             man->setUtauDB( db, opts );
-            man->analyze( opts );
+            
+            // 音源に入っている音素のリストを作ってから
+            vector<string_t> analyze_list;
+            map_t<string_t, utauParameters *>::iterator itr;
+            for( itr = db->begin(); itr != db->end(); itr++ )
+            {
+                analyze_list.push_back( itr->first );
+            }
+            // 解析する
+            man->analyze( analyze_list );
         }
     }
     

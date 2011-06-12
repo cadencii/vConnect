@@ -49,14 +49,14 @@ public:
     };
 
     void setUtauDB( UtauDB *p, runtimeOptions &options );
-    phoneme *corpusManager::getPhoneme( string_t lyric );
+    phoneme *getPhoneme( string_t lyric );
 
     /// <summary>
     /// 今のところ分析済みファイルの読み込みを行っています．
     /// 動作が変わる可能性も．
     /// </summary>
-    /// <param name="p"> vsqEventList へのポインタ．</param>
-    void analyze(void *p);
+    /// <param name="p">解析する音素のリスト．</param>
+    void analyze( vector<string_t> &phonemes );
 
     bool checkEnableExtention();
 

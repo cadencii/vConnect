@@ -29,6 +29,9 @@ namespace vcnctd
                 last_line = line;
                 return false;
             }
+
+            if( line.find( "#" ) == 0 ) continue;
+            
             int indx_cr = line.find( "\n" );
             if( indx_cr > 0 )
             {

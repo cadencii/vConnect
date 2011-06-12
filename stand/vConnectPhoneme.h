@@ -21,21 +21,26 @@ public: // public method
     /// <param name="framePeriod">分析シフト長．</param>
     /// <param name="cepstrumLength">ケプストラムの次元．</param>
     /// <returns>計算に成功したときは 0, 失敗したときは -1 を返します．</returns>
-    int computeWave(double *wave, int length, int fs, double framePeriod, int cepstrumLength = 32);
+    int computeWave(
+        double *wave,
+        int length,
+        int fs,
+        double framePeriod,
+        int cepstrumLength = 32 );
 
     /// <summary>
     /// 与えられたファイルパスから音素片を読み込みます．
     /// </summary>
     /// <param name="path">読み込みたいファイルのパス．</param>
     /// <returns>読み込みに成功したときは true, 失敗したときは false を返します．</returns>
-    bool readPhoneme(const char* path);
+    bool readPhoneme( const char *path );
 
     /// <summary>
     /// 与えられたファイルパスへ音素片を書き込みます．
     /// </summary>
     /// <param name="path">書き込みたいファイルのパス．</param>
     /// <returns>書き込みに成功したときは true, 失敗したときは false を返します．</returns>
-    bool writePhoneme(const char* path);
+    bool writePhoneme( const char *path );
 
     /// <summary>
     /// 今保持している音素片の該当箇所のメルケプストラムを取得します．
@@ -43,27 +48,30 @@ public: // public method
     /// <param name="index">読み込むフレーム時刻</param>
     /// <param name="length">ケプストラムの次元．</param>
     /// <returns>成功したときは，該当箇所のケプストラムへのポインタ，失敗したときは NULL を返します．</returns>
-    float *getMelCepstrum(int index, int *length);
+    float *getMelCepstrum( int index, int *length );
 
     /// <summary>
     /// 今保持している音素片の該当箇所の F0 を取得します．
     /// </summary>
     /// <param name="index">読み込むフレーム時刻</param>
     /// <returns>成功したときは，該当箇所の F0，失敗したときは -1 を返します．</returns>
-    float getF0(int index);
+    float getF0( int index );
 
     /// <summary>
     /// 今保持している音素片の長さを取得します．
     /// </summary>
     /// <returns>音素片フレーム長．</returns>
-    int getTimeLength(){ return timeLength; }
+    int getTimeLength()
+    {
+        return timeLength;
+    }
 
     /// <summary>
     /// 今保持している音素片の励起信号 Ogg ストリームを開きます．
     /// </summary>
     /// <param name="ovf">開きたい Ogg ストリーム．</param>
     /// <returns>成功したときは true，失敗したときは false を返します．</returns>
-    bool vorbisOpen(OggVorbis_File *ovf);
+    bool vorbisOpen( OggVorbis_File *ovf );
 
 public: // public static method
     /// <summary>

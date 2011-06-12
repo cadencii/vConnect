@@ -51,7 +51,7 @@ LIBFFT=fftw3
 # make install
 
 vConnect-STAND.exe: $(SRC) $(HEADER)
-	g++ -finput-charset=UTF-8 -D_STND_MULTI_THREAD -D_DEBUG -DUNICODE -g -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -o vConnect-STAND.exe
+	g++ -finput-charset=UTF-8 -D_STND_MULTI_THREAD -D_DEBUG -DUNICODE -g -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -logg -lvorbis -lvorbisfile -lvorbisenc -o vConnect-STAND.exe
 #	g++ -finput-charset=UTF-8 -D_DEBUG -DUNICODE -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -o vConnect-STAND.exe
 
 clean:

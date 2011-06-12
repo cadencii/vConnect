@@ -689,7 +689,9 @@ bool mb_fgets( string& line, MB_FILE *file ){
  * いろんなエンコーディングのテキストファイルを読み込むテストを実行します．
  */
 #include <iostream>
-#include <windows.h>
+#if defined( WIN32 )
+    #include <windows.h>
+#endif
 using namespace std;
 int mb_test(){
     //do nothing

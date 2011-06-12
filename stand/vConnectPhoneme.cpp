@@ -290,7 +290,7 @@ long vConnectPhoneme::vorbisTell(void *vp)
     return ((V_FILE*)vp)->pos;
 }
 
-int vConnectPhoneme::vorbisClose(void *vp)
+int vConnectPhoneme::vorbisClose( void *vp )
 {
     delete vp;
     return 0;

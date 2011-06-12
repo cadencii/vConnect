@@ -1,7 +1,7 @@
 /*
- *
- *    corpusManager.cpp
- *                        (c) HAL 2010-
+ * corpusManager.cpp
+ * Copyright (C) 2010- HAL,
+ * Copyright (C) 2011 kbinani.
  *
  *  This files is a part of v.Connect.
  * corpusManager is a class that controls corpus based on UTAU.
@@ -10,22 +10,22 @@
  * These files are distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
  */
 #include "corpusManager.h"
 #include "utauVoiceDB/UtauDB.h"
 #include "vConnectPhoneme.h"
 #include "vsqMetaText/vsqFileEx.h"
 
-void corpusManager::analyze(void *p)
+void corpusManager::analyze( vector<string_t> &phonemes )
 {
-    itemForAnalyze *items = (itemForAnalyze*)p;
-    map_t<string_t, utauParameters *>::iterator itr;
-    for( list<vsqEventEx*>::iterator i = items->itemList.begin(); i != items->itemList.end(); i++ )
+    int size = phonemes.size();
+    for( int i = 0; i < size; i++ )
     {
-        string_t lyric = (*i)->lyricHandle.getLyric();
-        this->getPhoneme( lyric );
-        cout << "corpusManager::analyze; lyric=" << lyric << endl;
+        string_t lyric = phonemes[i];
+        getPhoneme( lyric );
+        string str_lyric;
+        mb_conv( lyric, str_lyric );
+        cout << "corpusManager::analyze; lyric=" << str_lyric << endl;
     }
 }
 
@@ -104,7 +104,10 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
         if( mUtauDB->getParams( parameters, lyric ) )
         {
             target->p = new vConnectPhoneme;
-            if( target->p->readPhoneme( (mDBPath + parameters.fileName).c_str() ) )
+            string_t path = mDBPath + parameters.fileName;
+            string str_path;
+            mb_conv( path, str_path );
+            if( target->p->readPhoneme( str_path.c_str() ) )
             {
                 target->isValid = true;
                 target->fixedLength = parameters.msFixedLength;
@@ -123,7 +126,6 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
     return ret;
 }
 
-
 void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
 {
     string_t tmp;
@@ -133,7 +135,8 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
         p->getDBPath( mDBPath );
     }
     tmp = _T("vConnect.ini");
-    enableExtention = setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
+    enableExtention = 
+        setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
 }
 
 bool corpusManager::checkEnableExtention()
