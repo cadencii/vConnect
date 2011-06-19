@@ -253,13 +253,9 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / CLOCKS_PER_SEC, framePeriod * frameLength / 1000.0); 
 
     // ファイルに書き下す．
-    waveFileEx waveFile;
-    waveFile.setWaveBuffer(wave, waveLength);
-    waveFile.normalize();
-    waveFile.setOffset((double)beginFrame * framePeriod / 1000.0);
     string str_output;
     mb_conv( output, str_output );
-    waveFile.writeWaveFile( str_output );
+    waveFileEx::writeWaveFile( str_output, wave, waveLength, (double)beginFrame * framePeriod / 1000.0 );
     delete[] wave;
     delete[] f0;
     delete[] dynamics;
@@ -471,7 +467,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         currentPosition = currentTime * fs;
         for( int k = 0; k < p->fftLength / 2 && currentPosition < p->waveLength; k++, currentPosition++ )
         {
-            p->wave[currentPosition] += impulse[k] * p->dynamics[currentFrame];
+            p->wave[currentPosition] += impulse[k] * p->dynamics[currentFrame] / p->fftLength;
         }
 
         T = 1.0 / p->f0[currentFrame];

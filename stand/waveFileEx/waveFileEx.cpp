@@ -15,6 +15,18 @@
  */
 #include "waveFileEx.h"
 
+const waveFileEx::waveFormatEx waveFileEx::defaultFormat =
+{
+    1,
+    0,
+    1,
+    1,
+    44100,
+    88200,
+    2,
+    16,
+};
+
 void waveFileEx::outputError( string s ){
     cout << s << endl;
 }
@@ -216,60 +228,72 @@ bool    waveFileEx::readWaveData( FILE* fp )
     return result;
 }
 
-int    waveFileEx::writeWaveFile( string fileName ){
+int    waveFileEx::writeWaveFile( string fileName, const double *wave, int length, double secOffset, const waveFormatEx *format )
+{
     int result = 2;
-    FILE* fp;
+    FILE *fp;
+
+    if( !wave || length <= 0)
+    {
+        return 0;
+    }
+
+    if( !format )
+    {
+        format = &defaultFormat;
+    }
 
 #ifdef __GNUC__
     fp = fopen( fileName.c_str(), "wb" );
 #else
     fopen_s( &fp, fileName.c_str(), "wb" );
 #endif
+    
+    if( fp )
+    {
+        /* This code may occur an error on big-endian CPU. */
+        /* write Header */
+        unsigned int offset = secOffset * format->samplePerSecond;
+        unsigned int waveSize = (offset + length) * ( format->bitsPerSample / 8 ) * format->numChannels;
+        unsigned int fileSize = waveSize + 44;
+        unsigned int chunkSize = 16;
 
-    if( fp ){
-        if( !waveBuffer || waveLength <= 0 ){
-            result = 0;
-        }else{
-            setDefaultFormat();
-            /* This code may occur an error on big-endian CPU. */
-            /* write Header */
-            unsigned int offset = secOffset * format.samplePerSecond;
-            unsigned int waveSize = (offset + waveLength) * ( format.bitsPerSample / 8 ) * format.numChannels;
-            unsigned int fileSize = waveSize + 44;
-            unsigned int chunkSize = 16;
-
-            short *data = new short[waveLength + offset];
-            for(int i = 0; i < offset; i++)
-            {
-                data[i] = 0;
-            }
-            for(unsigned long i = 0, j = offset; i < waveLength; i++, j++)
-            {
-                data[j] = (short)( 32767.0 * waveBuffer[i] ); 
-            }
-
-            fprintf( fp, "RIFF" );
-            fwrite( (void*)&fileSize, 4, 1, fp );
-            fprintf( fp, "WAVEfmt " );
-            fwrite( (void*)&chunkSize, 4, 1, fp );
-            fwrite( (void*)&(format.chunkID), 2, 1, fp );
-            fwrite( (void*)&(format.numChannels), 2, 1, fp );
-            fwrite( (void*)&(format.samplePerSecond), 4, 1, fp );
-            fwrite( (void*)&(format.bytesPerSecond), 4, 1, fp );
-            fwrite( (void*)&(format.blockAlign), 2, 1, fp );
-            fwrite( (void*)&(format.bitsPerSample), 2, 1, fp );
-            fprintf( fp, "data" );
-
-            fwrite( (void*)&waveSize, 4, 1, fp );        
-            fwrite( (void*)data, 2, waveLength + offset, fp);
-
-            delete[] data;
-
-            result = 1;
+        short *data = new short[length + offset];
+        for(int i = 0; i < offset; i++)
+        {
+            data[i] = 0;
         }
+        for(unsigned long i = 0, j = offset; i < length; i++, j++)
+        {
+            data[j] = (short)( 32767.0 * wave[i] ); 
+        }
+
+        fprintf( fp, "RIFF" );
+        fwrite( (void*)&fileSize, 4, 1, fp );
+        fprintf( fp, "WAVEfmt " );
+        fwrite( (void*)&chunkSize, 4, 1, fp );
+        fwrite( (void*)&(format->chunkID), 2, 1, fp );
+        fwrite( (void*)&(format->numChannels), 2, 1, fp );
+        fwrite( (void*)&(format->samplePerSecond), 4, 1, fp );
+        fwrite( (void*)&(format->bytesPerSecond), 4, 1, fp );
+        fwrite( (void*)&(format->blockAlign), 2, 1, fp );
+        fwrite( (void*)&(format->bitsPerSample), 2, 1, fp );
+        fprintf( fp, "data" );
+
+        fwrite( (void*)&waveSize, 4, 1, fp );        
+        fwrite( (void*)data, 2, length + offset, fp);
+
+        delete[] data;
+
+        result = 1;
         fclose( fp );
     }
     return result;
+}
+
+int    waveFileEx::writeWaveFile( string fileName )
+{
+    return writeWaveFile( fileName, waveBuffer, waveLength, secOffset, &format);
 }
 
 void    waveFileEx::normalize( void )

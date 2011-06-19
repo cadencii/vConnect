@@ -26,15 +26,26 @@
 
 using namespace std;
 
-#include "waveFormatEx.h"
-
 class waveFileEx{
 public:
+    struct waveFormatEx {
+        short             chunkID;
+        long              chunkSize;
+        short             formatTag;
+        unsigned    short numChannels;
+        unsigned    long  samplePerSecond;
+        unsigned    long  bytesPerSecond;
+        unsigned    short blockAlign;
+        unsigned    short bitsPerSample;
+    };
+
     waveFileEx();
     ~waveFileEx(){destroy();}
+
     /* If the data is stereo, only left-channel will be read. */
     int    readWaveFile( string fileName );
     int    writeWaveFile( string fileName );
+    static int writeWaveFile( string fileName, const double *wave, int length, double secOffset = 0.0, const waveFormatEx *format = NULL );
 
     int    setWaveBuffer( vector<double>& srcBuffer );
     int    setWaveBuffer( double* srcBuffer, unsigned long bufferLength );
@@ -68,6 +79,8 @@ private:
     // 空白時間を持つことにした．
     double          secOffset;
     waveFormatEx    format;
+
+    static const waveFormatEx defaultFormat;
 };
 
 #endif
