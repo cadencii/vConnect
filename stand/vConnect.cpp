@@ -323,12 +323,13 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 #endif
 
     printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / CLOCKS_PER_SEC, framePeriod * frameLength / 1000.0); 
-    scanf("%d", &i);
 
     // ファイルに書き下す．
     string str_output;
     mb_conv( output, str_output );
     waveFileEx::writeWaveFile( str_output, wave, waveLength, (double)beginFrame * framePeriod / 1000.0 );
+
+    delete[] frames;
     delete[] wave;
     delete[] f0;
     delete[] dynamics;
