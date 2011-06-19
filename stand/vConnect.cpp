@@ -49,7 +49,7 @@ struct vConnectArg {
     int endFrame;
     int waveLength;
     int fftLength;
-    vector<vConnectFrame *> *data;
+    vConnectFrame *frames;
     vector<vConnectPhoneme *> *phonemes;
     vsqEventList *eventList;
 };
@@ -103,7 +103,7 @@ void vConnect::emptyPath( double secOffset, string_t output )
     return;
 }
 
-void calculateFrameData(vector<vConnectFrame *> &dst, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, int beginFrame)
+void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, int beginFrame)
 {
     vsqEventEx *itemPrev = NULL;
     for(int i = 0; i < vsq.events.eventList.size(); i++) {
@@ -137,9 +137,6 @@ void calculateFrameData(vector<vConnectFrame *> &dst, vector<vConnectPhoneme *> 
 
         for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame; j++, index++) {
             int frameIndex = (j - itemThis->beginFrame) * vel;
-            if(dst[index] == NULL) {
-                dst[index] = new vConnectFrame;
-            }
             vConnectData *data = new vConnectData;
             frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
             data->index = frameIndex;
@@ -148,11 +145,11 @@ void calculateFrameData(vector<vConnectFrame *> &dst, vector<vConnectPhoneme *> 
                 data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame);
             } else {
                 data->morphRatio = 1.0;
-                for(list<vConnectData *>::iterator itr = dst[index]->dataList.begin(); itr != dst[index]->dataList.end(); itr++) {
+                for(list<vConnectData *>::iterator itr = dst[index].dataList.begin(); itr != dst[index].dataList.end(); itr++) {
                     data->morphRatio -= (*itr)->morphRatio;
                 }
             }
-            dst[index]->dataList.push_back(data);
+            dst[index].dataList.push_back(data);
         }
         itemPrev = itemThis;
     }
@@ -227,30 +224,106 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     this->calculateF0( f0, dynamics );
 
     // 準備４．合成時刻に必要な情報を整理．
-    vector<vConnectFrame *> data( frameLength );
-    for( int i = 0; i < frameLength; i++ )
-    {
-        data[i] = NULL;
-    }
+    vConnectFrame *frames = new vConnectFrame[frameLength];
     vector<vConnectPhoneme *> phonemes;
-    calculateFrameData(data, phonemes, mVsq, mManagerList, beginFrame);
+    calculateFrameData(frames, frameLength, phonemes, mVsq, mManagerList, beginFrame);
 
     // 実際の合成．
-    vConnectArg arg;
-    arg.data = &data;
-    arg.phonemes = &phonemes;
-    arg.beginFrame = 0;
-    arg.endFrame = frameLength;
-    arg.f0 = f0;
-    arg.dynamics = dynamics;
-    arg.fftLength = fftLength;
-    arg.wave = wave;
-    arg.waveLength = waveLength;
-    arg.eventList = &(mVsq.events);
+    vConnectArg arg1, arg2;
+    arg1.frames = frames;
+    arg1.phonemes = &phonemes;
+    arg1.beginFrame = 0;
+    arg1.endFrame = frameLength;
+    arg1.f0 = f0;
+    arg1.dynamics = dynamics;
+    arg1.fftLength = fftLength;
+    arg1.wave = wave;
+    arg1.waveLength = waveLength;
+    arg1.eventList = &(mVsq.events);
+
     printf("begin synthesis..\n");
+
     clock_t cl = clock();
-    synthesizeFromList(&arg);
+#ifdef STND_MULTI_THREAD
+
+    thread_t hThread[2];
+
+#ifdef _DEBUG
+    cout << "vConnect::synthesize; STND_MULTI_THREAD" << endl;
+#endif
+
+    hMutex = stnd_mutex_create();
+    hFFTWMutex = stnd_mutex_create();
+
+#ifdef _DEBUG
+    cout << "vConnect::synthesize; mutex created: hFFTWMutex" << endl;
+#endif
+
+    arg2 = arg1;
+
+    int i, maxCount, c;
+    double currentTime = 0.0;
+
+    for(i = 0, c = 0, currentTime = 0.0; i < frameLength; )
+    {
+        if(f0[i] < 0.0) {
+            i++;
+            currentTime = (double)i * framePeriod / 1000.0;
+            continue;
+        }
+        f0[i] = (f0[i] == 0.0)? DEFAULT_F0 : f0[i];
+        double T = 1.0 / f0[i];
+        currentTime += T;
+        i = currentTime * 1000.0 / framePeriod;
+        c++;
+    }
+    maxCount = c;
+
+    for(i = 0, c = 0, currentTime = 0.0; c < maxCount / 2; )
+    {
+        if(f0[i] < 0.0) {
+            i++;
+            currentTime = (double)i * framePeriod / 1000.0;
+            continue;
+        }
+        double T = 1.0 / f0[i];
+        currentTime += T;
+        i = currentTime * 1000.0 / framePeriod;
+        c++;
+    }
+
+    arg1.endFrame = i;
+    arg2.endFrame -= i;
+    arg2.beginFrame = 0;
+    arg2.dynamics += i;
+    arg2.f0 += i;
+    arg2.frames += i;
+    arg2.wave += (int)(currentTime * fs);
+    arg2.waveLength -= currentTime * fs;
+    
+
+    hThread[0] = stnd_thread_create( synthesizeFromList, &arg1 );
+    hThread[1] = stnd_thread_create( synthesizeFromList, &arg2 );
+
+    stnd_thread_join( hThread[0] );
+    stnd_thread_join( hThread[1] );
+
+    stnd_thread_destroy( hThread[0] );
+    stnd_thread_destroy( hThread[1] );
+    stnd_mutex_destroy( hMutex );
+    stnd_mutex_destroy( hFFTWMutex );
+    hMutex = NULL;
+    hFFTWMutex = NULL;
+
+#else
+#ifdef _DEBUG
+    cout << "vConnect::synthesize; not STND_MULTI_THREAD" << endl;
+#endif
+    synthesizeFromList(&arg1);
+#endif
+
     printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / CLOCKS_PER_SEC, framePeriod * frameLength / 1000.0); 
+    scanf("%d", &i);
 
     // ファイルに書き下す．
     string str_output;
@@ -365,9 +438,9 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
     // この処理はスレッドセーフでない．
 #ifdef STND_MULTI_THREAD
-    if( hMutex )
+    if( hFFTWMutex )
     {
-        stnd_mutex_lock( hMutex );
+        stnd_mutex_lock( hFFTWMutex );
     }
 #endif
     fftw_plan forward = fftw_plan_dft_1d( p->fftLength, spectrum, cepstrum, FFTW_FORWARD,  FFTW_ESTIMATE);
@@ -375,9 +448,9 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     fftw_plan inverse = fftw_plan_dft_1d(p->fftLength, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_plan inverse_c2r = fftw_plan_dft_c2r_1d(p->fftLength, spectrum, impulse, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
-    if( hMutex )
+    if( hFFTWMutex )
     {
-        stnd_mutex_unlock( hMutex );
+        stnd_mutex_unlock( hFFTWMutex );
     }
 #endif
 
@@ -407,22 +480,17 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     // 合成処理
     while( currentFrame < p->endFrame )
     {
+        double currentF0;
         if(p->f0[currentFrame] < 0) {
             currentFrame++;
             currentTime = (double)currentFrame * framePeriod / 1000.0;
             continue;
         }
-        p->f0[currentFrame] = (p->f0[currentFrame] == 0.0) ? DEFAULT_F0 : p->f0[currentFrame];
+        currentF0 = (p->f0[currentFrame] == 0.0) ? DEFAULT_F0 : p->f0[currentFrame];
 
         /* ToDo : MelCepstrum の合成結果を melCepstrum に書き込む．
                   残差波形の合成結果を starSpec に書き込む．      */
-        list<vConnectData *> *frames = &(*(p->data))[currentFrame]->dataList;
-        if( NULL == frames )
-        {
-            currentFrame++;
-            currentTime = (double)currentFrame * framePeriod / 1000.0;
-            continue;
-        }
+        list<vConnectData *> *frames = &(p->frames[currentFrame].dataList);
         cepstrumLength = 
             calculateMelCepstrum( melCepstrum, 
                                  p->fftLength, 
@@ -470,7 +538,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
             p->wave[currentPosition] += impulse[k] * p->dynamics[currentFrame] / p->fftLength;
         }
 
-        T = 1.0 / p->f0[currentFrame];
+        T = 1.0 / currentF0;
         currentTime += T;
         currentFrame = currentTime * 1000.0 / framePeriod;
     }
@@ -491,9 +559,9 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
     // この処理はスレッドセーフでない．
 #ifdef STND_MULTI_THREAD
-    if( hMutex )
+    if( hFFTWMutex )
     {
-        stnd_mutex_lock( hMutex );
+        stnd_mutex_lock( hFFTWMutex );
     }
 #endif
     fftw_destroy_plan( forward );
@@ -501,18 +569,19 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     fftw_destroy_plan( inverse );
     fftw_destroy_plan( inverse_c2r );
 #ifdef STND_MULTI_THREAD
-    if( hMutex )
+    if( hFFTWMutex )
     {
-        stnd_mutex_unlock( hMutex );
+        stnd_mutex_unlock( hFFTWMutex );
     }
 #endif
 
 #ifdef STND_MULTI_THREAD
 #ifndef USE_PTHREADS
-    //_endthreadex( 0 );
-    return NULL;
+    _endthreadex( 0 );
 #endif
     return NULL;
+#else
+    return 0;
 #endif
 }
 
