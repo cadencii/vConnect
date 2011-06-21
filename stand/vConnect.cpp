@@ -47,11 +47,13 @@ struct vConnectArg {
     double *dynamics;
     int beginFrame;
     int endFrame;
+    int frameOffset;
     int waveLength;
     int fftLength;
     vConnectFrame *frames;
     vector<vConnectPhoneme *> *phonemes;
     vsqEventList *eventList;
+    vector<vector<standBP> > *controlCurves;
 };
 
 struct vorbisFile {
@@ -240,6 +242,8 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     arg1.wave = wave;
     arg1.waveLength = waveLength;
     arg1.eventList = &(mVsq.events);
+    arg1.controlCurves = &mControlCurves;
+    arg1.frameOffset = beginFrame;
 
     printf("begin synthesis..\n");
 
@@ -477,6 +481,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
     int currentPosition, currentFrame = p->beginFrame;
     double currentTime = 0.0, T;
+    int genIndex = 0;
 
     // 合成処理
     while( currentFrame < p->endFrame )
@@ -503,9 +508,10 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
         // starSpec -> residual DFT を実行する．
         fftw_execute(forward_r2c);
-        // メルケプストラムをstraSpecに展開．
+
+        // メルケプストラムを impulse に展開．
         vConnectUtility::extractMelCepstrum(
-            starSpec,
+            impulse,
             p->fftLength,
             melCepstrum,
             cepstrumLength,
@@ -513,6 +519,15 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
             impulse,
             inverse_c2r,
             fs );
+
+        // Gender Factor を適用したスペクトルを starSpec に書き込む．
+        while( currentFrame + p->frameOffset > (*(p->controlCurves))[GENDER][genIndex].frameTime )
+        {
+            genIndex++;
+        }
+        double stretchRatio = pow(2.0 , (double)((*(p->controlCurves))[GENDER][genIndex].value - 64) / 64.0);
+        vConnectUtility::linearStretch(starSpec, impulse, stretchRatio, p->fftLength);
+
         // 合成パワースペクトルから最小位相応答を計算．
         getMinimumPhaseSpectrum(
             starSpec,

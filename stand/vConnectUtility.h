@@ -45,6 +45,13 @@ public: // public static method
     /// <param name="maxFrequency">最大周波数．</param>
     static void stretchFromMelScale(double *spectrum, const double *melSpectrum, int spectrumLength, int maxFrequency);
 
+    /// <summary> スペクトルを線形伸縮します．</summary>
+    /// <param name="dst">結果を書き込むバッファ．</param>
+    /// <param name="src">元となるスペクトル．</param>
+    /// <param name="ratio">伸縮率</param>
+    /// <param name="length">配列長．</param>
+    static void linearStretch(double *dst, const double *src, double ratio, int length);
+
     /// <summary>配列の中間値を線形補間します．</summary>
     /// <param name="x">配列のインデックス．</param>
     /// <param name="p">配列</param>

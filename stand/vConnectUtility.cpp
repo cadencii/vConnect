@@ -73,6 +73,21 @@ void vConnectUtility::stretchFromMelScale(double *spectrum, const double *melSpe
     }
 }
 
+void vConnectUtility::linearStretch(double *dst, const double *src, double ratio, int length)
+{
+    for(int i = 0; i < length; i++)
+    {
+        double dIndex = (double)i * ratio;
+        int iIndex = dIndex;
+        double r = dIndex - (double)iIndex;
+        if(iIndex < 0 || iIndex >= length - 1) {
+            dst[i] = 0.0;
+        } else {
+            dst[i] = pow(src[iIndex], 1.0 - r) * pow(src[iIndex], r);
+        }
+    }
+}
+
 double vConnectUtility::interpolateArray( double x, const double *p )
 {
     int t = (int)x;
