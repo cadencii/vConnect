@@ -2,7 +2,7 @@
 #define __worldParameters_h__
 
 /// <summary>
-/// WORLD ‚Ì•ªÍƒpƒ‰ƒ[ƒ^‚Ìˆê•”‚ð•ÛŽ‚µ‚Ü‚·D
+/// WORLD ã®åˆ†æžãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ä¸€éƒ¨ã‚’ä¿æŒã—ã¾ã™ï¼Ž
 /// </summary>
 class worldParameters
 {
@@ -12,40 +12,40 @@ public:
     ~worldParameters();
 
     /// <summary>
-    /// —^‚¦‚ç‚ê‚½”gŒ`‚©‚ç WORLD ‚Ì•ªÍƒpƒ‰ƒ[ƒ^‚ð’Šo‚µ‚Ü‚·D
+    /// ä¸Žãˆã‚‰ã‚ŒãŸæ³¢å½¢ã‹ã‚‰ WORLD ã®åˆ†æžãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŠ½å‡ºã—ã¾ã™ï¼Ž
     /// </summary>
-    /// <param name="wave">”gŒ`‚ðŠi”[‚µ‚½”z—ñD</param>
-    /// <param name="waveLength">”z—ñ’·D</param>
-    /// <param name="fs">•W–{‰»Žü”g”D</param>
-    /// <param name="framePeriod">ƒtƒŒ[ƒ€’PˆÊŽžŠÔD</param>
-    /// <returns>¬Œ÷‚µ‚½‚Æ‚«‚Í trueCŽ¸”s‚µ‚½‚Æ‚«‚Í false ‚ð•Ô‚µ‚Ü‚·D</returns>
+    /// <param name="wave">æ³¢å½¢ã‚’æ ¼ç´ã—ãŸé…åˆ—ï¼Ž</param>
+    /// <param name="waveLength">é…åˆ—é•·ï¼Ž</param>
+    /// <param name="fs">æ¨™æœ¬åŒ–å‘¨æ³¢æ•°ï¼Ž</param>
+    /// <param name="framePeriod">ãƒ•ãƒ¬ãƒ¼ãƒ å˜ä½æ™‚é–“ï¼Ž</param>
+    /// <returns>æˆåŠŸã—ãŸã¨ãã¯ trueï¼Œå¤±æ•—ã—ãŸã¨ãã¯ false ã‚’è¿”ã—ã¾ã™ï¼Ž</returns>
     bool computeWave(double *wave, int waveLength, int fs, double framePeriod);
 
     /// <summary>
-    /// •ÛŽ‚µ‚Ä‚¢‚é•ªÍÏ‚Ýƒpƒ‰ƒ[ƒ^‚ðƒtƒ@ƒCƒ‹‚É‘‚«o‚µ‚Ü‚·D
+    /// ä¿æŒã—ã¦ã„ã‚‹åˆ†æžæ¸ˆã¿ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãå‡ºã—ã¾ã™ï¼Ž
     /// </summary>
-    /// <param name="path">‘‚«ž‚Þƒtƒ@ƒCƒ‹ƒpƒXD</param>
-    /// <returns>¬Œ÷‚µ‚½‚Æ‚«‚Í trueCŽ¸”s‚µ‚½‚Æ‚«‚Í false ‚ð•Ô‚µ‚Ü‚·D</returns>
+    /// <param name="path">æ›¸ãè¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ï¼Ž</param>
+    /// <returns>æˆåŠŸã—ãŸã¨ãã¯ trueï¼Œå¤±æ•—ã—ãŸã¨ãã¯ false ã‚’è¿”ã—ã¾ã™ï¼Ž</returns>
     bool writeParameters(const char *path);
 
     /// <summary>
-    /// •ªÍÏ‚Ýƒpƒ‰ƒ[ƒ^‚ð“Ç‚Ýž‚Ý‚Ü‚·D
+    /// åˆ†æžæ¸ˆã¿ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿ã¾ã™ï¼Ž
     /// </summary>
-    /// <param name="path">“Ç‚Ýž‚Þƒtƒ@ƒCƒ‹ƒpƒXD</param>
-    /// <returns>¬Œ÷‚µ‚½‚Æ‚«‚Í trueCŽ¸”s‚µ‚½‚Æ‚«‚Í false ‚ð•Ô‚µ‚Ü‚·D</returns>
+    /// <param name="path">èª­ã¿è¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ï¼Ž</param>
+    /// <returns>æˆåŠŸã—ãŸã¨ãã¯ trueï¼Œå¤±æ•—ã—ãŸã¨ãã¯ false ã‚’è¿”ã—ã¾ã™ï¼Ž</returns>
     bool readParameters(const char *path);
 
     /// <summary>
-    /// •ªÍÏ‚Ýƒpƒ‰ƒ[ƒ^‚ÌŠY“–‰ÓŠ‚ð“Ç‚Ýo‚µ‚Ü‚·D
+    /// åˆ†æžæ¸ˆã¿ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è©²å½“ç®‡æ‰€ã‚’èª­ã¿å‡ºã—ã¾ã™ï¼Ž
     /// </summary>
-    /// <param name="f0">F0 —ñ‚ð‘‚«ž‚Þ”z—ñD</param>
-    /// <param name="t">ŽžŠÔŽ²‚ð‘‚«ž‚Þ”z—ñD</param>
-    /// <param name="pulseLocation">ƒtƒŒ[ƒ€Žž–ˆ‚Ìƒpƒ‹ƒXˆÊ’u‚ð‘‚«ž‚Þ”z—ñD</param>
-    /// <param name="fs">•W–{‰»Žü”g”D</param>
-    /// <param name="beginFrame">ŠJŽnƒtƒŒ[ƒ€ŽžD</param>
-    /// <param name="endFrame">I—¹ƒtƒŒ[ƒ€ŽžD</param>
-    /// <param name="framePeriod">ƒtƒŒ[ƒ€’PˆÊŽžŠÔD</param>
-    /// <returns>¬Œ÷‚µ‚½‚Æ‚«‚Í trueCŽ¸”s‚µ‚½‚Æ‚«‚Í false ‚ð•Ô‚µ‚Ü‚·D</returns>
+    /// <param name="f0">F0 åˆ—ã‚’æ›¸ãè¾¼ã‚€é…åˆ—ï¼Ž</param>
+    /// <param name="t">æ™‚é–“è»¸ã‚’æ›¸ãè¾¼ã‚€é…åˆ—ï¼Ž</param>
+    /// <param name="pulseLocation">ãƒ•ãƒ¬ãƒ¼ãƒ æ™‚åˆ»æ¯Žã®ãƒ‘ãƒ«ã‚¹ä½ç½®ã‚’æ›¸ãè¾¼ã‚€é…åˆ—ï¼Ž</param>
+    /// <param name="fs">æ¨™æœ¬åŒ–å‘¨æ³¢æ•°ï¼Ž</param>
+    /// <param name="beginFrame">é–‹å§‹ãƒ•ãƒ¬ãƒ¼ãƒ æ™‚åˆ»ï¼Ž</param>
+    /// <param name="endFrame">çµ‚äº†ãƒ•ãƒ¬ãƒ¼ãƒ æ™‚åˆ»ï¼Ž</param>
+    /// <param name="framePeriod">ãƒ•ãƒ¬ãƒ¼ãƒ å˜ä½æ™‚é–“ï¼Ž</param>
+    /// <returns>æˆåŠŸã—ãŸã¨ãã¯ trueï¼Œå¤±æ•—ã—ãŸã¨ãã¯ false ã‚’è¿”ã—ã¾ã™ï¼Ž</returns>
     bool getParameters(float *f0, float *t, int *pulseLocations, int fs, double beginTime, double endTime, double framePeriod);
 
 private:

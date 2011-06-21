@@ -18,7 +18,7 @@
 #include "vConnect.h"
 #include "vConnectConverter.h"
 #include <locale>
-#define __TEST__
+//#define __TEST__
 
 #define VCONNECT_VERSION "v.Connect-STAND ver2.0.0"
 

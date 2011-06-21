@@ -42,7 +42,7 @@ bool worldParameters::computeWave(double *wave, int waveLength, int fs, double f
     pulseLocations = new int[tLen];
     this->framePeriod = framePeriod;
 
-    // t, f0 ‚Í DIO ‚¾‚¯‚Å O.K.
+    // t, f0 ã¯ DIO ã ã‘ã§ O.K.
     dio(wave, waveLength, fs, framePeriod, dT, dF0);
     for(int i = 0; i < tLen; i++)
     {
@@ -50,7 +50,7 @@ bool worldParameters::computeWave(double *wave, int waveLength, int fs, double f
         t[i] = dT[i];
     }
 
-    // PLATINUM —p‚Éƒpƒ‹ƒXˆÊ’u‚ğŒvZD platinum_v4 ‚Ì‹@”\ŒÀ’è”ÅD
+    // PLATINUM ç”¨ã«ãƒ‘ãƒ«ã‚¹ä½ç½®ã‚’è¨ˆç®—ï¼ platinum_v4 ã®æ©Ÿèƒ½é™å®šç‰ˆï¼
     int i, j, index;
     int fftl = (int)pow(2.0, 1.0+(int)(log(3.0*fs/FLOOR_F0+1) / log(2.0)));
 
@@ -60,7 +60,7 @@ bool worldParameters::computeWave(double *wave, int waveLength, int fs, double f
     {
         if(f0[i]!=0.0 && f0[i-1]==0.0) vuvNum++;
     }
-    vuvNum+=vuvNum-1; // “‡”‚Ì’²® (—Lº“‡‚Æ–³º“‡)
+    vuvNum+=vuvNum-1; // å³¶æ•°ã®èª¿æ•´ (æœ‰å£°å³¶ã¨ç„¡å£°å³¶)
     if(f0[0] == 0) vuvNum++;
     if(f0[tLen-1] == 0) vuvNum++;
 
@@ -224,7 +224,7 @@ bool worldParameters::getParameters(float *f0, float *t, int *pulseLocations, in
     int endIndex = endTime / framePeriod * 1000.0;
     int index, i, tmp;
 
-    // ŠJn‚ªƒ}ƒCƒiƒX‚Ì‰Â”\«‚ª‚ ‚é‚±‚Æ‚É’ˆÓD
+    // é–‹å§‹æ™‚åˆ»ãŒãƒã‚¤ãƒŠã‚¹ã®å¯èƒ½æ€§ãŒã‚ã‚‹ã“ã¨ã«æ³¨æ„ï¼
     for(i = 0, index = beginIndex; index < 0; i++, index++)
     {
         f0[i] = 0;
@@ -232,7 +232,7 @@ bool worldParameters::getParameters(float *f0, float *t, int *pulseLocations, in
         pulseLocations[i] = 0;
     }
     tmp = index;
-    // ƒf[ƒ^‚ğƒRƒs[D
+    // ãƒ‡ãƒ¼ã‚¿ã‚’ã‚³ãƒ”ãƒ¼ï¼
     for(; index < endIndex; i++, index++)
     {
         int tmpIndex = (double)index * framePeriod / this->framePeriod;
@@ -245,7 +245,7 @@ bool worldParameters::getParameters(float *f0, float *t, int *pulseLocations, in
         pulseLocations[i] = this->pulseLocations[tmpIndex] - beginTime * fs;
     }
 
-    // w’è‚³‚ê‚½’·‚³‚Ù‚Ç‚Éƒf[ƒ^‚ª–³‚¢ê‡D
+    // æŒ‡å®šã•ã‚ŒãŸé•·ã•ã»ã©ã«ãƒ‡ãƒ¼ã‚¿ãŒç„¡ã„å ´åˆï¼
     for(; index < endIndex; i++, index++)
     {
         f0[i] = 0;
