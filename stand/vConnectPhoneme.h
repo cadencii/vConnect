@@ -3,6 +3,9 @@
 
 #include <vorbis/vorbisfile.h>
 #include <fftw3.h>
+#include <string>
+
+using namespace std;
 
 /// <summary>
 /// 音素片の形式に対応した列挙子です．
@@ -11,6 +14,8 @@ enum phonemeMode {
     VCNT_COMPRESSED = 0,     // Ogg + MelCepstrum に圧縮された形式．
     VCNT_RAW = 1,            // 波形データをそのまま使う形式．
 };
+
+struct utauParameters;
 
 /// <summary>
 /// vConnect-STANDの１音素片を格納するクラスです．
@@ -39,18 +44,27 @@ public: // public method
         int cepstrumLength = 32 );
 
     /// <summary>
-    /// 与えられたファイルパスから音素片を読み込みます．
+    /// 与えられたファイルパスから圧縮形式の音素片を読み込みます．
     /// </summary>
     /// <param name="path">読み込みたいファイルのパス．</param>
     /// <returns>読み込みに成功したときは true, 失敗したときは false を返します．</returns>
     bool readPhoneme( const char *path );
 
     /// <summary>
-    /// 与えられたファイルパスへ音素片を書き込みます．
+    /// 与えられたファイルパスへ圧縮形式の音素片を書き込みます．
     /// </summary>
     /// <param name="path">書き込みたいファイルのパス．</param>
     /// <returns>書き込みに成功したときは true, 失敗したときは false を返します．</returns>
     bool writePhoneme( const char *path );
+
+    /// <summary>
+    /// 与えられた UTAU 原音設定から波形を保持する音素片を得ます．
+    /// </summary>
+    /// <param name="path">読み込むディレクトリパス．</parm>
+    /// <param name="params">UTAU 原音設定．</param>
+    /// <param name="framePeriod">フレーム単位時間．</param>
+    /// <returns>読み込みに成功したときは true，失敗時は false を返します．</returns>
+    bool readRawWave( string dir_path, const utauParameters *params, double framePeriod );
 
     /// <summary>
     /// 今保持している音素片の該当箇所のメルケプストラムを取得します．

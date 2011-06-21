@@ -107,7 +107,18 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
             string_t path = mDBPath + parameters.fileName;
             string str_path;
             mb_conv( path, str_path );
-            if( target->p->readPhoneme( str_path.c_str() ) )
+            bool bResult = false;
+            if( parameters.isWave )
+            {
+                string dir_path;
+                mb_conv( mDBPath, dir_path );
+                bResult = target->p->readRawWave( dir_path, &parameters, framePeriod );
+            }
+            else
+            {
+                bResult = target->p->readPhoneme( str_path.c_str() );
+            }
+            if( bResult )
             {
                 target->isValid = true;
                 target->fixedLength = parameters.msFixedLength;

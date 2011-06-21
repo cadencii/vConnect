@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include "vConnectUtility.h"
 #include "world/world.h"
+#include "utauVoiceDB/utauParameters.h"
+#include "waveFileEx/waveFileEx.h"
+#include "worldParameters.h"
 
 vConnectPhoneme::vConnectPhoneme()
 {
@@ -390,7 +393,7 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
     } else {
         int i;
 
-        for(i = 0;i < wLen;i++)
+        for(i = 0; i < wLen;i++)
         {
             int tmpIndex = i + pulseIndex - (int)(0.5+T0);
             waveform[i] = wave[max(0, tmpIndex)] * 
@@ -417,3 +420,90 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
 
 }
 
+bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauParams, double framePeriod)
+{
+    if(!utauParams)
+    {
+        return false;
+    }
+    waveFileEx waveFile;
+    string fileName;
+
+    mb_conv(utauParams->fileName, fileName);
+    fileName = dir_path + fileName;
+
+    if(waveFile.readWaveFile(fileName + ".wav") == 1)
+    {
+        worldParameters worldParams;
+        mode = VCNT_RAW;
+        double *waveBuffer;
+        int waveLength;
+        waveBuffer = waveFile.getWavePointer(&waveLength);
+
+        // 事前分析データが無いのであれば事前分析を行いファイルとして保存する．
+        if(worldParams.readParameters((fileName + ".wpd").c_str()) == false)
+        {
+            if(worldParams.computeWave(waveBuffer, waveLength, fs, framePeriod))
+            {
+                /* 要らない…？
+                // 同名ファイルの書き込み中に読み込まれるといけない．
+#ifdef STND_MULTI_THREAD
+                if(hMutex)
+                {
+                    stnd_mutex_lock(hMutex);
+                }
+#endif
+                */
+                worldParams.writeParameters((fileName + ".wpd").c_str());
+                /*
+#ifdef STND_MULTI_THREAD
+                if(hMutex)
+                {
+                    stnd_mutex_unlock(hMutex);
+                }
+#endif
+                */
+            }
+            else
+            {
+                // 事前分析に失敗した．
+                return false;
+            }
+        }
+        destroy();
+        double beginTime = utauParams->msLeftBlank * 1000.0;
+        double endTime = (utauParams->msRightBlank < 0) ?
+                         (beginTime - utauParams->msRightBlank * 1000.0) :
+                         ((double)waveLength / (double)waveFile.getSamplingFrequency() - utauParams->msRightBlank * 1000.0);
+
+        // 読み込みその他終了したので，波形とパラメタを取り出す．
+        timeLength = (endTime - beginTime) / framePeriod + 0.5;
+        f0 = new float[timeLength];
+        t  = new float[timeLength];
+        pulseLocations = new int[timeLength];
+        wave = new double[(int)((endTime-beginTime)*waveFile.getSamplingFrequency() + 0.5)];
+
+        worldParams.getParameters(f0, t, pulseLocations, waveFile.getSamplingFrequency(), beginTime, endTime, framePeriod);
+
+        int i, j, frameLength = (endTime - beginTime) * waveFile.getSamplingFrequency() + 0.5;
+
+        // ToDo:: 音量正規化はここで行う．
+        for(i = 0, j = beginTime * waveFile.getSamplingFrequency(); j < 0; i++, j++)
+        {
+            wave[i] = 0.0;
+        }
+        for(; i < frameLength; i++, j++)
+        {
+            if(j > waveLength) {
+                break;
+            }
+            wave[i] = waveBuffer[j];
+        }
+        for(; i < frameLength; i++)
+        {
+            wave[i] = 0.0;
+        }
+    }
+
+    return true;
+}

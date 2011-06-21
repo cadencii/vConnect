@@ -76,6 +76,13 @@ void calculateAperiodicity(double *aperiodicity, int fftl, int fs, double *perio
 void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, double **specgram, 
 		 double **residualSpecgram);
 
+void getWedgeList(double *x, int xLen, int vuvNum, int *stList, int *edList, int fs, double framePeriod, double *f0, int *wedgeList);
+
+int getPulseLocations(double *x, int xLen, double *totalPhase, int vuvNum, int *stList, int *edList, int fs, double framePeriod, int *wedgeList, double *pulseLocations);
+
+void getOneFrameResidualSpec(double *x, int xLen, int fs, int positionIndex, double framePeriod, double f0, double *specgram, int fftl, double *pulseLocations, int pCount,
+                            double *residualSpec, fftw_plan *forwardFFT, fftw_complex *tmpSpec, fftw_complex *starSpec, fftw_complex *ceps, double *tmpWave,
+                            fftw_plan minForward, fftw_plan minInverse);
 // WORLD Synthesis
 void synthesis(double *f0, int tLen, double **specgram, double **aperiodicity, int fftl, double framePeriod, int fs, 
                double *synthesisOut, int xLen);

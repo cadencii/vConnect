@@ -19,6 +19,7 @@ struct utauParameters {
     float    msRightBlank;
     float    msPreUtterance;
     float    msVoiceOverlap;
+    bool     isWave;
 };
 
 #endif

@@ -56,6 +56,17 @@ public:
     int    getWaveBuffer( vector<double>& dstBuffer, double leftBlank, double rightBlank );
     int    getWaveBuffer( double *dstBuffer, double leftBlank, double rightBlank, int length );
 
+    int    getSamplingFrequency() { return format.samplePerSecond; }
+
+    double *getWavePointer(int *length)
+    {
+        if(!length)
+        {
+            *length = waveLength;
+        }
+        return waveBuffer;
+    }
+
     long   getWaveLength( void ){ return waveLength; }
     long   getWaveLength( double leftBlank, double rightBlank );
 

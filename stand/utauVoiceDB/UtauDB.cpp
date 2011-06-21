@@ -98,6 +98,11 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
                     {
                         index = temp.find( _T("=") );
                     }
+                    current->isWave = false;
+                }
+                else
+                {
+                    current->isWave = true;
                 }
 
                 normalize_path_separator( current->fileName );
@@ -173,6 +178,7 @@ int UtauDB::getParams( utauParameters &parameters, string_t search )
             parameters.msPreUtterance = i->second->msPreUtterance;
             parameters.msRightBlank = i->second->msRightBlank;
             parameters.msVoiceOverlap = i->second->msVoiceOverlap;
+            parameters.isWave = i->second->isWave;
             result = 1;
         }
     }
