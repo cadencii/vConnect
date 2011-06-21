@@ -64,6 +64,8 @@ int getSamplesForDIO(int fs, int xLen, double framePeriod);
 int getFFTLengthForStar(int fs);
 void star(double *x, int xLen, int fs, double *timeAxis, double *f0,
           double **specgram, bool mode);
+void starGeneralBody(double *x, int xLen, int fs, double f0, double t, int fftl,
+                               double * sliceSTAR, double *waveform, double *powerSpec, fftw_complex *ySpec, fftw_plan *forwardFFT);
 
 // 非周期性指標推定法 PLATINUM : 名称未定
 void platinum(int fs, double *f0, int tLen,

@@ -2,6 +2,15 @@
 #define __vConnectPhoneme_h__
 
 #include <vorbis/vorbisfile.h>
+#include <fftw3.h>
+
+/// <summary>
+/// 音素片の形式に対応した列挙子です．
+/// </summary>
+enum phonemeMode {
+    VCNT_COMPRESSED = 0,     // Ogg + MelCepstrum に圧縮された形式．
+    VCNT_RAW = 1,            // 波形データをそのまま使う形式．
+};
 
 /// <summary>
 /// vConnect-STANDの１音素片を格納するクラスです．
@@ -11,6 +20,7 @@ class vConnectPhoneme
 public: // public method
     vConnectPhoneme();
     ~vConnectPhoneme();
+
 
     /// <summary>
     /// 与えられた波形を音素片へと変換します．
@@ -73,6 +83,38 @@ public: // public method
     /// <returns>成功したときは true，失敗したときは false を返します．</returns>
     bool vorbisOpen( OggVorbis_File *ovf );
 
+    /// <summary>
+    /// 今保持しているデータの形式を取得します．
+    /// </summary>
+    /// <returns>データ保持形式．</returns>
+    phonemeMode getMode()
+    {
+        return mode;
+    }
+
+    /// <summary>
+    /// 現在保持しているデータが波形の際，対応する箇所の STAR パラメータを計算します．
+    /// </summary>
+    /// <param name="starSpec">STAR スペクトルを書き込むバッファ．</param>
+    /// <param name="residualSpec">PLATINUM 残差スペクトルを書き込むバッファ．</param>
+    /// <param name="t">計算したいフレーム時刻．</param>
+    /// <param name="fftLength">FFT 長．</param>
+    /// <param name="waveform">FFT 長の作業領域．</param>
+    /// <param name="spectrum">FFT 長の作業領域．</param>
+    /// <param name="cepstrum">FFT 長の作業領域．</param>
+    /// <param name="forward_r2c">waveform -> spectrum の FFTW プラン．</param>
+    /// <param name="forward">spectrum -> cepstrum の FFTW プラン．</param>
+    /// <param name="inverse">cepstrum -> spectrum の FFTW プラン．</param>
+    void getOneFrameWorld(  double *starSpec,
+                            double *residualSpec,
+                            double t, int fftLength,
+                            double *waveform,
+                            fftw_complex *spectrum,
+                            fftw_complex *cepstrum,
+                            fftw_plan forward_r2c,
+                            fftw_plan forward,
+                            fftw_plan inverse);
+
 public: // public static method
     /// <summary>
     /// 開いた Ogg ストリームを閉じます．
@@ -107,6 +149,12 @@ private: // private field
     float *f0;
     float *t;
     char  *vorbisData;
+
+    double *wave;
+    int waveLength;
+    int *pulseLocations;
+
+    phonemeMode mode;
 };
 
 

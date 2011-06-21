@@ -25,10 +25,6 @@
 #include <stdio.h> // for debug
 #include <stdlib.h>
 
-
-void starGeneralBody(double *x, int xLen, int fs, double f0, double t, int fftl,
-                               double * sliceSTAR, double *waveform, double *powerSpec, fftw_complex *ySpec, fftw_plan *forwardFFT);
-
 // calculate fft length from sampling frequency.
 // this function ignores the lowest f0.
 int getFFTLengthForStar(int fs)

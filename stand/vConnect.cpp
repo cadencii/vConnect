@@ -390,6 +390,10 @@ int calculateMelCepstrum( float *dst, int fftLength, list<vConnectData *> &frame
     list<vConnectData *>::iterator i;
     for( i = frames.begin(); i != frames.end(); i++ )
     {
+        if( (*i)->phoneme->getMode() != VCNT_COMPRESSED )
+        {
+            continue;
+        }
         int length;
         float *data;
         data = (*i)->phoneme->getMelCepstrum( (*i)->index, &length );
@@ -428,6 +432,45 @@ void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames,
     }
 }
 
+void calculateRawWave(double *starSpec,
+                      fftw_complex *residualSpec,
+                      int fftLength,
+                      list<vConnectData *> &frames,
+                      double *waveform,
+                      fftw_complex *spectrum,
+                      fftw_complex *cepstrum,
+                      fftw_plan forward_r2c,
+                      fftw_plan forward,
+                      fftw_plan inverse)
+{
+    list<vConnectData *>::iterator i;
+    double *tmpStar = new double[fftLength];
+    double *tmpRes  = new double[fftLength];
+    fftw_complex *tmpResComplex = new fftw_complex[fftLength];
+    for(i = frames.begin(); i != frames.end(); i++)
+    {
+        if((*i)->phoneme->getMode() != VCNT_RAW)
+        {
+            // 波形保持形式でない．
+            continue;
+        }
+        (*i)->phoneme->getOneFrameWorld(tmpStar, tmpRes, (*i)->index * framePeriod, fftLength, waveform, spectrum, cepstrum, forward_r2c, forward, inverse);
+        vConnectUtility::extractResidual(tmpResComplex, tmpRes, fftLength);
+        for(int j = 0; j < fftLength; j++)
+        {
+            starSpec[j] *= pow(tmpStar[j], (*i)->morphRatio);
+        }
+        for(int j = 0; j <= fftLength / 2; j++)
+        {
+            residualSpec[j][0] += tmpResComplex[j][0] * (*i)->morphRatio;
+            residualSpec[j][1] += tmpResComplex[j][1] * (*i)->morphRatio;
+        }
+    }
+    delete[] tmpResComplex;
+    delete[] tmpStar;
+    delete[] tmpRes;
+}
+
 __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 {
     vConnectArg *p = (vConnectArg *)arg;
@@ -437,6 +480,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     fftw_complex *cepstrum = new fftw_complex[p->fftLength];
     fftw_complex *residual = new fftw_complex[p->fftLength];
     double *starSpec = new double[p->fftLength];
+    double *waveform = new double[p->fftLength];
     double *impulse  = new double[p->fftLength];
     float *melCepstrum = new float[p->fftLength];
     int cepstrumLength;
@@ -448,10 +492,11 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         stnd_mutex_lock( hFFTWMutex );
     }
 #endif
-    fftw_plan forward = fftw_plan_dft_1d( p->fftLength, spectrum, cepstrum, FFTW_FORWARD,  FFTW_ESTIMATE);
-    fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(p->fftLength, starSpec, residual, FFTW_ESTIMATE);
+    fftw_plan forward = fftw_plan_dft_1d(p->fftLength, spectrum, cepstrum, FFTW_FORWARD,  FFTW_ESTIMATE);
     fftw_plan inverse = fftw_plan_dft_1d(p->fftLength, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(p->fftLength, starSpec, residual, FFTW_ESTIMATE);
     fftw_plan inverse_c2r = fftw_plan_dft_c2r_1d(p->fftLength, spectrum, impulse, FFTW_ESTIMATE);
+    fftw_plan forward_r2c_raw = fftw_plan_dft_r2c_1d(p->fftLength, waveform, spectrum, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex )
     {
@@ -520,13 +565,16 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
             inverse_c2r,
             fs );
 
+        // 合成単位に波形が含まれる場合分析して加算する．
+        calculateRawWave(starSpec, residual, p->fftLength, p->frames->dataList, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse); 
+
         // Gender Factor を適用したスペクトルを starSpec に書き込む．
         while( currentFrame + p->frameOffset > (*(p->controlCurves))[GENDER][genIndex].frameTime )
         {
             genIndex++;
         }
         double stretchRatio = pow(2.0 , (double)((*(p->controlCurves))[GENDER][genIndex].value - 64) / 64.0);
-        vConnectUtility::linearStretch(starSpec, impulse, stretchRatio, p->fftLength);
+        vConnectUtility::linearStretch(starSpec, impulse, stretchRatio, p->fftLength / 2 + 1);
 
         // 合成パワースペクトルから最小位相応答を計算．
         getMinimumPhaseSpectrum(
@@ -568,6 +616,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
     delete[] melCepstrum;
     delete[] impulse;
+    delete[] waveform;
     delete[] starSpec;
     delete[] residual;
     delete[] cepstrum;
@@ -581,9 +630,10 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     }
 #endif
     fftw_destroy_plan( forward );
-    fftw_destroy_plan( forward_r2c );
     fftw_destroy_plan( inverse );
     fftw_destroy_plan( inverse_c2r );
+    fftw_destroy_plan( forward_r2c );
+    fftw_destroy_plan( forward_r2c_raw );
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex )
     {

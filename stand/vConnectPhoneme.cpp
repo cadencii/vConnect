@@ -14,6 +14,11 @@ vConnectPhoneme::vConnectPhoneme()
     melCepstrum = NULL;
     t = f0 = NULL;
     vorbisData = NULL;
+    
+    wave = NULL;
+    pulseLocations = NULL;
+    mode = VCNT_COMPRESSED;
+    waveLength = 0;
 }
 
 vConnectPhoneme::~vConnectPhoneme()
@@ -33,19 +38,26 @@ void vConnectPhoneme::destroy()
     delete[] t;
     delete[] vorbisData;
 
+    delete[] wave;
+    delete[] pulseLocations;
+
     timeLength = 0;
     cepstrumLength = 0;
     vorbisSize = 0;
     framePeriod = 0.0f;
+    waveLength = 0;
 
     melCepstrum = NULL;
     t = f0 = NULL;
+    mode = VCNT_COMPRESSED;
     vorbisData = NULL;
+    wave = NULL;
+    pulseLocations = NULL;
 }
 
 bool vConnectPhoneme::writePhoneme(const char* path)
 {
-    if(!melCepstrum || !f0 || !vorbisData
+    if( mode != VCNT_COMPRESSED || !melCepstrum || !f0 || !vorbisData
         || timeLength <= 0 || cepstrumLength <= 0 || vorbisSize <= 0) {
             return false;
     }
@@ -103,6 +115,7 @@ bool vConnectPhoneme::readPhoneme(const char *path)
     fread(vorbisData, vorbisSize, 1, fp);
 
     fclose(fp);
+    mode = VCNT_COMPRESSED;
 
     return true;
 }
@@ -221,6 +234,8 @@ int vConnectPhoneme::computeWave(double *wave, int length, int fs, double frameP
     delete[] specgram;
     delete[] residual;
 
+    mode = VCNT_COMPRESSED;
+
     return 0;
 }
 
@@ -298,6 +313,12 @@ int vConnectPhoneme::vorbisClose( void *vp )
 
 bool vConnectPhoneme::vorbisOpen(OggVorbis_File *ovf)
 {
+    // 保持形式が圧縮形式でない場合．
+    if(mode != VCNT_COMPRESSED)
+    {
+        return false;
+    }
+
     ov_callbacks callbacks = {
         &vConnectPhoneme::vorbisRead,
         &vConnectPhoneme::vorbisSeek,
@@ -316,3 +337,83 @@ bool vConnectPhoneme::vorbisOpen(OggVorbis_File *ovf)
 
     return true;
 }
+
+void vConnectPhoneme::getOneFrameWorld(double *starSpec,
+                                       double *residualSpec,
+                                       double t, int fftLength,
+                                       double *waveform,
+                                       fftw_complex *spectrum,
+                                       fftw_complex *cepstrum,
+                                       fftw_plan forward_r2c,
+                                       fftw_plan forward,
+                                       fftw_plan inverse)
+{
+    if( mode != VCNT_RAW )
+    {
+        for(int i = 0; i < fftLength; i++) {
+            starSpec[i] = 1.0;
+            residualSpec[i] = 0.0;
+        }
+        return;
+    }
+    int index = t / this->framePeriod * 1000.0;
+    if(index < 0)
+    {
+        index = 0;
+    }
+    if(index >= this->timeLength)
+    {
+        index = timeLength;
+    }
+
+    ////// 各バッファと FFT の対応は以下．
+    // fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(fftLength, waveform, spectrum, FFTW_ESTIMATE);
+    // fftw_plan forward = fftw_plan_dft_1d(fftLength, spectrum, cepstrum, FFTW_FORWARD, FFTW_ESTIMATE);
+    // fftw_plan inverse = fftw_plan_dft_1d(fftLength, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+    // STAR スペクトルを計算する．
+    //  残差分を作業用バッファとして使いまわし．
+    starGeneralBody(wave, waveLength, fs, f0[index], this->t[index], fftLength, starSpec, waveform, residualSpec, spectrum, &forward_r2c);
+
+    // PLATINUM 残差スペクトルを計算する．
+    double T0 = (double)fs / f0[index];
+    int wLen = (int)(0.5 + T0*2.0);
+    int pulseIndex = pulseLocations[index];
+
+    // 波形終了位置を越えてしまっている．
+    if(wLen+pulseIndex-(int)(0.5+T0) >= waveLength)
+    {
+        for(int i = 0;i < fftLength;i++)
+        {
+            residualSpec[i] = 0.0;
+        }
+    } else {
+        int i;
+
+        for(i = 0;i < wLen;i++)
+        {
+            int tmpIndex = i + pulseIndex - (int)(0.5+T0);
+            waveform[i] = wave[max(0, tmpIndex)] * 
+            (0.5 - 0.5*cos(2.0*PI*(double)(i+1)/((double)(wLen+1))));
+        }
+        for(;i < fftLength;i++)
+        {
+            waveform[i] = 0.0;
+        }
+
+        getMinimumPhaseSpectrum(starSpec, spectrum, cepstrum, fftLength, forward, inverse);
+
+        fftw_execute(forward_r2c);
+
+        for(i = 0;i < fftLength/2-1;i++)
+        {
+            double tmp = spectrum[i+1][0]*spectrum[i+1][0] + spectrum[i+1][1]*spectrum[i+1][1];
+            tmp /= (double)fftLength;
+            residualSpec[i*2+1] = ( spectrum[i+1][0]*spectrum[i+1][0] + spectrum[i+1][1]*spectrum[i+1][1])/tmp;
+            residualSpec[i*2+2] = (-spectrum[i+1][1]*spectrum[i+1][0] + spectrum[i+1][0]*spectrum[i+1][1])/tmp;
+        }
+        residualSpec[fftLength-1] = spectrum[fftLength/2][0] / spectrum[fftLength/2][0];
+    }
+
+}
+

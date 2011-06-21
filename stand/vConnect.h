@@ -70,7 +70,6 @@ private: // private field
     vsqFileEx mVsq;
     corpusManager mManager;
     vector<corpusManager *> mManagerList;
-    //これ要らないstandSpecgram specgram;
     long mEndFrame;
     double mFluctTheta;
     vector<vector<standBP> > mControlCurves;
