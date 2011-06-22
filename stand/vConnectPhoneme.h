@@ -11,6 +11,7 @@ using namespace std;
 /// 音素片の形式に対応した列挙子です．
 /// </summary>
 enum phonemeMode {
+    VCNT_UNKNOWN = -1,       // 形式不明．
     VCNT_COMPRESSED = 0,     // Ogg + MelCepstrum に圧縮された形式．
     VCNT_RAW = 1,            // 波形データをそのまま使う形式．
 };
@@ -167,6 +168,7 @@ private: // private field
     double *wave;
     int waveLength;
     int *pulseLocations;
+    int waveOffset;
 
     phonemeMode mode;
 };

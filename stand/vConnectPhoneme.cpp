@@ -20,8 +20,9 @@ vConnectPhoneme::vConnectPhoneme()
     
     wave = NULL;
     pulseLocations = NULL;
-    mode = VCNT_COMPRESSED;
+    mode = VCNT_UNKNOWN;
     waveLength = 0;
+    waveOffset = 0;
 }
 
 vConnectPhoneme::~vConnectPhoneme()
@@ -41,7 +42,7 @@ void vConnectPhoneme::destroy()
     delete[] t;
     delete[] vorbisData;
 
-    delete[] wave;
+    delete[] (wave + waveOffset);
     delete[] pulseLocations;
 
     timeLength = 0;
@@ -49,10 +50,11 @@ void vConnectPhoneme::destroy()
     vorbisSize = 0;
     framePeriod = 0.0f;
     waveLength = 0;
+    waveOffset = 0;
 
     melCepstrum = NULL;
     t = f0 = NULL;
-    mode = VCNT_COMPRESSED;
+    mode = VCNT_UNKNOWN;
     vorbisData = NULL;
     wave = NULL;
     pulseLocations = NULL;
@@ -366,20 +368,21 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
     }
     if(index >= this->timeLength)
     {
-        index = timeLength;
+        index = timeLength - 1;
     }
 
     ////// 各バッファと FFT の対応は以下．
-    // fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(fftLength, waveform, spectrum, FFTW_ESTIMATE);
+    // fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(fftLength, waveform, cepstrum, FFTW_ESTIMATE);
     // fftw_plan forward = fftw_plan_dft_1d(fftLength, spectrum, cepstrum, FFTW_FORWARD, FFTW_ESTIMATE);
     // fftw_plan inverse = fftw_plan_dft_1d(fftLength, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
 
     // STAR スペクトルを計算する．
     //  残差分を作業用バッファとして使いまわし．
-    starGeneralBody(wave, waveLength, fs, f0[index], this->t[index], fftLength, starSpec, waveform, residualSpec, spectrum, &forward_r2c);
+    double currentF0 = (f0[index] == 0.0)? DEFAULT_F0 : f0[index];
+    starGeneralBody(wave, waveLength, fs, currentF0, this->t[index], fftLength, starSpec, waveform, residualSpec, cepstrum, &forward_r2c);
 
     // PLATINUM 残差スペクトルを計算する．
-    double T0 = (double)fs / f0[index];
+    double T0 = (double)fs / currentF0;
     int wLen = (int)(0.5 + T0*2.0);
     int pulseIndex = pulseLocations[index];
 
@@ -408,14 +411,14 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
 
         fftw_execute(forward_r2c);
 
+        residualSpec[0] = cepstrum[0][0] / spectrum[0][0];
         for(i = 0;i < fftLength/2-1;i++)
         {
             double tmp = spectrum[i+1][0]*spectrum[i+1][0] + spectrum[i+1][1]*spectrum[i+1][1];
-            tmp /= (double)fftLength;
-            residualSpec[i*2+1] = ( spectrum[i+1][0]*spectrum[i+1][0] + spectrum[i+1][1]*spectrum[i+1][1])/tmp;
-            residualSpec[i*2+2] = (-spectrum[i+1][1]*spectrum[i+1][0] + spectrum[i+1][0]*spectrum[i+1][1])/tmp;
+            residualSpec[i*2+1] = ( spectrum[i+1][0]*cepstrum[i+1][0] + spectrum[i+1][1]*cepstrum[i+1][1])/tmp;
+            residualSpec[i*2+2] = (-spectrum[i+1][1]*cepstrum[i+1][0] + spectrum[i+1][0]*cepstrum[i+1][1])/tmp;
         }
-        residualSpec[fftLength-1] = spectrum[fftLength/2][0] / spectrum[fftLength/2][0];
+        residualSpec[fftLength-1] = cepstrum[fftLength/2][0] / spectrum[fftLength/2][0];
     }
 
 }
@@ -435,7 +438,6 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
     if(waveFile.readWaveFile(fileName + ".wav") == 1)
     {
         worldParameters worldParams;
-        mode = VCNT_RAW;
         double *waveBuffer;
         int waveLength;
         waveBuffer = waveFile.getWavePointer(&waveLength);
@@ -471,38 +473,49 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
             }
         }
         destroy();
-        double beginTime = utauParams->msLeftBlank * 1000.0;
+        double beginTime = utauParams->msLeftBlank / 1000.0;
         double endTime = (utauParams->msRightBlank < 0) ?
-                         (beginTime - utauParams->msRightBlank * 1000.0) :
-                         ((double)waveLength / (double)waveFile.getSamplingFrequency() - utauParams->msRightBlank * 1000.0);
+                         (beginTime - utauParams->msRightBlank / 1000.0) :
+                         ((double)waveLength / (double)waveFile.getSamplingFrequency() - utauParams->msRightBlank / 1000.0);
 
         // 読み込みその他終了したので，波形とパラメタを取り出す．
-        timeLength = (endTime - beginTime) / framePeriod + 0.5;
+        waveOffset = 0;
+        timeLength = (endTime - beginTime) / framePeriod * 1000.0 + 0.5;
         f0 = new float[timeLength];
         t  = new float[timeLength];
         pulseLocations = new int[timeLength];
-        wave = new double[(int)((endTime-beginTime)*waveFile.getSamplingFrequency() + 0.5)];
 
-        worldParams.getParameters(f0, t, pulseLocations, waveFile.getSamplingFrequency(), beginTime, endTime, framePeriod);
+        worldParams.getParameters(f0, t, pulseLocations, waveFile.getSamplingFrequency(), beginTime, timeLength, framePeriod);
+        for(int i = 0; i < timeLength; i++)
+        {
+            waveOffset = min(waveOffset, pulseLocations[i]);
+        }
 
-        int i, j, frameLength = (endTime - beginTime) * waveFile.getSamplingFrequency() + 0.5;
+        int sampleLength =(endTime - beginTime) * waveFile.getSamplingFrequency() + 0.5 - waveOffset;
+        wave = new double[sampleLength];
+
+        int i, j;
 
         // ToDo:: 音量正規化はここで行う．
-        for(i = 0, j = beginTime * waveFile.getSamplingFrequency(); j < 0; i++, j++)
+        for(i = 0, j = beginTime * waveFile.getSamplingFrequency() + waveOffset; j < 0; i++, j++)
         {
             wave[i] = 0.0;
         }
-        for(; i < frameLength; i++, j++)
+        for(; i < sampleLength; i++, j++)
         {
             if(j > waveLength) {
                 break;
             }
             wave[i] = waveBuffer[j];
         }
-        for(; i < frameLength; i++)
+        for(; i < sampleLength; i++)
         {
             wave[i] = 0.0;
         }
+        wave -= waveOffset;
+        mode = VCNT_RAW;
+        this->framePeriod = framePeriod;
+        this->waveLength = sampleLength + waveOffset;
     }
 
     return true;

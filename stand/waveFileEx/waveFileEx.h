@@ -60,7 +60,7 @@ public:
 
     double *getWavePointer(int *length)
     {
-        if(!length)
+        if(length)
         {
             *length = waveLength;
         }

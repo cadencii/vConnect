@@ -333,6 +333,14 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     mb_conv( output, str_output );
     waveFileEx::writeWaveFile( str_output, wave, waveLength, (double)beginFrame * framePeriod / 1000.0 );
 
+    for(int i = 0; i < frameLength; i++)
+    {
+        list<vConnectData *>::iterator j;
+        for(j = frames[i].dataList.begin(); j != frames[i].dataList.end(); j++)
+        {
+            delete (*j);
+        }
+    }
     delete[] frames;
     delete[] wave;
     delete[] f0;
@@ -454,7 +462,7 @@ void calculateRawWave(double *starSpec,
             // 波形保持形式でない．
             continue;
         }
-        (*i)->phoneme->getOneFrameWorld(tmpStar, tmpRes, (*i)->index * framePeriod, fftLength, waveform, spectrum, cepstrum, forward_r2c, forward, inverse);
+        (*i)->phoneme->getOneFrameWorld(tmpStar, tmpRes, (*i)->index * framePeriod / 1000.0, fftLength, waveform, spectrum, cepstrum, forward_r2c, forward, inverse);
         vConnectUtility::extractResidual(tmpResComplex, tmpRes, fftLength);
         for(int j = 0; j < fftLength; j++)
         {
@@ -496,7 +504,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     fftw_plan inverse = fftw_plan_dft_1d(p->fftLength, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_plan forward_r2c = fftw_plan_dft_r2c_1d(p->fftLength, starSpec, residual, FFTW_ESTIMATE);
     fftw_plan inverse_c2r = fftw_plan_dft_c2r_1d(p->fftLength, spectrum, impulse, FFTW_ESTIMATE);
-    fftw_plan forward_r2c_raw = fftw_plan_dft_r2c_1d(p->fftLength, waveform, spectrum, FFTW_ESTIMATE);
+    fftw_plan forward_r2c_raw = fftw_plan_dft_r2c_1d(p->fftLength, waveform, cepstrum, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex )
     {
@@ -551,22 +559,31 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
                           *frames, 
                           vorbisMap );
 
-        // starSpec -> residual DFT を実行する．
-        fftw_execute(forward_r2c);
+        if(cepstrumLength > 0)
+        {
+            // starSpec -> residual DFT を実行する．
+            fftw_execute(forward_r2c);
 
-        // メルケプストラムを impulse に展開．
-        vConnectUtility::extractMelCepstrum(
-            impulse,
-            p->fftLength,
-            melCepstrum,
-            cepstrumLength,
-            spectrum,
-            impulse,
-            inverse_c2r,
-            fs );
+            // メルケプストラムを impulse に展開．
+            vConnectUtility::extractMelCepstrum(
+                impulse,
+                p->fftLength,
+                melCepstrum,
+                cepstrumLength,
+                spectrum,
+                impulse,
+                inverse_c2r,
+                fs );
+        } else {
+            for(int k = 0; k <= p->fftLength / 2; k++)
+            {
+                impulse[k] = 1.0;
+                residual[k][0] = residual[k][1] = 0.0;
+            }
+        }
 
         // 合成単位に波形が含まれる場合分析して加算する．
-        calculateRawWave(starSpec, residual, p->fftLength, p->frames->dataList, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse); 
+        calculateRawWave(impulse, residual, p->fftLength, p->frames->dataList, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse); 
 
         // Gender Factor を適用したスペクトルを starSpec に書き込む．
         while( currentFrame + p->frameOffset > (*(p->controlCurves))[GENDER][genIndex].frameTime )

@@ -121,6 +121,11 @@ void starGeneralBody(double *x, int xLen, int fs, double f0, double t, int fftl,
     int i,j;
     double t0 = 1.0 / f0;
 
+    if(f0 != 150.0) {
+        int a;
+        a = pow(2.0, 2);
+    }
+
     int *baseIndex, *index; // i付きのも包含する (Matlab版参照)
     int nFragment = (int)(0.5 + 3.0*(double)fs/f0/2.0);
     baseIndex = (int *)malloc(sizeof(int) * (nFragment*2+1));

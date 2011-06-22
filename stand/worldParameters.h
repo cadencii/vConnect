@@ -42,11 +42,11 @@ public:
     /// <param name="t">時間軸を書き込む配列．</param>
     /// <param name="pulseLocation">フレーム時刻毎のパルス位置を書き込む配列．</param>
     /// <param name="fs">標本化周波数．</param>
-    /// <param name="beginFrame">開始フレーム時刻．</param>
-    /// <param name="endFrame">終了フレーム時刻．</param>
+    /// <param name="beginTime">開始時刻[s]．</param>
+    /// <param name="timeLength">配列長．</param>
     /// <param name="framePeriod">フレーム単位時間．</param>
     /// <returns>成功したときは true，失敗したときは false を返します．</returns>
-    bool getParameters(float *f0, float *t, int *pulseLocations, int fs, double beginTime, double endTime, double framePeriod);
+    bool getParameters(float *f0, float *t, int *pulseLocations, int fs, double beginTime, int timeLength, double framePeriod);
 
 private:
 

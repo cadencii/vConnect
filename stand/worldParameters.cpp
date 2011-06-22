@@ -44,10 +44,10 @@ bool worldParameters::computeWave(double *wave, int waveLength, int fs, double f
 
     // t, f0 は DIO だけで O.K.
     dio(wave, waveLength, fs, framePeriod, dT, dF0);
-    for(int i = 0; i < tLen; i++)
+    for(int k = 0; k < tLen; k++)
     {
-        f0[i] = dF0[i];
-        t[i] = dT[i];
+        f0[k] = dF0[k];
+        t[k] = dT[k];
     }
 
     // PLATINUM 用にパルス位置を計算． platinum_v4 の機能限定版．
@@ -128,14 +128,13 @@ bool worldParameters::computeWave(double *wave, int waveLength, int fs, double f
     pulseLocations[0] = 0;
     for(i = 1;i < tLen;i++)
     {
-        double currentF0 = f0[i] <= FLOOR_F0 ? DEFAULT_F0 : f0[i];
         int tmpIndex;
 
         double tmp;
         double tmpValue = 100000.0; // safeGuard
-        for(i = 0;j < pCount; j++)
+        for(j = 0;j < pCount; j++)
         {
-            tmp = fabs(tmpPulseLocations[j] - (double)i * framePeriod);
+            tmp = fabs(tmpPulseLocations[j] - (double)i * framePeriod / 1000.0);
             if(tmp < tmpValue)
             {
                 tmpValue = tmp;
@@ -147,7 +146,7 @@ bool worldParameters::computeWave(double *wave, int waveLength, int fs, double f
     }
 
     free(fixedF0);
-    free(pulseLocations);
+    free(tmpPulseLocations);
     free(totalPhase);
     free(f0interpolatedRaw);
     free(signalTime);
@@ -198,8 +197,9 @@ bool worldParameters::readParameters(const char *path)
     destroy();
     c  = fread(&tLen, sizeof(int), 1, fp);
     c += fread(&framePeriod, sizeof(float), 1, fp);
-    float *t = new float[tLen];
-    float *f0 = new float[tLen];
+    t = new float[tLen];
+    f0 = new float[tLen];
+    pulseLocations = new int[tLen];
     c += fread(t, sizeof(float), tLen, fp);
     c += fread(f0, sizeof(float), tLen, fp);
     c += fread(pulseLocations, sizeof(int), tLen, fp);
@@ -218,10 +218,10 @@ bool worldParameters::readParameters(const char *path)
     return ret;
 }
 
-bool worldParameters::getParameters(float *f0, float *t, int *pulseLocations, int fs, double beginTime, double endTime, double framePeriod)
+bool worldParameters::getParameters(float *f0, float *t, int *pulseLocations, int fs, double beginTime, int timeLength, double framePeriod)
 {
     int beginIndex = beginTime / framePeriod * 1000.0;
-    int endIndex = endTime / framePeriod * 1000.0;
+    int endIndex = beginIndex + timeLength;
     int index, i, tmp;
 
     // 開始時刻がマイナスの可能性があることに注意．
