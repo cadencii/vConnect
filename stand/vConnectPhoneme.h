@@ -121,7 +121,7 @@ public: // public method
     /// <param name="forward">spectrum -> cepstrum の FFTW プラン．</param>
     /// <param name="inverse">cepstrum -> spectrum の FFTW プラン．</param>
     void getOneFrameWorld(  double *starSpec,
-                            double *residualSpec,
+                            fftw_complex *residualSpec,
                             double t, int fftLength,
                             double *waveform,
                             fftw_complex *spectrum,

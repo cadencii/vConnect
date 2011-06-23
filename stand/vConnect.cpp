@@ -453,8 +453,7 @@ void calculateRawWave(double *starSpec,
 {
     list<vConnectData *>::iterator i;
     double *tmpStar = new double[fftLength];
-    double *tmpRes  = new double[fftLength];
-    fftw_complex *tmpResComplex = new fftw_complex[fftLength];
+    fftw_complex *tmpRes = new fftw_complex[fftLength];
     for(i = frames.begin(); i != frames.end(); i++)
     {
         if((*i)->phoneme->getMode() != VCNT_RAW)
@@ -463,20 +462,18 @@ void calculateRawWave(double *starSpec,
             continue;
         }
         (*i)->phoneme->getOneFrameWorld(tmpStar, tmpRes, (*i)->index * framePeriod / 1000.0, fftLength, waveform, spectrum, cepstrum, forward_r2c, forward, inverse);
-        vConnectUtility::extractResidual(tmpResComplex, tmpRes, fftLength);
         for(int j = 0; j < fftLength; j++)
         {
             starSpec[j] *= pow(tmpStar[j], (*i)->morphRatio);
         }
         for(int j = 0; j <= fftLength / 2; j++)
         {
-            residualSpec[j][0] += tmpResComplex[j][0] * (*i)->morphRatio;
-            residualSpec[j][1] += tmpResComplex[j][1] * (*i)->morphRatio;
+            residualSpec[j][0] += tmpRes[j][0] * (*i)->morphRatio;
+            residualSpec[j][1] += tmpRes[j][1] * (*i)->morphRatio;
         }
     }
-    delete[] tmpResComplex;
-    delete[] tmpStar;
     delete[] tmpRes;
+    delete[] tmpStar;
 }
 
 __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
@@ -583,7 +580,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         }
 
         // 合成単位に波形が含まれる場合分析して加算する．
-        calculateRawWave(impulse, residual, p->fftLength, p->frames->dataList, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse); 
+        calculateRawWave(impulse, residual, p->fftLength, *frames, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse); 
 
         // Gender Factor を適用したスペクトルを starSpec に書き込む．
         while( currentFrame + p->frameOffset > (*(p->controlCurves))[GENDER][genIndex].frameTime )

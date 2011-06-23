@@ -344,7 +344,7 @@ bool vConnectPhoneme::vorbisOpen(OggVorbis_File *ovf)
 }
 
 void vConnectPhoneme::getOneFrameWorld(double *starSpec,
-                                       double *residualSpec,
+                                       fftw_complex *residualSpec,
                                        double t, int fftLength,
                                        double *waveform,
                                        fftw_complex *spectrum,
@@ -357,7 +357,7 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
     {
         for(int i = 0; i < fftLength; i++) {
             starSpec[i] = 1.0;
-            residualSpec[i] = 0.0;
+            residualSpec[i][0] = residualSpec[i][1] = 0.0;
         }
         return;
     }
@@ -379,7 +379,8 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
     // STAR スペクトルを計算する．
     //  残差分を作業用バッファとして使いまわし．
     double currentF0 = (f0[index] == 0.0)? DEFAULT_F0 : f0[index];
-    starGeneralBody(wave, waveLength, fs, currentF0, this->t[index], fftLength, starSpec, waveform, residualSpec, cepstrum, &forward_r2c);
+    // starGeneralBody(x, xLen, fs, currentF0, timeAxis[i], fftl, specgram[i], waveform, powerSpec, ySpec,&forwardFFT);
+    starGeneralBody(wave, waveLength, fs, currentF0, this->t[index], fftLength, starSpec, waveform, waveform, cepstrum, &forward_r2c);
 
     // PLATINUM 残差スペクトルを計算する．
     double T0 = (double)fs / currentF0;
@@ -389,9 +390,9 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
     // 波形終了位置を越えてしまっている．
     if(wLen+pulseIndex-(int)(0.5+T0) >= waveLength)
     {
-        for(int i = 0;i < fftLength;i++)
+        for(int i = 0;i <= fftLength / 2;i++)
         {
-            residualSpec[i] = 0.0;
+            residualSpec[i][0] = residualSpec[i][1] = 0.0;
         }
     } else {
         int i;
@@ -399,7 +400,7 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
         for(i = 0; i < wLen;i++)
         {
             int tmpIndex = i + pulseIndex - (int)(0.5+T0);
-            waveform[i] = wave[max(0, tmpIndex)] * 
+            waveform[i] = wave[max(waveOffset, tmpIndex)] * 
             (0.5 - 0.5*cos(2.0*PI*(double)(i+1)/((double)(wLen+1))));
         }
         for(;i < fftLength;i++)
@@ -407,20 +408,20 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
             waveform[i] = 0.0;
         }
 
+        // 最小位相スペクトルを求める．
         getMinimumPhaseSpectrum(starSpec, spectrum, cepstrum, fftLength, forward, inverse);
 
+        // 実波形スペクトルを求める．
         fftw_execute(forward_r2c);
 
-        residualSpec[0] = cepstrum[0][0] / spectrum[0][0];
-        for(i = 0;i < fftLength/2-1;i++)
+        // 最小位相はゼロ点を持たないので除算して残差スペクトルを得る．
+        for(i = 0;i <= fftLength/2;i++)
         {
-            double tmp = spectrum[i+1][0]*spectrum[i+1][0] + spectrum[i+1][1]*spectrum[i+1][1];
-            residualSpec[i*2+1] = ( spectrum[i+1][0]*cepstrum[i+1][0] + spectrum[i+1][1]*cepstrum[i+1][1])/tmp;
-            residualSpec[i*2+2] = (-spectrum[i+1][1]*cepstrum[i+1][0] + spectrum[i+1][0]*cepstrum[i+1][1])/tmp;
+            double tmp = spectrum[i][0]*spectrum[i][0] + spectrum[i][1]*spectrum[i][1];
+            residualSpec[i][0] = ( spectrum[i][0]*cepstrum[i][0] + spectrum[i][1]*cepstrum[i+1][1])/tmp;
+            residualSpec[i][1] = (-spectrum[i][1]*cepstrum[i][0] + spectrum[i][0]*cepstrum[i+1][1])/tmp;
         }
-        residualSpec[fftLength-1] = cepstrum[fftLength/2][0] / spectrum[fftLength/2][0];
     }
-
 }
 
 bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauParams, double framePeriod)
@@ -488,7 +489,8 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
         worldParams.getParameters(f0, t, pulseLocations, waveFile.getSamplingFrequency(), beginTime, timeLength, framePeriod);
         for(int i = 0; i < timeLength; i++)
         {
-            waveOffset = min(waveOffset, pulseLocations[i]);
+            int tmp = waveFile.getSamplingFrequency() * 1.0 / ((f0[i] == 0.0)?DEFAULT_F0:f0[i]) +0.5;
+            waveOffset = min(waveOffset, pulseLocations[i] - tmp);
         }
 
         int sampleLength =(endTime - beginTime) * waveFile.getSamplingFrequency() + 0.5 - waveOffset;
