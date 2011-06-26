@@ -9,7 +9,6 @@ using namespace std;
 #include "waveFileEx/waveFileEx.h"
 #include "time.h"
 
-#define VOL_NORMALIZE 0.06
 const int bufSize = 4096;
 
 bool vConnectConverter::convert(const char* otoIni, const char *dstDir)
@@ -83,6 +82,11 @@ bool vConnectConverter::convert(const char* otoIni, const char *dstDir)
         // 大きい方が正規化のための音量．
         sum1 = max(sum1, sum2);
         sum1 = VOL_NORMALIZE / sqrt( ( sum1 / 2048.0 ) );
+
+        for(int i = 0; i < waveLength; i++)
+        {
+            wave[i] *= sum1;
+        }
 
         fprintf(stderr, "  computing wave....\n");
         clock_t cl = clock();

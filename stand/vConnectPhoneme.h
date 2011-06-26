@@ -7,6 +7,9 @@
 
 using namespace std;
 
+// 音量正規化用のマジックナンバー
+const double VOL_NORMALIZE = 0.06;
+
 /// <summary>
 /// 音素片の形式に対応した列挙子です．
 /// </summary>

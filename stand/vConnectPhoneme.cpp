@@ -498,7 +498,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
 
         int i, j;
 
-        // ToDo:: 音量正規化はここで行う．
+        // 波形の値を取り出す．
         for(i = 0, j = beginTime * waveFile.getSamplingFrequency() + waveOffset; j < 0; i++, j++)
         {
             wave[i] = 0.0;
@@ -518,6 +518,24 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
         mode = VCNT_RAW;
         this->framePeriod = framePeriod;
         this->waveLength = sampleLength + waveOffset;
+
+        // 波形の正規化を行う．
+        double sum1 = 0.0, sum2 = 0.0;
+
+        for(i = 0; i < 2048; i++)
+        {
+            sum1 += wave[i] * wave[i];
+        }
+        for(i = 0, j = utauParams->msFixedLength / 1000.0 * waveFile.getSamplingFrequency(); i < 2048 && j < waveLength; i++, j++)
+        {
+            sum2 += wave[j] * wave[j];
+        }
+        sum1 = max(sum1, sum2);
+        sum1 = VOL_NORMALIZE / sqrt( (sum1 / 2048.0) );
+        for(i = waveOffset; i < sampleLength + waveOffset; i++)
+        {
+            wave[i] *= sum1;
+        }
     }
 
     return true;
