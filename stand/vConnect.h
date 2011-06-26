@@ -22,6 +22,7 @@
 
 #define NOTE_NUM 128
 #define VIB_NUM 128
+#define NOISE_LEN 8192
 
 class vConnectPhoneme;
 
@@ -53,6 +54,10 @@ public: // public static method
         int singerIndex,
         vector<corpusManager *> *managers
         );
+public: // public static field
+
+    // BRE 用ノイズ源
+    static double noiseWave[NOISE_LEN];
 
 private: // private method
     /* 内部処理用関数 */

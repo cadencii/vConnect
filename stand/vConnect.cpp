@@ -26,6 +26,7 @@ double temporary1[TRANS_MAX];
 double temporary2[TRANS_MAX];
 double temporary3[TRANS_MAX];
 
+double vConnect::noiseWave[NOISE_LEN];
 double vConnect::mNoteFrequency[NOTE_NUM];
 double vConnect::mVibrato[VIB_NUM];
 
@@ -72,6 +73,11 @@ vConnect::vConnect()
     {
         double period = exp( 5.24 - 1.07e-2 * i ) * 2.0 / 1000.0;
         mVibrato[i] = 2.0 * ST_PI / period;
+    }
+
+    for(int i = 0; i < NOISE_LEN; i++)
+    {
+        noiseWave[i] = randn();
     }
 
     time_t timer;
@@ -328,6 +334,11 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 
     printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / CLOCKS_PER_SEC, framePeriod * frameLength / 1000.0); 
 
+    // 波形のノーマライズ（振幅の絶対値が 1.0 を超えたら絶対値を 1.0 に丸める）．
+    for(int i = 0; i < waveLength; i++)
+    {
+        wave[i] = max(-1.0, min(1.0, wave[i]));
+    }
     // ファイルに書き下す．
     string str_output;
     mb_conv( output, str_output );
@@ -476,6 +487,16 @@ void calculateRawWave(double *starSpec,
     delete[] tmpStar;
 }
 
+void appendNoise(double *wave, int length, double ratio, int *c)
+{
+    for(int i = 0; i < length; i++)
+    {
+        (*c)++;
+        wave[i] += ratio * vConnect::noiseWave[*c];
+        *c = *c % NOISE_LEN;
+    }
+}
+
 __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 {
     vConnectArg *p = (vConnectArg *)arg;
@@ -531,7 +552,8 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
     int currentPosition, currentFrame = p->beginFrame;
     double currentTime = 0.0, T;
-    int genIndex = 0;
+    int genIndex = 0, breIndex = 0;
+    int noiseCount = 0;
 
     // 合成処理
     while( currentFrame < p->endFrame )
@@ -543,6 +565,17 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
             continue;
         }
         currentF0 = (p->f0[currentFrame] == 0.0) ? DEFAULT_F0 : p->f0[currentFrame];
+        T = 1.0 / currentF0;
+
+        // コントロールトラックのインデックスを該当箇所まで進める．
+        while( currentFrame + p->frameOffset > (*(p->controlCurves))[GENDER][genIndex].frameTime )
+        {
+            genIndex++;
+        }
+        while( currentFrame + p->frameOffset > (*(p->controlCurves))[BRETHINESS][breIndex].frameTime )
+        {
+            breIndex++;
+        }
 
         /* ToDo : MelCepstrum の合成結果を melCepstrum に書き込む．
                   残差波形の合成結果を starSpec に書き込む．      */
@@ -558,9 +591,6 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
         if(cepstrumLength > 0)
         {
-            // starSpec -> residual DFT を実行する．
-            fftw_execute(forward_r2c);
-
             // メルケプストラムを impulse に展開．
             vConnectUtility::extractMelCepstrum(
                 impulse,
@@ -575,18 +605,18 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
             for(int k = 0; k <= p->fftLength / 2; k++)
             {
                 impulse[k] = 1.0;
-                residual[k][0] = residual[k][1] = 0.0;
             }
         }
+        // BRE の値によりノイズを励起信号に加算する．
+        appendNoise(starSpec, min(p->fftLength, T * fs), (*(p->controlCurves))[BRETHINESS][breIndex].value / 128.0, &noiseCount);
+
+        // starSpec -> residual DFT を実行する．
+        fftw_execute(forward_r2c);
 
         // 合成単位に波形が含まれる場合分析して加算する．
         calculateRawWave(impulse, residual, p->fftLength, *frames, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse); 
 
         // Gender Factor を適用したスペクトルを starSpec に書き込む．
-        while( currentFrame + p->frameOffset > (*(p->controlCurves))[GENDER][genIndex].frameTime )
-        {
-            genIndex++;
-        }
         double stretchRatio = pow(2.0 , (double)((*(p->controlCurves))[GENDER][genIndex].value - 64) / 64.0);
         vConnectUtility::linearStretch(starSpec, impulse, stretchRatio, p->fftLength / 2 + 1);
 
@@ -616,7 +646,6 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
             p->wave[currentPosition] += impulse[k] * p->dynamics[currentFrame] / p->fftLength;
         }
 
-        T = 1.0 / currentF0;
         currentTime += T;
         currentFrame = currentTime * 1000.0 / framePeriod;
     }
