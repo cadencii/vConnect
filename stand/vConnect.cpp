@@ -111,29 +111,33 @@ void vConnect::emptyPath( double secOffset, string_t output )
     return;
 }
 
-void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, int beginFrame)
+void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, vector<standBP> &briCurve, int beginFrame)
 {
+    vector<int> briArray;
     vsqEventEx *itemPrev = NULL;
+
+    // brightness を展開．
+    int briIndex = 0;
+    briArray.resize(frameLength);
+    for(int i = 0; i < frameLength; i++)
+    {
+        while( i + beginFrame > briCurve[briIndex].frameTime )
+        {
+            briIndex++;
+        }
+        briArray[i] = briCurve[briIndex].value;
+    }
+
+    // 音符ごとに対応する音素を計算して合成リストへ追加していく．
     for(int i = 0; i < vsq.events.eventList.size(); i++) {
         vsqEventEx *itemThis = vsq.events.eventList[i], *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
         string_t lyric = itemThis->lyricHandle.getLyric();
-        corpusManager::phoneme *p = managers[itemThis->singerIndex]->getPhoneme(lyric);
+        list<corpusManager::phoneme *> phonemeList;
+        corpusManager::phoneme *p;
+        managers[itemThis->singerIndex]->getPhoneme(lyric, phonemeList);
         double vel = pow(2.0, (double)(64 - itemThis->velocity) / 64);
 
-        if(!p || !p->isValid){ continue; }
-
-        vConnectPhoneme *phoneme = p->p;
-        bool newPhoneme = true;
-        for(int j = 0; j < phonemes.size(); j++)
-        {
-            if(phonemes[j] == phoneme) {
-                newPhoneme = false;
-                break;
-            }
-        }
-        if(newPhoneme) {
-            phonemes.push_back(phoneme);
-        }
+        // 次の音符が今の音符にかぶる場合はそれの設定．
         int nextBeginFrame;
         if(itemNext) {
             if(itemPrev) {
@@ -143,21 +147,43 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
             }
         }
 
-        for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame; j++, index++) {
-            int frameIndex = (j - itemThis->beginFrame) * vel;
-            vConnectData *data = new vConnectData;
-            frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
-            data->index = frameIndex;
-            data->phoneme = phoneme;
-            if(itemThis->isContinuousBack && nextBeginFrame < j) {
-                data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame);
-            } else {
-                data->morphRatio = 1.0;
-                for(list<vConnectData *>::iterator itr = dst[index].dataList.begin(); itr != dst[index].dataList.end(); itr++) {
-                    data->morphRatio -= (*itr)->morphRatio;
+        for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)
+        {
+            // 音素の有効性チェック
+            p = (*it);
+            if(!p || !p->isValid){ continue; }
+
+            // 登録されていない音素片なら音素片リストに突っ込む．
+            vConnectPhoneme *phoneme = p->p;
+            bool newPhoneme = true;
+            for(int j = 0; j < phonemes.size(); j++)
+            {
+                if(phonemes[j] == phoneme) {
+                    newPhoneme = false;
+                    break;
                 }
             }
-            dst[index].dataList.push_back(data);
+            if(newPhoneme) {
+                phonemes.push_back(phoneme);
+            }
+
+            // 音符が有効な区間に今の音素を書き込む．
+            for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame; j++, index++) {
+                int frameIndex = (j - itemThis->beginFrame) * vel;
+                vConnectData *data = new vConnectData;
+                frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
+                data->index = frameIndex;
+                data->phoneme = phoneme;
+                if(itemThis->isContinuousBack && nextBeginFrame < j) {
+                    data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame);
+                } else {
+                    data->morphRatio = 1.0;
+                    for(list<vConnectData *>::iterator itr = dst[index].dataList.begin(); itr != dst[index].dataList.end(); itr++) {
+                        data->morphRatio -= (*itr)->morphRatio;
+                    }
+                }
+                dst[index].dataList.push_back(data);
+            }
         }
         itemPrev = itemThis;
     }
@@ -234,7 +260,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     // 準備４．合成時刻に必要な情報を整理．
     vConnectFrame *frames = new vConnectFrame[frameLength];
     vector<vConnectPhoneme *> phonemes;
-    calculateFrameData(frames, frameLength, phonemes, mVsq, mManagerList, beginFrame);
+    calculateFrameData(frames, frameLength, phonemes, mVsq, mManagerList, mControlCurves[BRIGHTNESS], beginFrame);
 
     // 実際の合成．
     vConnectArg arg1, arg2;

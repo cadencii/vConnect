@@ -27,6 +27,15 @@ void corpusManager::analyze( vector<string_t> &phonemes )
         mb_conv( lyric, str_lyric );
         cout << "corpusManager::analyze; lyric=" << str_lyric << endl;
     }
+    for( int i = 0; i < mAppendCorpus.size(); i++)
+    {
+        if(mAppendCorpus[i])
+        {
+            mAppendCorpus[i]->analyze(phonemes);
+        }
+    }
+
+    mEnableExtention = mEnableBrightness = mEnableFrequency = false;
 }
 
 corpusManager::~corpusManager()
@@ -36,6 +45,10 @@ corpusManager::~corpusManager()
     {
         SAFE_DELETE( i->second->p );
         SAFE_DELETE( i->second );
+    }
+    for( int j = 0; j < mAppendCorpus.size(); j++)
+    {
+        delete mAppendCorpus[j];
     }
 }
 
@@ -123,6 +136,10 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
                 target->isValid = true;
                 target->fixedLength = parameters.msFixedLength;
                 ret = target;
+                target->brightness = mBrightness;
+                target->frequency = mFrequency;
+                target->enableBrightness = mEnableBrightness;
+                target->enableFrequency = mEnableFrequency;
             }
         }
         target->isProcessing = false;
@@ -137,6 +154,25 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
     return ret;
 }
 
+
+void corpusManager::getPhoneme(string_t lyric, list<phoneme*> &phonemeList)
+{
+    phoneme *p;
+    if(p = getPhoneme(lyric))
+    {
+        p->enableBrightness = mEnableBrightness;
+        p->enableFrequency = mEnableFrequency;
+        phonemeList.push_back(p);
+    }
+    for(int i = 0; i < mAppendCorpus.size(); i++)
+    {
+        if(mAppendCorpus[i])
+        {
+            mAppendCorpus[i]->getPhoneme(lyric, phonemeList);
+        }
+    }
+}
+
 void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
 {
     string_t tmp;
@@ -146,11 +182,30 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
         p->getDBPath( mDBPath );
     }
     tmp = _T("vConnect.ini");
-    enableExtention = 
-        setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
+    mEnableExtention =  setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
+
+    if(mEnableExtention)
+    {
+        setCorpusSetting(setting.getLibrarySetting(SETTING_BASE));
+    }
 }
 
 bool corpusManager::checkEnableExtention()
 {
-    return enableExtention;
+    return mEnableExtention;
+}
+
+void corpusManager::setCorpusSetting(librarySetting *setting)
+{
+    if(!setting)
+    {
+        mEnableBrightness = mEnableFrequency = false;
+        return;
+    }
+    mEnableBrightness = true;
+    mBrightness = setting->brightness;
+
+    // 暫定．
+    mEnableFrequency = false;
+    mFrequency = setting->frequency;
 }
