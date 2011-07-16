@@ -7,6 +7,12 @@
 #include "waveFileEx/waveFileEx.h"
 #include "worldParameters.h"
 
+double vConnectPhoneme::getFrameTime(int index)
+{
+    index = max(0, min(index, timeLength - 1));
+    return t[index];
+}
+
 vConnectPhoneme::vConnectPhoneme()
 {
     timeLength = 0;

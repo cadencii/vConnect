@@ -16,6 +16,11 @@
 #include "vConnectPhoneme.h"
 #include "vsqMetaText/vsqFileEx.h"
 
+corpusManager::corpusManager()
+{
+    mUtauDB = NULL;
+}
+
 void corpusManager::analyze( vector<string_t> &phonemes )
 {
     int size = phonemes.size();
@@ -35,7 +40,7 @@ void corpusManager::analyze( vector<string_t> &phonemes )
         }
     }
 
-    mEnableExtention = mEnableBrightness = mEnableFrequency = false;
+    mIsAppend = mEnableExtention = mEnableBrightness = mEnableFrequency = false;
 }
 
 corpusManager::~corpusManager()
@@ -49,6 +54,12 @@ corpusManager::~corpusManager()
     for( int j = 0; j < mAppendCorpus.size(); j++)
     {
         delete mAppendCorpus[j];
+    }
+
+    // うーん…
+    if(mIsAppend)
+    {
+        delete mUtauDB;
     }
 }
 
@@ -158,12 +169,16 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
 void corpusManager::getPhoneme(string_t lyric, list<phoneme*> &phonemeList)
 {
     phoneme *p;
-    if(p = getPhoneme(lyric))
+
+    // 有効な音素なら追加する．
+    if((p = getPhoneme(lyric)) && p->isValid && p->p)
     {
         p->enableBrightness = mEnableBrightness;
         p->enableFrequency = mEnableFrequency;
         phonemeList.push_back(p);
     }
+
+    // アペンドがあるならそれを追加．
     for(int i = 0; i < mAppendCorpus.size(); i++)
     {
         if(mAppendCorpus[i])
@@ -187,6 +202,16 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
     if(mEnableExtention)
     {
         setCorpusSetting(setting.getLibrarySetting(SETTING_BASE));
+        librarySetting *brightnessSetting = setting.getLibrarySetting(SETTING_BRIGHTNESS);
+        if(mEnableBrightness && brightnessSetting)
+        {
+            UtauDB *db = new UtauDB();
+            mAppendCorpus.resize(1, NULL);
+            mAppendCorpus[0] = new corpusManager();
+            db->read(brightnessSetting->path + _T("oto.ini"), options.encodingOtoIni.c_str());
+            mAppendCorpus[0]->setUtauDB(db, options);
+            mAppendCorpus[0]->setIsAppend(true);
+        }
     }
 }
 

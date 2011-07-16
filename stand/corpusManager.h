@@ -25,6 +25,7 @@ class vsqEventEx;
 class corpusManager
 {
 public:
+    corpusManager();
     ~corpusManager();
 
     class phoneme {
@@ -90,6 +91,8 @@ public:
 
     bool checkEnableExtention();
 
+    void setIsAppend(bool isAppend){ mIsAppend = isAppend; }
+
 private:
 
     map_t<string_t, phoneme *> objectMap;
@@ -103,6 +106,8 @@ private:
     bool mEnableBrightness;
     float mFrequency;
     bool mEnableFrequency;
+
+    bool mIsAppend;
 };
 
 #endif // __corpusManager_h__

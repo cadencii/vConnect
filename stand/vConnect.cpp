@@ -149,11 +149,8 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
 
         for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)
         {
-            // 音素の有効性チェック
-            p = (*it);
-            if(!p || !p->isValid){ continue; }
-
             // 登録されていない音素片なら音素片リストに突っ込む．
+            p = (*it);
             vConnectPhoneme *phoneme = p->p;
             bool newPhoneme = true;
             for(int j = 0; j < phonemes.size(); j++)
@@ -172,7 +169,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                 int frameIndex = (j - itemThis->beginFrame) * vel;
                 vConnectData *data = new vConnectData;
                 frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
-                data->index = frameIndex;
+                data->index = phoneme->getFrameTime(frameIndex) / framePeriod * 1000.0;
                 data->phoneme = phoneme;
                 if(itemThis->isContinuousBack && nextBeginFrame < j) {
                     data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame);

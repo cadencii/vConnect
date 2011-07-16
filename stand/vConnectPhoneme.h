@@ -133,6 +133,13 @@ public: // public method
                             fftw_plan forward,
                             fftw_plan inverse);
 
+    /// <summary>
+    /// 現在保持しているデータが波形の際，対応する箇所の STAR パラメータを計算します．
+    /// </summary>
+    /// <param name="frameTime"> フレーム時刻 </param>
+    /// <returns> 該当時刻のフレームインデックス． </returns>
+    double getFrameTime(int frameTime);
+
 public: // public static method
     /// <summary>
     /// 開いた Ogg ストリームを閉じます．
