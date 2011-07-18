@@ -180,6 +180,7 @@ int vConnectPhoneme::computeWave(double *wave, int length, int fs, double frameP
     }
 
     /* melCepstrum の計算 → specgram へ再度展開 */
+    // 展開する場合は melCepstrum の歪み分を残差に持たせる形になる． */
     for(int i = 0; i < timeLength; i++) {
         int j;
         vConnectUtility::stretchToMelScale(spectrum, specgram[i], fftLength / 2 + 1, fs / 2);

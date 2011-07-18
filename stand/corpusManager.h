@@ -92,6 +92,7 @@ public:
     bool checkEnableExtention();
 
     void setIsAppend(bool isAppend){ mIsAppend = isAppend; }
+    void setBrightness(int bri){ if(0 <= bri && bri <= 128) mBrightness = bri; }
 
 private:
 

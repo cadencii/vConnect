@@ -147,38 +147,92 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
             }
         }
 
+        // 登録されていない音素片なら音素片リストに突っ込む．
         for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)
         {
-            // 登録されていない音素片なら音素片リストに突っ込む．
             p = (*it);
-            vConnectPhoneme *phoneme = p->p;
+            vConnectPhoneme* phoneme = p->p;
             bool newPhoneme = true;
+
             for(int j = 0; j < phonemes.size(); j++)
             {
-                if(phonemes[j] == phoneme) {
+                if(phonemes[j] == phoneme)
+                {
                     newPhoneme = false;
                     break;
                 }
             }
-            if(newPhoneme) {
+            if(newPhoneme)
+            {
                 phonemes.push_back(phoneme);
             }
+        }
 
-            // 音符が有効な区間に今の音素を書き込む．
-            for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame; j++, index++) {
-                int frameIndex = (j - itemThis->beginFrame) * vel;
+        // 音符が有効な区間に今の音素を書き込む．
+        for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame; j++, index++)
+        {
+            int frameIndex = (j - itemThis->beginFrame) * vel;
+            int briVal = briArray[index];                       // 現在の bri 値．
+            int minBri = -1, maxBri = 129;
+
+            frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
+
+            // brightness の幅を計算する．
+            for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)
+            {
+                p = (*it);
+                if(p->brightness < briVal)
+                {
+                    minBri = max(p->brightness, minBri);
+                }
+                else
+                {
+                    maxBri = min(p->brightness, maxBri);
+                }
+            }
+            if(minBri == -1)
+            {
+                briVal = maxBri;
+            }
+            if(maxBri == 129)
+            {
+                briVal = minBri;
+            }
+
+            // 対象になる音素ずつ各フレームに登録．
+            for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)
+            {
+                p = (*it);
+                // brightness が範囲外．
+                if(p->brightness < minBri || p->brightness > maxBri)
+                {
+                    continue;
+                }
+                vConnectPhoneme *phoneme = p->p;
                 vConnectData *data = new vConnectData;
-                frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
                 data->index = phoneme->getFrameTime(frameIndex) / framePeriod * 1000.0;
                 data->phoneme = phoneme;
-                if(itemThis->isContinuousBack && nextBeginFrame < j) {
+
+                double baseBriRatio = 1.0 - (double)abs(briVal - p->brightness) / (double)(maxBri - minBri);
+                baseBriRatio = max(0, min(1.0, baseBriRatio));
+                if(baseBriRatio == 0.0)
+                {
+                    delete data;
+                    continue;
+                }
+                if(itemThis->isContinuousBack && nextBeginFrame < j)
+                {
                     data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame);
-                } else {
+                }
+                else
+                {
                     data->morphRatio = 1.0;
-                    for(list<vConnectData *>::iterator itr = dst[index].dataList.begin(); itr != dst[index].dataList.end(); itr++) {
+                    for(list<vConnectData *>::iterator itr = dst[index].dataList.begin(); itr != dst[index].dataList.end(); itr++)
+                    {
                         data->morphRatio -= (*itr)->morphRatio;
                     }
                 }
+                data->morphRatio *= baseBriRatio;
                 dst[index].dataList.push_back(data);
             }
         }
@@ -666,7 +720,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         currentPosition = currentTime * fs;
         for( int k = 0; k < p->fftLength / 2 && currentPosition < p->waveLength; k++, currentPosition++ )
         {
-            p->wave[currentPosition] += impulse[k] * p->dynamics[currentFrame] / p->fftLength;
+            p->wave[currentPosition] += impulse[k] / p->fftLength * p->dynamics[currentFrame];
         }
 
         currentTime += T;

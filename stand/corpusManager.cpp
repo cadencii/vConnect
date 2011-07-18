@@ -19,6 +19,8 @@
 corpusManager::corpusManager()
 {
     mUtauDB = NULL;
+    mBrightness = 64;
+    mFrequency = 440.0;
 }
 
 void corpusManager::analyze( vector<string_t> &phonemes )
@@ -209,6 +211,7 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
             mAppendCorpus.resize(1, NULL);
             mAppendCorpus[0] = new corpusManager();
             db->read(brightnessSetting->path + _T("oto.ini"), options.encodingOtoIni.c_str());
+            mAppendCorpus[0]->setBrightness(brightnessSetting->brightness);
             mAppendCorpus[0]->setUtauDB(db, options);
             mAppendCorpus[0]->setIsAppend(true);
         }
