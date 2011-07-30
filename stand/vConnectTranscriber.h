@@ -1,0 +1,20 @@
+#ifndef __vConnectTranscriber_h__
+#define __vConnectTranscriber_h__
+
+#include "stand.h"
+
+class vConnectTranscriber
+{
+public:
+    /// <summary>
+    /// 与えられた二つの UTAU 原音設定から時間伸縮関数を生成します．
+    /// </summary>
+    /// <param name="src_path">転写元ディレクトリパス．</param>
+    /// <param name="dst_path">転写先ディレクトリパス．</param>
+    /// <returns>転写に成功したときは true，失敗時は false を返します．</returns>
+    static bool transcribe(string_t &src_path, string_t &dst_path, const char *codepage);
+private:
+};
+
+#endif
+

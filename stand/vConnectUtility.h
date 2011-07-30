@@ -71,6 +71,25 @@ public: // public static method
     /// <param name="length">波形長．</param>
     /// <param name="fs">標本化周波数．</param>
     static void newOggVorbis(char **dst, int *size, const double *wave, int length, int fs);
+
+    /// <summary>二つのデータを伸縮マッチングします．</summary>
+    /// <param name = "T">ストレッチング関数．</param>
+    /// <param name = "H">ストレッチング関数．</param>
+    /// <param name = "src_s">元となるデータ列．</param>
+    /// <param name = "dst_s">対象となるデータ列．</param>
+    /// <param name = "length">データ長．</param>
+    static void calculateMatching( double* T, double* H, double* src_s, double* dst_s, int length );
+
+    static void applyStretching( double *T, double* target, int length );
+
+private:
+    static void _get_graduation( double* src, double* dst, int length,
+                                 double *d1s, double *d2s, double *d1d, double *d2d);
+
+    static void _log_normalize_infinite( double* dst, int length );
+
+    static double _get_cost( double* src, double* dst, int i, int j, int n, int m,
+                             double *d1d, double *d2d, double *d1s, double *d2s);
 };
 
 #endif

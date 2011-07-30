@@ -35,6 +35,8 @@ public: // public method
     /// <returns>取得に失敗した場合に0，成功した場合は0以外の値を返します．</returns>
     int getParams( utauParameters &parameters, string_t search );
 
+    int getParams( utauParameters &parameters, int index );
+
     /// <summary>
     /// oto.iniファイルのパスを取得します．
     /// </summary>
@@ -47,6 +49,9 @@ public: // public method
     /// </summary>
     /// <returns>音素の数が0の場合trueを，そうでない場合はfalseを返します．</returns>
     bool empty();
+
+
+    int size();
 
     map_t<string_t, utauParameters *>::iterator begin();
     

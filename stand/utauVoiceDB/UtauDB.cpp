@@ -195,3 +195,35 @@ bool UtauDB::empty()
 {
     return mSettingMap.empty();
 }
+
+int UtauDB::size()
+{
+    return mSettingList.size();
+}
+
+int UtauDB::getParams(utauParameters &parameters, int index)
+{
+    int ret = 0;
+    list<utauParameters*>::iterator it = mSettingList.begin();
+    for(int i = 0; i < size() && it != mSettingList.end(); i++, it++)
+    {
+        if(index == i)
+        {
+            ret = 1;
+            parameters.fileName = (*it)->fileName;
+            parameters.lyric = (*it)->lyric;
+            parameters.msFixedLength = (*it)->msFixedLength;
+            parameters.msLeftBlank = (*it)->msLeftBlank;
+            parameters.msPreUtterance = (*it)->msPreUtterance;
+            parameters.msRightBlank = (*it)->msRightBlank;
+            parameters.msVoiceOverlap = (*it)->msVoiceOverlap;
+            parameters.isWave = (*it)->isWave;
+            break;
+        }
+    }
+    if(it!= mSettingList.end())
+    {
+        parameters = *(*it);
+    }
+    return ret;
+}
