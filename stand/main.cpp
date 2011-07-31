@@ -17,6 +17,7 @@
  */
 #include "vConnect.h"
 #include "vConnectConverter.h"
+#include "vConnectTranscriber.h"
 #include <locale>
 //#define __TEST__
 
@@ -46,6 +47,11 @@ int main( int argc, char *argv[] ){
             // "-"で始まるので
             if( s == "-c" ){
                 options.convert = true;
+                options.transcribe = false;
+                current_parse = "";
+            }else if( s == "-t" ){
+                options.transcribe = true;
+                options.convert = false;
                 current_parse = "";
             }else if( s == "-list-charset" ){
                 print_list_charset = true;
@@ -109,9 +115,12 @@ int main( int argc, char *argv[] ){
         cout << "    vConnect [vsq_meta_text_path] [out_wave_path]" << endl;
         cout << "      or" << endl;
         cout << "    vConnect -c -i [utau_oto_ini_path] -o [out_stand_path]" << endl;
+        cout << "    vConnect -t -i [src_vConnect_ini_path] -o [dst_vConnect_ini_path]" << endl;
         cout << "options:" << endl;
         cout << "    -i [path]                       path of input-file" << endl;
         cout << "    -o [path]                       path of output-file" << endl;
+        cout << "    -c                              convert mode" << endl;
+        cout << "    -t                              transcribe mode" << endl;
         cout << "    -charset-otoini [charset-name]  charset of oto.ini (default: Shift_JIS)" << endl;
         cout << "    -charset-vxt [charset-name]     charset of input-file (default: Shift_JIS)" << endl;
         cout << "    -list-charset                   print supported charset list" << endl;
@@ -130,7 +139,12 @@ int main( int argc, char *argv[] ){
     cout << "::main; output=" << output << "; mbs_output=" << mbs_output << endl;
 #endif
     if(options.convert == false ) {
-        vC.synthesize( tinput, toutput, options );
+        if(options.transcribe) {
+            vConnectTranscriber transcriber;
+            transcriber.transcribe(tinput, toutput, options.encodingOtoIni.c_str());
+        } else {
+            vC.synthesize( tinput, toutput, options );
+        }
     } else {
         vConnectConverter converter;
         converter.convert(input.c_str(), output.c_str());

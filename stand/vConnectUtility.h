@@ -78,7 +78,7 @@ public: // public static method
     /// <param name = "src_s">元となるデータ列．</param>
     /// <param name = "dst_s">対象となるデータ列．</param>
     /// <param name = "length">データ長．</param>
-    static void calculateMatching( double* T, double* H, double* src_s, double* dst_s, int length );
+    static void calculateMatching( double* dst_to_src, double* src_to_dst, double* src_s, double* dst_s, int length );
 
     static void applyStretching( double *T, double* target, int length );
 

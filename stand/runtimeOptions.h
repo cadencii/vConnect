@@ -34,6 +34,7 @@ public:
     string encodingVoiceTexture;
 
     bool convert;
+    bool transcribe;
 };
 
 #endif // __runtimeOptions_h__

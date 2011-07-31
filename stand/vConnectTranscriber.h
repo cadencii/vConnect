@@ -3,6 +3,8 @@
 
 #include "stand.h"
 
+class vConnectPhoneme;
+
 class vConnectTranscriber
 {
 public:
@@ -14,6 +16,11 @@ public:
     /// <returns>転写に成功したときは true，失敗時は false を返します．</returns>
     static bool transcribe(string_t &src_path, string_t &dst_path, const char *codepage);
 private:
+
+    static void _transcribe_compressed(vConnectPhoneme *src, vConnectPhoneme *dst);
+    static void _transcribe_raw(vConnectPhoneme *src, vConnectPhoneme *dst);
+
+    static void _calculate_compressed_env(double *dst, vConnectPhoneme *src, int length);
 };
 
 #endif

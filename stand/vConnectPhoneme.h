@@ -140,6 +140,8 @@ public: // public method
     /// <returns> 該当時刻のフレームインデックス． </returns>
     double getFrameTime(int frameTime);
 
+    void setTimeFunction(double *t, int length);
+
 public: // public static method
     /// <summary>
     /// 開いた Ogg ストリームを閉じます．
