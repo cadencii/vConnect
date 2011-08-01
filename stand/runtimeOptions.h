@@ -22,6 +22,7 @@ class runtimeOptions{
 public:
     runtimeOptions(){
         convert = false;
+        transcribe = false;
         encodingOtoIni = "Shift_JIS";
         encodingVsqText = "Shift_JIS";
         encodingVowelTable = "Shift_JIS";

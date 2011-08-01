@@ -210,7 +210,6 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                 }
                 vConnectPhoneme *phoneme = p->p;
                 vConnectData *data = new vConnectData;
-                data->index = phoneme->getFrameTime(frameIndex) / framePeriod * 1000.0;
                 data->phoneme = phoneme;
 
                 double baseBriRatio = 1.0 - (double)abs(briVal - p->brightness) / (double)(maxBri - minBri);
@@ -232,6 +231,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                         data->morphRatio -= (*itr)->morphRatio;
                     }
                 }
+                data->index = (phoneme->getFrameTime(frameIndex) * (1.0 - baseBriRatio) + frameIndex * framePeriod * baseBriRatio / 1000.0) / framePeriod * 1000.0;
                 data->morphRatio *= baseBriRatio;
                 dst[index].dataList.push_back(data);
             }
