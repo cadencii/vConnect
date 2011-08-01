@@ -1,4 +1,6 @@
-﻿02 May. 2011 v2.0.8   fixed; fatal bug during unvoiced part
+﻿02 Aug. 2011 v3.0.0   renewed; synthesis system
+---
+02 May. 2011 v2.0.8   fixed; fatal bug during unvoiced part
 01 May. 2011 v2.0.7   fixed; Wave file I/O
 20 Apr. 2011 v2.0.6   fixed; add time stretching function
 18 Apr. 2011 v2.0.5   fixed; BRE's frequency filter

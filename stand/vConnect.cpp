@@ -177,6 +177,25 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
 
             frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
 
+            // 同じフレームを使いまわしたくない場合はここを使うとよい．
+/*
+            frameIndex = max(2, frameIndex);
+            if(frameIndex > itemThis->utauSetting.msFixedLength / framePeriod)
+            {
+                int tmpDiff = frameIndex - itemThis->utauSetting.msFixedLength / framePeriod;
+                int tmpRoom = (p->p->getTimeLength() - itemThis->utauSetting.msFixedLength / framePeriod ) * 2 / 3;
+
+                frameIndex = itemThis->utauSetting.msFixedLength / framePeriod;
+                if(tmpDiff / tmpRoom % 2 == 0)
+                {
+                    frameIndex += tmpDiff % tmpRoom;
+                }
+                else
+                {
+                    frameIndex += tmpRoom - tmpDiff % tmpRoom;
+                }
+            }*/
+
             // brightness の幅を計算する．
             for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)
             {
@@ -199,6 +218,16 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                 briVal = minBri;
             }
 
+            // あとどの程度空きがあるか先に計算．
+            double morphRatio = 1.0;
+            for(list<vConnectData *>::iterator itr = dst[index].dataList.begin(); itr!= dst[index].dataList.end(); itr++)
+            {
+                morphRatio -= (*itr)->morphRatio;
+            }
+            if(morphRatio <= 0.0)
+            {
+                continue;
+            }
             // 対象になる音素ずつ各フレームに登録．
             for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)
             {
@@ -221,15 +250,11 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                 }
                 if(itemThis->isContinuousBack && nextBeginFrame < j)
                 {
-                    data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame);
+                    data->morphRatio = (double)(itemThis->endFrame - j) / (double)(itemThis->endFrame - nextBeginFrame) * morphRatio;
                 }
                 else
                 {
-                    data->morphRatio = 1.0;
-                    for(list<vConnectData *>::iterator itr = dst[index].dataList.begin(); itr != dst[index].dataList.end(); itr++)
-                    {
-                        data->morphRatio -= (*itr)->morphRatio;
-                    }
+                    data->morphRatio = morphRatio;
                 }
                 data->index = (phoneme->getFrameTime(frameIndex) * (1.0 - baseBriRatio) + frameIndex * framePeriod * baseBriRatio / 1000.0) / framePeriod * 1000.0;
                 data->morphRatio *= baseBriRatio;
@@ -506,22 +531,34 @@ void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames,
 {
     memset(dst, 0, sizeof(double) * fftLength);
     float **pcm_channels;
-    for(list<vConnectData *>::iterator i = frames.begin(); i != frames.end(); i++) {
+    for(list<vConnectData *>::iterator i = frames.begin(); i != frames.end(); i++)
+    {
         int count = 0;
         map_t<vConnectPhoneme *, OggVorbis_File *>::iterator itr = vorbisMap.find((*i)->phoneme);
-        if(itr != vorbisMap.end()) {
-            if(ov_pcm_seek_lap(itr->second, (*i)->index * fftLength)) {
+
+        if(itr == vorbisMap.end())
+        {
+            continue;
+        }
+        else
+        {
+            if(ov_pcm_seek_lap(itr->second, (*i)->index * fftLength))
+            {
                 // シークに失敗
                 continue;
             }
-            while(count < fftLength) {
+            while(count < fftLength)
+            {
                 int bitStream;
                 long samples = ov_read_float(itr->second, &pcm_channels, fftLength - count, &bitStream);
                 // 読み込み失敗．
                 if(samples <= 0){ break; }
-                for(int j = 0, k = count; j < samples && k < fftLength; j++, k++) {
+                
+                for(int j = 0, k = count; j < samples && k < fftLength; j++, k++)
+                {
                     dst[k] += pcm_channels[0][j] * (*i)->morphRatio;
                 }
+                
                 count += samples;
             }
         }
