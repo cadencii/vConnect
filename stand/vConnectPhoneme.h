@@ -140,7 +140,7 @@ public: // public method
     /// <returns> 該当時刻のフレームインデックス． </returns>
     double getFrameTime(int frameTime);
 
-    void setTimeFunction(double *t, int length);
+    void setTimeAxis(double *t, int length);
 
 public: // public static method
     /// <summary>

@@ -140,8 +140,7 @@ int main( int argc, char *argv[] ){
 #endif
     if(options.convert == false ) {
         if(options.transcribe) {
-            vConnectTranscriber transcriber;
-            transcriber.transcribe(tinput, toutput, options.encodingOtoIni.c_str());
+            vConnectTranscriber::transcribe(tinput, toutput, options.encodingOtoIni.c_str());
         } else {
             vC.synthesize( tinput, toutput, options );
         }

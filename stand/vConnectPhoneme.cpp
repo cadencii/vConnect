@@ -548,7 +548,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
     return true;
 }
 
-void vConnectPhoneme::setTimeFunction(double *t, int length)
+void vConnectPhoneme::setTimeAxis(double *t, int length)
 {
     if(length != timeLength)
     {

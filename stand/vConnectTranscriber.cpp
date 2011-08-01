@@ -25,14 +25,18 @@ bool vConnectTranscriber::transcribe(string_t &src_path, string_t &dst_path, con
         cout << "Begin analysis : " << s.c_str() << endl;
 
         map_t<string_t, int>::iterator itr = analyzedItems.find(src_param.fileName);
-        if(itr == analyzedItems.end())
+        if(itr != analyzedItems.end())
         {
             cout << " Already analyzed." << endl;
             continue;
         }
 
+        clock_t cl = clock();
+
         if(dst.getParams(dst_param, src_param.lyric) != 1)
         {
+            mb_conv(src_param.lyric, s);
+            cout << " error; not found : " << s.c_str() << endl;
             continue;
         }
         if(dst_param.isWave != src_param.isWave)
@@ -84,6 +88,8 @@ bool vConnectTranscriber::transcribe(string_t &src_path, string_t &dst_path, con
             /* ここは生波形用 */
         }
 
+        cout << "Done. Elapsed time = " << (double)(clock() - cl) / CLOCKS_PER_SEC << " [s]" << endl;
+
         analyzedItems.insert(make_pair(src_param.fileName, i));
     }
     return ret;
@@ -93,7 +99,7 @@ void vConnectTranscriber::_transcribe_compressed(vConnectPhoneme *src, vConnectP
 {
     int src_len, dst_len;
     double *src_env, *dst_env;
-    double *src_to_dst, *dst_to_src;
+    double *src_to_dst, *dst_to_src, *dst_to_src_stretched;
 
     src_len = src->getTimeLength();
     dst_len = dst->getTimeLength();
@@ -102,15 +108,43 @@ void vConnectTranscriber::_transcribe_compressed(vConnectPhoneme *src, vConnectP
     dst_env = new double[dst_len];
     src_to_dst = new double[src_len];
     dst_to_src = new double[dst_len];
+    dst_to_src_stretched = new double[src_len];
 
+    cout << " extract source compressed wave." << endl;
     _calculate_compressed_env(src_env, src, src_len);
+    cout << "  done." << endl;
+
+    cout << " extract target compressed wave." << endl;
     _calculate_compressed_env(dst_env, dst, dst_len);
+    cout << "  done." << endl;
 
-    vConnectUtility::calculateMatching(dst_to_src, src_to_dst, src_env, dst_env, src_len);
+    cout << " calculate matching between two phonemes." << endl;
+    for(int i = 0; i < src_len - 1; i++)
+    {
+        double tmp = (double)i / (double)src_len * (double)dst_len;
+        dst_to_src_stretched[i] = vConnectUtility::interpolateArray(tmp, dst_to_src);
+    }
+    dst_to_src_stretched[src_len-1] = dst_to_src[dst_len-1];
 
-    src->setTimeFunction(src_to_dst, src_len);
-    dst->setTimeFunction(dst_to_src, dst_len);
+    vConnectUtility::calculateMatching(dst_to_src_stretched, src_to_dst, src_env, dst_env, src_len);
 
+    for(int i = 0; i < dst_len; i++)
+    {
+        double tmp = (double)i / (double)dst_len * (double)src_len;
+        dst_to_src[i] = vConnectUtility::interpolateArray(tmp, dst_to_src_stretched) * framePeriod / 1000.0 / (double)src_len * (double)dst_len;
+    }
+
+    for(int i = 0; i < src_len; i++)
+    {
+        dst_to_src_stretched[i] = src_to_dst[i] * framePeriod / 1000.0;
+    }
+    memcpy(src_to_dst, dst_to_src_stretched, sizeof(double) * src_len);
+    cout << "  done." << endl;
+
+    src->setTimeAxis(src_to_dst, src_len);
+    dst->setTimeAxis(dst_to_src, dst_len);
+
+    delete[] dst_to_src_stretched;
     delete[] src_to_dst;
     delete[] dst_to_src;
     delete[] src_env;
@@ -120,7 +154,6 @@ void vConnectTranscriber::_transcribe_compressed(vConnectPhoneme *src, vConnectP
 void vConnectTranscriber::_calculate_compressed_env(double *dst, vConnectPhoneme *src, int length)
 {
     int fftl = 2048;
-    fftw_complex *in = new fftw_complex[fftl];
     double      *out = new double[fftl];
     double      *pow_spec = new double[fftl];
 
@@ -147,7 +180,7 @@ void vConnectTranscriber::_calculate_compressed_env(double *dst, vConnectPhoneme
 
         // ケプストラムからパワースペクトルを計算．
         mel_cep = src->getMelCepstrum(i, &mel_len);
-        vConnectUtility::extractMelCepstrum(pow_spec, fftl, mel_cep, mel_len, in, out, inverse, fs);
+        vConnectUtility::extractMelCepstrum(pow_spec, fftl, mel_cep, mel_len, spectrum, out, inverse_c2r, fs);
         getMinimumPhaseSpectrum(pow_spec, spectrum, cepstrum, fftl, forward, inverse);
 
         // Ogg ストリームから残差波形をデコード．
@@ -197,7 +230,6 @@ void vConnectTranscriber::_calculate_compressed_env(double *dst, vConnectPhoneme
     delete[] res_spec;
     delete[] res_wave;
     delete[] pow_spec;
-    delete[] in;
     delete[] out;
 }
 

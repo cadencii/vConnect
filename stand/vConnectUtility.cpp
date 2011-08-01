@@ -398,6 +398,16 @@ void vConnectUtility::calculateMatching( double* T, double* H, double* src_s, do
         l = tx; j = ty;
     }
 
+    H[0] = 0.0;
+    l = j = length - 1;
+
+    while( l > 0 && j > 0 ){
+        tx = pathX[l][j-l+512]; ty = pathY[l][j-l+512];
+        for( k = j; k > ty; k-- )
+            H[k] = (double)j - (double)( j - k ) * (double)( l - tx ) / (double)( j - ty );
+        l = tx; j = ty;
+    }
+
 /*    if(H){
         applyStretching( T, dst, length );
         for( i = 0; i < length; i++ )
