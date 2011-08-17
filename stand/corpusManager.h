@@ -43,6 +43,7 @@ public:
             enableBrightness = false;
             frequency = 0.0f;
             enableFrequency = false;
+            children = NULL;
         }
         vConnectPhoneme *p;
         bool isProcessing;
@@ -54,6 +55,7 @@ public:
 
         float frequency;
         bool enableFrequency;
+        phoneme *children;
 #if defined( STND_MULTI_THREAD )
         mutex_t waitHandle;
 #endif
@@ -78,7 +80,7 @@ public:
     /// </summary>
     /// <param name="lyric"> 検索する音素片に対応する歌詞 </param>
     /// <param name="phonemeList"> 音素片を追加するリスト </param>
-    void getPhoneme(string_t lyric, list<phoneme*> &phonemeList);
+    phoneme *getPhoneme(string_t lyric, list<phoneme*> &phonemeList);
 
     /// <summary>
     /// 今のところ分析済みファイルの読み込みを行っています．

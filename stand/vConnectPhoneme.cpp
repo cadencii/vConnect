@@ -7,12 +7,6 @@
 #include "waveFileEx/waveFileEx.h"
 #include "worldParameters.h"
 
-double vConnectPhoneme::getFrameTime(int index)
-{
-    index = max(0, min(index, timeLength - 1));
-    return t[index];
-}
-
 vConnectPhoneme::vConnectPhoneme()
 {
     timeLength = 0;
@@ -21,7 +15,7 @@ vConnectPhoneme::vConnectPhoneme()
     framePeriod = 0.0f;
 
     melCepstrum = NULL;
-    t = f0 = NULL;
+    baseTimeAxis = t = f0 = NULL;
     vorbisData = NULL;
     
     wave = NULL;
@@ -29,6 +23,7 @@ vConnectPhoneme::vConnectPhoneme()
     mode = VCNT_UNKNOWN;
     waveLength = 0;
     waveOffset = 0;
+    baseTimeLength = 0;
 }
 
 vConnectPhoneme::~vConnectPhoneme()
@@ -46,12 +41,14 @@ void vConnectPhoneme::destroy()
     }
     delete[] f0;
     delete[] t;
+    delete[] baseTimeAxis;
     delete[] vorbisData;
 
     delete[] (wave + waveOffset);
     delete[] pulseLocations;
 
     timeLength = 0;
+    baseTimeLength = 0;
     cepstrumLength = 0;
     vorbisSize = 0;
     framePeriod = 0.0f;
@@ -91,6 +88,12 @@ bool vConnectPhoneme::writePhoneme(const char* path)
     fwrite(&vorbisSize, sizeof(int), 1, fp);
     fwrite(vorbisData, vorbisSize, 1, fp);
 
+    if(baseTimeAxis)
+    {
+        fwrite(&baseTimeLength, sizeof(int), 1, fp);
+        fwrite(baseTimeAxis, sizeof(float), baseTimeLength, fp);
+    }
+
     fclose(fp);
 
     return true;
@@ -124,6 +127,15 @@ bool vConnectPhoneme::readPhoneme(const char *path)
     fread(&vorbisSize, sizeof(int), 1, fp);
     vorbisData = new char[vorbisSize];
     fread(vorbisData, vorbisSize, 1, fp);
+
+    if(fread(&baseTimeLength, sizeof(int), 1, fp) == 1 && baseTimeLength > 0)
+    {
+        baseTimeAxis = new float[baseTimeLength];
+    }
+    else
+    {
+        baseTimeLength = 0;
+    }
 
     fclose(fp);
     mode = VCNT_COMPRESSED;
@@ -533,9 +545,10 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
         {
             sum1 += wave[i] * wave[i];
         }
-        for(i = 0, j = utauParams->msFixedLength / 1000.0 * waveFile.getSamplingFrequency(); i < 2048 && j < waveLength; i++, j++)
+        float wavePos = utauParams->msLeftBlank + utauParams->msFixedLength;
+        for(i = 0, j = wavePos / 1000.0 * waveFile.getSamplingFrequency(); i < 2048 && j < waveLength - waveOffset; i++, j++)
         {
-            sum2 += wave[j] * wave[j];
+            sum2 += waveBuffer[j] * waveBuffer[j];
         }
         sum1 = max(sum1, sum2);
         sum1 = VOL_NORMALIZE / sqrt( (sum1 / 2048.0) );
@@ -558,4 +571,35 @@ void vConnectPhoneme::setTimeAxis(double *t, int length)
     {
         this->t[i] = t[i];
     }
+}
+
+void vConnectPhoneme::setBaseTimeAxis(double *base, int length)
+{
+    if(length <= 0)
+    {
+        return;
+    }
+    delete[] baseTimeAxis;
+    baseTimeAxis = new float[length];
+    baseTimeLength = length;
+    for(int i = 0; i < length; i++)
+    {
+        this->baseTimeAxis[i] = base[i];
+    }
+}
+
+double vConnectPhoneme::getFrameTime(int index)
+{
+    index = max(0, min(index, timeLength - 1));
+    return t[index];
+}
+
+double vConnectPhoneme::getBaseFrameTime(int index)
+{
+    if(baseTimeAxis == NULL)
+    {
+        return (double)index * framePeriod / 1000.0;
+    }
+    index = max(0, min(index, baseTimeLength - 1));
+    return baseTimeAxis[index];
 }

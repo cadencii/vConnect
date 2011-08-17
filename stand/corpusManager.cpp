@@ -168,9 +168,9 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
 }
 
 
-void corpusManager::getPhoneme(string_t lyric, list<phoneme*> &phonemeList)
+corpusManager::phoneme *corpusManager::getPhoneme(string_t lyric, list<phoneme*> &phonemeList)
 {
-    phoneme *p;
+    phoneme *p = NULL;
 
     // 有効な音素なら追加する．
     if((p = getPhoneme(lyric)) && p->isValid && p->p)
@@ -185,9 +185,10 @@ void corpusManager::getPhoneme(string_t lyric, list<phoneme*> &phonemeList)
     {
         if(mAppendCorpus[i])
         {
-            mAppendCorpus[i]->getPhoneme(lyric, phonemeList);
+            p->children = mAppendCorpus[i]->getPhoneme(lyric, phonemeList);
         }
     }
+    return p;
 }
 
 void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )

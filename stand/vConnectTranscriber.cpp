@@ -72,11 +72,11 @@ bool vConnectTranscriber::transcribe(string_t &src_path, string_t &dst_path, con
 
             _transcribe_compressed(&src_phoneme, &dst_phoneme);
 
-            src.getDBPath(tmp_path);
+/*            src.getDBPath(tmp_path);
             tmp_path += src_param.fileName;
             mb_conv(tmp_path, s);
             src_phoneme.writePhoneme(s.c_str());
-
+*/
             dst.getDBPath(tmp_path);
             tmp_path += dst_param.fileName;
             mb_conv(tmp_path, s);
@@ -119,20 +119,40 @@ void vConnectTranscriber::_transcribe_compressed(vConnectPhoneme *src, vConnectP
     cout << "  done." << endl;
 
     cout << " calculate matching between two phonemes." << endl;
+    cout << "   ; src length = " << src_len << ", dst length = " << dst_len << endl;
+
+    cout << "  stretch dst->src." << endl;
     for(int i = 0; i < src_len - 1; i++)
     {
         double tmp = (double)i / (double)src_len * (double)dst_len;
-        dst_to_src_stretched[i] = vConnectUtility::interpolateArray(tmp, dst_to_src);
+        if(tmp >= dst_len - 1)
+        {
+            dst_to_src_stretched[i] = dst_env[dst_len-1];
+        }
+        else
+        {
+            dst_to_src_stretched[i] = vConnectUtility::interpolateArray(tmp, dst_env);
+        }
     }
-    dst_to_src_stretched[src_len-1] = dst_to_src[dst_len-1];
+    dst_to_src_stretched[src_len-1] = dst_env[dst_len-1];
 
-    vConnectUtility::calculateMatching(dst_to_src_stretched, src_to_dst, src_env, dst_env, src_len);
+    cout << "  calculate streching function." << endl;
+    vConnectUtility::calculateMatching(dst_to_src_stretched, src_to_dst, src_env, dst_to_src_stretched, src_len);
 
-    for(int i = 0; i < dst_len; i++)
+    cout << "  stretch src->dst." << endl;
+    for(int i = 0; i < dst_len - 1; i++)
     {
         double tmp = (double)i / (double)dst_len * (double)src_len;
-        dst_to_src[i] = vConnectUtility::interpolateArray(tmp, dst_to_src_stretched) * framePeriod / 1000.0 / (double)src_len * (double)dst_len;
+        if(tmp >= src_len - 1)
+        {
+            dst_to_src[i] = dst_to_src_stretched[src_len-1];
+        }
+        else
+        {
+            dst_to_src[i] = vConnectUtility::interpolateArray(tmp, dst_to_src_stretched) * framePeriod / 1000.0 / (double)src_len * (double)dst_len;
+        }
     }
+    dst_to_src[dst_len-1] = dst_to_src_stretched[src_len-1] / (double)src_len * (double)dst_len;
 
     for(int i = 0; i < src_len; i++)
     {
@@ -141,8 +161,8 @@ void vConnectTranscriber::_transcribe_compressed(vConnectPhoneme *src, vConnectP
     memcpy(src_to_dst, dst_to_src_stretched, sizeof(double) * src_len);
     cout << "  done." << endl;
 
-    src->setTimeAxis(src_to_dst, src_len);
     dst->setTimeAxis(dst_to_src, dst_len);
+    dst->setTimeAxis(src_to_dst, src_len);
 
     delete[] dst_to_src_stretched;
     delete[] src_to_dst;

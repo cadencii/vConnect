@@ -139,8 +139,10 @@ public: // public method
     /// <param name="frameTime"> フレーム時刻 </param>
     /// <returns> 該当時刻のフレームインデックス． </returns>
     double getFrameTime(int frameTime);
+    double getBaseFrameTime(int frameTime);
 
     void setTimeAxis(double *t, int length);
+    void setBaseTimeAxis(double *base, int length);
 
 public: // public static method
     /// <summary>
@@ -176,6 +178,10 @@ private: // private field
     float *f0;
     float *t;
     char  *vorbisData;
+
+    // 転写用
+    float *baseTimeAxis;
+    int baseTimeLength;
 
     double *wave;
     int waveLength;

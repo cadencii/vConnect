@@ -393,7 +393,8 @@ int    waveFileEx::getWaveBuffer( double *dstBuffer, double leftBlank, double ri
         }
 
         int i, cpyLength;
-        cpyLength = (waveLength < endIndex - beginIndex) ? waveLength: endIndex - beginIndex;
+        endIndex = min<int>(waveLength, endIndex);
+        cpyLength = min<int>(waveLength, endIndex - beginIndex);
 
         for( i = beginIndex; i < 0; i++){
             dstBuffer[i-beginIndex] = 0.0;
