@@ -169,8 +169,9 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
         }
 
         // 音符が有効な区間に今の音素を書き込む．
-        for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame; j++, index++)
+        for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame && index < frameLength; j++, index++)
         {
+            if(index < 0){ continue; }
             int frameIndex = (j - itemThis->beginFrame) * vel;
             int briVal = briArray[index];                       // 現在の bri 値．
             int minBri = -1, maxBri = 129;
@@ -178,7 +179,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
             frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
 
             // 同じフレームを使いまわしたくない場合はここを使うとよい．
-/*
+
             frameIndex = max(2, frameIndex);
             if(frameIndex > itemThis->utauSetting.msFixedLength / framePeriod)
             {
@@ -194,7 +195,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                 {
                     frameIndex += tmpRoom - tmpDiff % tmpRoom;
                 }
-            }*/
+            }
 
             // brightness の幅を計算する．
             for(list<corpusManager::phoneme *>::iterator it = phonemeList.begin(); it != phonemeList.end(); it++)

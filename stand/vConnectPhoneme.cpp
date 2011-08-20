@@ -56,7 +56,7 @@ void vConnectPhoneme::destroy()
     waveOffset = 0;
 
     melCepstrum = NULL;
-    t = f0 = NULL;
+    baseTimeAxis = t = f0 = NULL;
     mode = VCNT_UNKNOWN;
     vorbisData = NULL;
     wave = NULL;
