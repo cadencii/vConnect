@@ -63,7 +63,11 @@ bool vConnectConverter::convert(const char* otoIni, const char *dstDir)
         fprintf(stderr,"====\n");
         fprintf(stderr, "Begin analysis : %s @ %s\n", alias.c_str(), fileName.c_str());
 
-        waveFile.readWaveFile(srcDir + "\\" + fileName);
+        if(waveFile.readWaveFile(srcDir + "\\" + fileName) != 1)
+        {
+            cout << "error ; can't open the file, " << (srcDir + "\\" + fileName).c_str() << endl;
+            continue;
+        }
         waveLength = waveFile.getWaveLength(leftBlank, rightBlank);
         wave = new double[waveLength];
         waveFile.getWaveBuffer(wave, leftBlank, rightBlank, waveLength);

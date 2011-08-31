@@ -183,7 +183,7 @@ corpusManager::phoneme *corpusManager::getPhoneme(string_t lyric, list<phoneme*>
     // アペンドがあるならそれを追加．
     for(int i = 0; i < mAppendCorpus.size(); i++)
     {
-        if(mAppendCorpus[i])
+        if(mAppendCorpus[i] && p)
         {
             p->children = mAppendCorpus[i]->getPhoneme(lyric, phonemeList);
         }
