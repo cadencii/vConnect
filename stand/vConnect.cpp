@@ -57,9 +57,25 @@ struct vConnectArg {
     vector<vector<standBP> > *controlCurves;
 };
 
-struct vorbisFile {
+class vorbisFile {
+public:
+    explicit vorbisFile(int fftLength)
+    {
+        if(fftLength > 0)
+        {
+            buf = new float[fftLength];
+        }
+        pos = 0;
+        prevPos = -1;
+    }
+    ~vorbisFile()
+    {
+        delete buf;
+    }
     OggVorbis_File ovf;
+    int prevPos;
     int pos;
+    float *buf;
 };
 
 vConnect::vConnect()
@@ -533,14 +549,14 @@ int calculateMelCepstrum( float *dst, int fftLength, list<vConnectData *> &frame
     return ret;
 }
 
-void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames, map_t<vConnectPhoneme *, OggVorbis_File *> &vorbisMap)
+void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames, map_t<vConnectPhoneme *, vorbisFile *> &vorbisMap)
 {
     memset(dst, 0, sizeof(double) * fftLength);
     float **pcm_channels;
     for(list<vConnectData *>::iterator i = frames.begin(); i != frames.end(); i++)
     {
         int count = 0;
-        map_t<vConnectPhoneme *, OggVorbis_File *>::iterator itr = vorbisMap.find((*i)->phoneme);
+        map_t<vConnectPhoneme *, vorbisFile *>::iterator itr = vorbisMap.find((*i)->phoneme);
 
         if(itr == vorbisMap.end())
         {
@@ -548,25 +564,42 @@ void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames,
         }
         else
         {
-            if(ov_pcm_seek_lap(itr->second, (*i)->index * fftLength))
+            // データが前のと一緒
+            if(itr->second->prevPos == (*i)->index)
             {
-                // シークに失敗
+                for(int j = 0; j < fftLength; j++)
+                {
+                    dst[j] += itr->second->buf[j] * (*i)->morphRatio;
+                }
                 continue;
+            }
+            // 現在位置とインデックスがずれるのでシークしないとだめ
+            if(itr->second->pos != (*i)->index)
+            {
+                if(ov_pcm_seek_lap(&(itr->second->ovf), (*i)->index * fftLength))
+                {
+                    // シークに失敗
+                    continue;
+                }
             }
             while(count < fftLength)
             {
                 int bitStream;
-                long samples = ov_read_float(itr->second, &pcm_channels, fftLength - count, &bitStream);
+                long samples = ov_read_float(&(itr->second->ovf), &pcm_channels, fftLength - count, &bitStream);
                 // 読み込み失敗．
                 if(samples <= 0){ break; }
                 
                 for(int j = 0, k = count; j < samples && k < fftLength; j++, k++)
                 {
+                    itr->second->buf[k] = pcm_channels[0][j];
                     dst[k] += pcm_channels[0][j] * (*i)->morphRatio;
                 }
                 
                 count += samples;
             }
+            // 今の位置と前の位置を更新
+            itr->second->prevPos = itr->second->pos;
+            itr->second->pos++;
         }
     }
 }
@@ -651,21 +684,21 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 #endif
 
     // 検索用ハッシュ
-    map_t<vConnectPhoneme *, OggVorbis_File *> vorbisMap;
+    map_t<vConnectPhoneme *, vorbisFile *> vorbisMap;
     for( int i = 0; i < p->phonemes->size(); i++ )
     {
         if( !(*(p->phonemes))[i] )
         {
             continue;
         }
-        OggVorbis_File *ovf = new OggVorbis_File;
-        if( (*(p->phonemes))[i]->vorbisOpen( ovf ) )
+        vorbisFile *vf = new vorbisFile(p->fftLength);
+        if( (*(p->phonemes))[i]->vorbisOpen(&(vf->ovf) ) )
         {
-            vorbisMap.insert( make_pair( (*(p->phonemes))[i], ovf ) );
+            vorbisMap.insert( make_pair( (*(p->phonemes))[i], vf ) );
         } 
         else
         {
-            delete ovf;
+            delete vf;
         }
     }
     //================================================================================================= ↑前処理
@@ -771,9 +804,9 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     }
 
     //================================================================================================= ↓後処理
-    map_t<vConnectPhoneme *, OggVorbis_File*>::iterator i;
+    map_t<vConnectPhoneme *, vorbisFile*>::iterator i;
     for( i = vorbisMap.begin(); i != vorbisMap.end(); i++) {
-        ov_clear( i->second );
+        ov_clear( &(i->second->ovf) );
         delete i->second;
     }
 
@@ -964,7 +997,7 @@ void vConnect::calculateF0( double *f0, double *dynamics )
     long frameLength = mEndFrame - beginFrame;
     long index = 0;
     long portamentoBegin, portamentoLength;
-	long previousEndFrame = LONG_MIN, vibratoBeginFrame = 0, noteBeginFrame;
+    long previousEndFrame = LONG_MIN, vibratoBeginFrame = 0, noteBeginFrame;
     int  pitIndex = 0, pbsIndex = 0, dynIndex = 0; // ControlCurve Index
 
     for( unsigned int i = 0; i < mVsq.events.eventList.size(); i++ )
@@ -995,17 +1028,17 @@ void vConnect::calculateF0( double *f0, double *dynamics )
             portamentoBegin = LONG_MAX;
         }
 
-		// vibrato 開始位置は元々の音符開始位置近辺から計算する．そこまで厳密じゃなくていいよね．
-		if( previousEndFrame > itemi->beginFrame - beginFrame )
+        // vibrato 開始位置は元々の音符開始位置近辺から計算する．そこまで厳密じゃなくていいよね．
+        if( previousEndFrame > itemi->beginFrame - beginFrame )
         {
-			vibratoBeginFrame = previousEndFrame;
-			vibratoBeginFrame += (long)( 1000.0 * mVsq.vsqTempoBp.tickToSecond( itemi->vibratoDelay ) /framePeriod );
-		}
+            vibratoBeginFrame = previousEndFrame;
+            vibratoBeginFrame += (long)( 1000.0 * mVsq.vsqTempoBp.tickToSecond( itemi->vibratoDelay ) /framePeriod );
+        }
         else
         {
-			vibratoBeginFrame = itemi->beginFrame - beginFrame;
-			vibratoBeginFrame += (long)( 1000.0 * mVsq.vsqTempoBp.tickToSecond( itemi->vibratoDelay ) /framePeriod );
-		}
+            vibratoBeginFrame = itemi->beginFrame - beginFrame;
+            vibratoBeginFrame += (long)( 1000.0 * mVsq.vsqTempoBp.tickToSecond( itemi->vibratoDelay ) /framePeriod );
+        }
 
         // ノート・ビブラート・微細振動を書く
         for( ; index < itemi->endFrame - beginFrame && index < frameLength; index++ )
@@ -1034,7 +1067,7 @@ void vConnect::calculateF0( double *f0, double *dynamics )
             /* Vibrato */
             if( index > vibratoBeginFrame )
             {
-				double pos = (double)(index - vibratoBeginFrame ) / (double)( itemi->endFrame - beginFrame - vibratoBeginFrame );
+                double pos = (double)(index - vibratoBeginFrame ) / (double)( itemi->endFrame - beginFrame - vibratoBeginFrame );
                 vibratoRate = mVibrato[itemi->vibratoHandle.getVibratoRate( pos )];
                 vibratoDepth = (double)itemi->vibratoHandle.getVibratoDepth( pos ) * 2.5 / 127.0 / 2.0;
                 vibratoTheta += vibratoRate * framePeriod / 1000.0;
@@ -1048,8 +1081,8 @@ void vConnect::calculateF0( double *f0, double *dynamics )
             {
                 vibratoTheta = 0.0;
             }
-		}
-		previousEndFrame = itemi->endFrame - beginFrame;
+        }
+        previousEndFrame = itemi->endFrame - beginFrame;
     }
 
     previousEndFrame = LONG_MIN;
