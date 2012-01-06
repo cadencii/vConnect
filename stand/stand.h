@@ -134,7 +134,7 @@ using namespace std;
 //        -------------------------------------------------------------------------------
 //          UNICODE not defined  |    N.G. (*2)            |    N.G. (*2)
 //
-// *1 patched version only. 
+// *1 patched version only.
 //    http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.9.1.bin.woe32.zip would not work
 // *2 libiconv is required in MacOSX and Linux to convert character set.
 //
@@ -149,7 +149,7 @@ typedef char char_t;
 #endif
 typedef std::basic_string<char_t,
                           char_traits<char_t>,
-                          allocator<char_t> > 
+                          allocator<char_t> >
 string_t;
 
 // winnt.hにあるTEXTマクロと同じ
@@ -249,8 +249,8 @@ void normalize_path_separator( string_t& path );
     #define __stnd_thread_start_retval unsigned int
   #endif
 #else
-  #define __stnd_declspec 
-  #define __stnd_thread_start_retval void
+  #define __stnd_declspec
+  #define __stnd_thread_start_retval int
 #endif
 
 // マルチスレッド関係のインライン関数

@@ -86,7 +86,7 @@ int main( int argc, char *argv[] ){
             }
         }
     }
-    
+
 #ifdef __TEST__
     input = "test.txt";
     output = "log.wav";
@@ -138,9 +138,10 @@ int main( int argc, char *argv[] ){
     cout << "::main; input=" << input << "; mbs_input=" << mbs_input << endl;
     cout << "::main; output=" << output << "; mbs_output=" << mbs_output << endl;
 #endif
-    if(options.convert == false ) {
-        if(options.transcribe) {
-            vConnectTranscriber::transcribe(tinput, toutput, options.encodingOtoIni.c_str());
+    if( options.convert == false ){
+        if( options.transcribe ){
+            const char *encoding = options.encodingOtoIni.c_str();
+            vConnectTranscriber::transcribe( tinput, toutput, encoding );
         } else {
             vC.synthesize( tinput, toutput, options );
         }

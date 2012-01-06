@@ -1,24 +1,14 @@
-SRC=./stand/corpusManager.cpp ./stand/main.cpp ./stand/stand.cpp \
-    ./stand/vConnect.cpp ./stand/vConnectConverter.cpp \
-    ./stand/vConnectPhoneme.cpp ./stand/vConnectUtility.cpp \
-    ./stand/mb_text.cpp \
-    \
-    ./stand/utauVoiceDB/UtauDB.cpp ./stand/utauVoiceDB/utauFreq.cpp \
-    \
-    ./stand/vsqMetaText/vsqBase.cpp ./stand/vsqMetaText/vsqBPList.cpp \
-    ./stand/vsqMetaText/vsqEventEx.cpp ./stand/vsqMetaText/vsqEventList.cpp \
-    ./stand/vsqMetaText/vsqFileEx.cpp ./stand/vsqMetaText/vsqHandle.cpp \
-    ./stand/vsqMetaText/vsqTempo.cpp \
-    \
-    ./stand/waveFileEx/waveFileEx.cpp \
-    \
-    ./stand/world/dio.cpp ./stand/world/platinum.cpp ./stand/world/star.cpp \
-    ./stand/world/platinum_v4.cpp ./stand/world/synthesis.cpp \
-    ./stand/world/synthesis_v4.cpp ./stand/world/matlabfunctions.cpp \
-    ./stand/vConnectSetting.cpp
+SRC=stand/*.cpp \
+    stand/utauVoiceDB/*.cpp \
+    stand/vsqMetaText/*.cpp \
+    stand/waveFileEx/*.cpp \
+    stand/world/*.cpp
 
-#we have more *.h's dependency
-HEADER=./stand/mb_text.h ./stand/stand.h
+HEADER=stand/*.h \
+    stand/utauVoiceDB/*.h \
+    stand/vsqMetaText/*.h \
+    stand/waveFileEx/*.h \
+    stand/world/*.h
 
 #install path of FFTW (Windows)
 PATHFFTW=
@@ -41,18 +31,24 @@ LIBFFT=fftw3
 #    dlltool --add-stdcall-underscore -d libfftw3f-3.def -l libfftw3f-3.a
 #    dlltool --add-stdcall-underscore -d libfftw3l-3.def -l libfftw3l-3.a
 
-#get libiconv (in MinGW/MSYS)
-# http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.13.tar.gz
-# http://www2d.biglobe.ne.jp/~msyk/software/libiconv/libiconv-1.13-ja-1.patch.gz
-# cd ~/src/libiconv-1.13/
-# patch -p1 -N < ../libiconv-1.13-ja-1.patch
-# ./configure --prefix=/mingw --enable-static --disable-shared
-# make
-# make install
+all: vConnect-STAND.exe
 
-vConnect-STAND.exe: $(SRC) $(HEADER)
-	g++ -finput-charset=UTF-8 -D_STND_MULTI_THREAD -D_DEBUG -DUNICODE -g -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -logg -lvorbis -lvorbisfile -lvorbisenc -o vConnect-STAND.exe
-#	g++ -finput-charset=UTF-8 -D_DEBUG -DUNICODE -s -O2 $(IPATHFFTW) $(SRC) $(LPATHFFTW) -lpthread -liconv -l$(LIBFFT) -o vConnect-STAND.exe
+vConnect-STAND.exe: $(SRC) $(HEADER) libiconv-1.13/lib/*.o
+	g++ -finput-charset=UTF-8 -DSTND_MULTI_THREAD -DUNICODE -g -s -O2 $(IPATHFFTW) $(SRC) libiconv-1.13/lib/*.o $(LPATHFFTW) -lpthread -l$(LIBFFT) -logg -lvorbis -lvorbisfile -lvorbisenc -o vConnect-STAND.exe
+
+libiconv-1.13/lib/*.o: libiconv-1.13.tar.gz
+
+libiconv-1.13.tar.gz:
+	rm -f libiconv-1.13.tar.gz
+	rm -rf libiconv-1.13
+	rm -f libiconv-1.13-ja-1.patch.gz
+	rm -f libiconv-1.13-ja-1.patch
+	wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.13.tar.gz
+	tar zxvf libiconv-1.13.tar.gz
+	wget http://www2d.biglobe.ne.jp/~msyk/software/libiconv/libiconv-1.13-ja-1.patch.gz
+	gunzip libiconv-1.13-ja-1.patch.gz
+	cd libiconv-1.13 && patch -p1 -N < ../libiconv-1.13-ja-1.patch
+	cd libiconv-1.13 && ./configure --enable-static --disable-shared && make
 
 clean:
-	$(RM) vConnect-STAND.exe
+	rm -f vConnect-STAND.exe

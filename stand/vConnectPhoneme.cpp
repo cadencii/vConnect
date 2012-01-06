@@ -17,7 +17,7 @@ vConnectPhoneme::vConnectPhoneme()
     melCepstrum = NULL;
     baseTimeAxis = t = f0 = NULL;
     vorbisData = NULL;
-    
+
     wave = NULL;
     pulseLocations = NULL;
     mode = VCNT_UNKNOWN;
@@ -331,7 +331,8 @@ long vConnectPhoneme::vorbisTell(void *vp)
 
 int vConnectPhoneme::vorbisClose( void *vp )
 {
-    delete vp;
+    V_FILE *p = (V_FILE *)vp;
+    delete p;
     return 0;
 }
 
@@ -419,7 +420,7 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
         for(i = 0; i < wLen;i++)
         {
             int tmpIndex = i + pulseIndex - (int)(0.5+T0);
-            waveform[i] = wave[max(waveOffset, tmpIndex)] * 
+            waveform[i] = wave[max(waveOffset, tmpIndex)] *
             (0.5 - 0.5*cos(2.0*PI*(double)(i+1)/((double)(wLen+1))));
         }
         for(;i < fftLength;i++)
