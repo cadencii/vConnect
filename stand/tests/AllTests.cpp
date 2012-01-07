@@ -6,8 +6,9 @@
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 
-#include "TextReaderTest.h"
 #include "EncodingConverterTest.h"
+#include "TextReaderTest.h"
+#include "TextWriterTest.h"
 
 int main( int argc, char* argv[] )
 {
