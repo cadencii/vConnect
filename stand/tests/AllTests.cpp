@@ -1,10 +1,12 @@
 #include <cppunit/TestRunner.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
+#include <cppunit/CompilerOutputter.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 
+#include "TextReaderTest.h"
 #include "EncodingConverterTest.h"
 
 int main( int argc, char* argv[] )
@@ -19,6 +21,9 @@ int main( int argc, char* argv[] )
     CppUnit::TestRunner runner;
     runner.addTest( CppUnit::TestFactoryRegistry::getRegistry().makeTest() );
     runner.run( controller );
+
+    CppUnit::CompilerOutputter outputter( &results, CppUnit::stdCOut() );
+    outputter.write();
 
     return results.wasSuccessful() ? 0 : 1;
 }
