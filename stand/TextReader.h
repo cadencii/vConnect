@@ -1,3 +1,16 @@
+/*
+ * TextReader.h
+ * Copyright © 2012 kbinani
+ *
+ * This file is part of vConnect-STAND.
+ *
+ * vConnect-STAND is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
+ *
+ * vConnect-STAND is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #ifndef __TextReader_h__
 #define __TextReader_h__
 
@@ -166,6 +179,10 @@ namespace vconnect
         }
 
     private:
+        TextReader()
+        {
+        }
+
         /**
          * マルチバイトの一文字分のデータをファイルから読み込む
          * @param buffer 読み込んだデータの格納先
