@@ -1,7 +1,7 @@
 /*
  *
- *    waveFileEx.cpp                                         
- *                              (c) HAL 2010-           
+ *    waveFileEx.cpp
+ *                              (c) HAL 2010-, kbinani 2012
  *
  *  This file is a part of STAND Library.
  * STAND Library is a wrapper library of WORLD.
@@ -23,20 +23,21 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 using namespace std;
 
 class waveFileEx{
 public:
     struct waveFormatEx {
-        short             chunkID;
-        long              chunkSize;
-        short             formatTag;
-        unsigned    short numChannels;
-        unsigned    long  samplePerSecond;
-        unsigned    long  bytesPerSecond;
-        unsigned    short blockAlign;
-        unsigned    short bitsPerSample;
+        int16_t  chunkID;
+        int32_t  chunkSize;
+        int16_t  formatTag;
+        uint16_t numChannels;
+        uint32_t samplePerSecond;
+        uint32_t bytesPerSecond;
+        uint16_t blockAlign;
+        uint16_t bitsPerSample;
     };
 
     waveFileEx();
