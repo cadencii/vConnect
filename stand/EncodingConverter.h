@@ -101,7 +101,7 @@ namespace vconnect
          * @return
          */
         static string getInternalEncoding()
-        {
+		{
             unsigned int result = 0;
             char *localeNameRaw = std::setlocale( LC_CTYPE, "" );
 #ifdef __APPLE__
@@ -148,7 +148,8 @@ namespace vconnect
          * コードページの名称から、読込み時の読込単位(バイト)を調べます
          * @return テキストファイルからの読み込み単位
          */
-        static int getBytesPerWord( string encoding ){
+        static int getBytesPerWord( string encoding )
+		{
             encoding = toLower( encoding );
             if( encoding.compare( "shift_jis" ) == 0 ){
                 return 1;
