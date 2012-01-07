@@ -9,29 +9,30 @@
 #include "time.h"
 #include "stand.h"
 #include "TextReader.h"
+#include "TextWriter.h"
 
 const int bufSize = 4096;
 
 using namespace std;
 using namespace vconnect;
 
-bool vConnectConverter::convert( const char* otoIni, const char *dstDir )
+bool vConnectConverter::convert( const char *otoIni, const char *dstDir )
 {
-    TextReader reader( otoIni, "Shift_JIS" );
-    FILE *out;
 
     char buf[bufSize];
 
     string srcDir = otoIni;
     string dstDir_s = dstDir;
-    string fileName, alias;
+    string fileName;
+    string alias;
     srcDir = srcDir.substr( 0, srcDir.rfind( PATH_SEPARATOR ) );
-    out = fopen( (dstDir_s + "oto.ini").c_str(), "w" );
 
     float leftBlank, fixedLength, rightBlank, preUtterance, voiceOverlap;
 
     int count = 0;
 
+    TextReader reader( otoIni, "Shift_JIS" );
+    TextWriter writer( (dstDir_s + "oto.ini").c_str(), "Shift_JIS", "\x0D\x0A" );
     while( false == reader.isEOF() ){
         string buffer = reader.readLine();
         if( buffer.length() == 0 ){
@@ -113,12 +114,12 @@ bool vConnectConverter::convert( const char* otoIni, const char *dstDir )
         }
         fprintf( stderr, "====\n" );
 
-        fprintf( out, "%s", line.c_str() );
+        writer.writeLine( line );
 
         delete[] wave;
     }
 
-    fclose( out );
+    writer.close();
     reader.close();
 
     return true;
