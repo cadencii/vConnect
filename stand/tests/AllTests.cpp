@@ -9,6 +9,7 @@
 #include "EncodingConverterTest.h"
 #include "TextReaderTest.h"
 #include "TextWriterTest.h"
+#include "StringUtilTest.h"
 
 int main( int argc, char* argv[] )
 {
