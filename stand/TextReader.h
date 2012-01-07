@@ -172,10 +172,22 @@ namespace vconnect
          */
         void close()
         {
-            fclose( this->fileHandle );
-            delete this->converter;
-            delete [] this->unitBuffer;
-            delete [] this->buffer;
+            if( this->fileHandle ){
+                fclose( this->fileHandle );
+            }
+            if( this->converter ){
+                delete this->converter;
+            }
+            if( this->unitBuffer ){
+                delete [] this->unitBuffer;
+            }
+            if( this->buffer ){
+                delete [] this->buffer;
+            }
+            this->fileHandle = NULL;
+            this->converter = NULL;
+            this->unitBuffer = NULL;
+            this->buffer = NULL;
         }
 
     private:
