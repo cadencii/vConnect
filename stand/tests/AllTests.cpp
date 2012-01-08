@@ -10,6 +10,7 @@
 #include "TextReaderTest.h"
 #include "TextWriterTest.h"
 #include "StringUtilTest.h"
+#include "PathTest.h"
 
 int main( int argc, char* argv[] )
 {
