@@ -1,31 +1,17 @@
 /*
  * vsqFileEx.cpp
  * Copyright (C) 2009-2011 HAL,
- * Copyright (C) 2011 kbinani.
+ * Copyright (C) 2011-2012 kbinani.
  */
 #include "vsqFileEx.h"
 
-void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string_t key, string_t value )
+void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string_t singerName, string_t otoIniPath )
 {
-    string_t::size_type indx_tab = key.find( _T( "\t" ) );
-    string_t singer_name, path_otoini;
-
-    if( indx_tab == string_t::npos )
-    {
-        singer_name = _T( "" );
-        path_otoini = key;
-    }
-    else
-    {
-        singer_name = key.substr( 0, indx_tab );
-        path_otoini = key.substr( indx_tab + 1 );
-    }
-
     // 名前登録して
-    singerMap.insert( make_pair( singer_name, target->singerIndex ) );
+    singerMap.insert( make_pair( singerName, target->singerIndex ) );
     // 中身読んで
     UtauDB *p = new UtauDB;
-    p->read( path_otoini, target->_codepage_otoini.c_str() );
+    p->read( otoIniPath, target->_codepage_otoini.c_str() );
     // リストに追加
     UtauDB::dbRegist( p );
     target->singerIndex++;
@@ -152,28 +138,17 @@ vsqFileEx::vsqFileEx()
 
 bool vsqFileEx::read( string_t file_name, runtimeOptions options )
 {
-#ifdef _DEBUG
-    cout << "vsqFileEx::read" << endl;
-#endif
     bool result = false;
     voiceDataBase.setRuntimeOptions( options );
 
-    MB_FILE *fp;
-#ifdef _DEBUG
-    cout << "vsqFileEx::read; calling mb_fopen...";
-#endif
-    fp = mb_fopen( file_name, options.encodingVsqText.c_str() );
-#ifdef _DEBUG
-    cout << " done" << endl;
-    cout << "vsqFileEx::read; (fp==NULL)=" << (fp == NULL ? "true" : "false") << endl;
-#endif
+    MB_FILE *fp = mb_fopen( file_name, options.encodingVsqText.c_str() );
 
-    bool ret = readCore( fp );
+    bool ret = readCore( fp, file_name );
     mb_fclose( fp );
     return ret;
 }
 
-bool vsqFileEx::readCore( MB_FILE *fp )
+bool vsqFileEx::readCore( MB_FILE *fp, string vsqFilePath )
 {
     if( !fp ) return false;
 
@@ -232,7 +207,21 @@ bool vsqFileEx::readCore( MB_FILE *fp )
         else if( search.compare( OBJ_NAME_OTOINI ) == 0 )
         {
             // [oto.ini]
-            setParamOtoIni( &this->voiceDataBase, left, right );
+            string_t::size_type index = left.find( _T( "\t" ) );
+            string_t singerName, otoIniPath;
+
+            if( index == string_t::npos ){
+                singerName = _T( "" );
+                otoIniPath = left;
+            }else{
+                singerName = left.substr( 0, index );
+                otoIniPath = left.substr( index + 1 );
+            }
+            if( false == Path::exists( otoIniPath ) ){
+                string directory = Path::getDirectoryName( vsqFilePath );
+                otoIniPath = Path::combine( directory, otoIniPath );
+            }
+            this->setParamOtoIni( &this->voiceDataBase, singerName, otoIniPath );
         }
         else if( search.compare( OBJ_NAME_TEMPO ) == 0 )
         {
@@ -320,7 +309,7 @@ bool vsqFileEx::readCore( MB_FILE *fp )
 
     // utau音源が無ければ合成しようがないので false.
     int size = UtauDB::dbSize();
-    
+
 #if defined( _DEBUG )
     dumpEvents();
     dumpMapIDs();

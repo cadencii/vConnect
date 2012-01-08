@@ -16,8 +16,10 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <shlwapi.h>
 #endif
 #include <string>
+#include <sys/stat.h>
 
 namespace vconnect
 {
@@ -38,7 +40,11 @@ namespace vconnect
             char resolvedPath[MAX_PATH];
             GetFullPathNameA( path.c_str(), MAX_PATH * sizeof( char ), resolvedPath, NULL );
             string result = resolvedPath;
-            return result;
+            if( exists( result ) ){
+                return result;
+            }else{
+                return "";
+            }
 #else
             char resolvedPath[PATH_MAX];
             string result = "";
@@ -77,6 +83,37 @@ namespace vconnect
                 return "\\";
             #else
                 return "/";
+            #endif
+        }
+
+        /**
+         * ディレクトリのパスを取得する
+         * @param path パス
+         * @return ディレクトリのパス
+         */
+        static string getDirectoryName( string path )
+        {
+            string separator= getDirectorySeparator();
+            string::size_type index = path.rfind( separator );
+            if( index != string::npos ){
+                return path.substr( 0, index );
+            }else{
+                return path;
+            }
+        }
+
+        /**
+         * パスが存在するかどうか調べる
+         * @param path パス
+         * @return ファイルまたはディレクトリが存在すれば true を返す
+         */
+        static bool exists( string path )
+        {
+            #ifdef _WIN32
+                return PathFileExists( path.c_str() ) ? true : false;
+            #else
+                struct stat statResult;
+                return (stat( path.c_str(), & statResult ) == 0) ? true : false;
             #endif
         }
 

@@ -1,7 +1,7 @@
 /**
  * vsqFileEx.h
  * Copyright (C) 2009-2011 HAL,
- * Copyright (C) 2011 kbinani.
+ * Copyright (C) 2011-2012 kbinani.
  */
 #ifndef __vsqFileEx_h__
 #define __vsqFileEx_h__
@@ -12,6 +12,9 @@
 #include "vsqPhonemeDB.h"
 #include "../runtimeOptions.h"
 #include "../Socket.h"
+#include "../Path.h"
+
+using namespace vconnect;
 
 /// <summary>
 /// VSQメタテキストが表現するシーケンスを取り扱うクラスです．
@@ -39,7 +42,7 @@ public:
     /// <param name="options">読み込み時の設定値．</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
     bool read( Socket socket, runtimeOptions options );
-    
+
     /// <summary>
     /// シーケンスの演奏長さを取得します．単位は秒です．
     /// </summary>
@@ -114,9 +117,10 @@ private:
     /// VSQのメタテキストを読み込みます．
     /// </summary>
     /// <param name="fp">読み込むストリーム．</param>
+    /// <param name="vsqFilePath">読み込むファイルのパス</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
-    bool readCore( MB_FILE *fp );
-    
+    bool readCore( MB_FILE *fp, string vsqFilePath );
+
     /// <summary>
     /// 指定したイベントの内容を，メタテキストの行データを元に設定します．
     /// </summary>
@@ -125,7 +129,7 @@ private:
     /// <param name="right">メタテキストの"="の右側部分</param>
     void setParamEvent( vsqEventEx *target, string_t left, string_t right );
 
-    void setParamOtoIni( vsqPhonemeDB *target, string_t left, string_t right );
+    void setParamOtoIni( vsqPhonemeDB *target, string_t singerName, string_t otoIniPath );
 
 private:
 
@@ -153,7 +157,6 @@ public:
     {
         cout << "vsqFileEx::dumpMapIDs" << endl;
         map_t<string_t, vsqEventEx *>::iterator i;
-        int j = 0;
         for( i = mMapIDs.begin(); i != mMapIDs.end(); i++ )
         {
             string s;

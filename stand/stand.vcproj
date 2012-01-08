@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisenc.lib libvorbisfile.lib"
+				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisfile.lib shlwapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -131,7 +131,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisenc.lib libvorbisfile.lib"
+				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisfile.lib shlwapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
@@ -202,7 +202,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisenc.lib libvorbisfile.lib"
+				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisfile.lib shlwapi.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
@@ -298,11 +298,111 @@
 			Name="stand"
 			>
 			<File
+				RelativePath=".\corpusManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\corpusManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EncodingConverter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mb_text.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mb_text.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Path.h"
+				>
+			</File>
+			<File
+				RelativePath=".\runtimeOptions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Socket.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stand.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\stand.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StringUtil.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TextReader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TextWriter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectConverter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectPhoneme.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectPhoneme.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectSetting.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectSetting.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectTranscriber.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectTranscriber.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectUtility.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vConnectUtility.h"
+				>
+			</File>
+			<File
+				RelativePath=".\worldParameters.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\worldParameters.h"
 				>
 			</File>
 		</Filter>
@@ -315,10 +415,6 @@
 			</File>
 			<File
 				RelativePath=".\waveFileEx\waveFileEx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\waveFileEx\waveFormatEx.h"
 				>
 			</File>
 		</Filter>
@@ -402,80 +498,12 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="vConnect"
-			>
-			<File
-				RelativePath=".\corpusManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\corpusManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\runtimeOptions.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnect.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnect.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectConverter.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectConverter.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectPhoneme.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectPhoneme.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectSetting.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectSetting.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectUtility.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectUtility.h"
-				>
-			</File>
-		</Filter>
 		<File
 			RelativePath="..\libgcc.lib"
 			>
 		</File>
 		<File
 			RelativePath="..\libiconv.lib"
-			>
-		</File>
-		<File
-			RelativePath=".\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\mb_text.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\mb_text.h"
 			>
 		</File>
 		<File

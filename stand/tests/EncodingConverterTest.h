@@ -6,7 +6,7 @@
 using namespace vconnect;
 using namespace std;
 
-class EncodingConverterTest : public CppUnit::TestFixture
+class EncodingConverterTest : public CppUnit::TestFixture, public vconnect::EncodingConverter
 {
 public:
     void testConvert()
@@ -27,6 +27,20 @@ public:
         CPPUNIT_ASSERT_EQUAL( expected, actual );
     }
 
+    void testGetCodeset()
+    {
+        string expected = "codeset";
+        string actual = getCodeset( "language_territory.codeset@modifier" );
+        CPPUNIT_ASSERT_EQUAL( expected, actual );
+
+        actual = getCodeset( "language_territory.codeset" );
+        CPPUNIT_ASSERT_EQUAL( expected, actual );
+
+        expected = "";
+        actual = getCodeset( "language_territory" );
+        CPPUNIT_ASSERT_EQUAL( expected, actual );
+    }
+
     /**
      * 指定されたパスに置かれたファイルを文字列に読み込む
      * @param path 読み込むファイルのパス
@@ -43,6 +57,7 @@ public:
 
     CPPUNIT_TEST_SUITE( EncodingConverterTest );
     CPPUNIT_TEST( testConvert );
+    CPPUNIT_TEST( testGetCodeset );
     CPPUNIT_TEST_SUITE_END();
 };
 
