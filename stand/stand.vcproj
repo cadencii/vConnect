@@ -346,11 +346,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TextReader.h"
+				RelativePath=".\TextInputStream.h"
 				>
 			</File>
 			<File
-				RelativePath=".\TextWriter.h"
+				RelativePath=".\TextOutputStream.h"
 				>
 			</File>
 			<File

@@ -1,5 +1,5 @@
 /*
- * TextReader.h
+ * TextInputStream.h
  * Copyright © 2012 kbinani
  *
  * This file is part of vConnect-STAND.
@@ -11,8 +11,8 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#ifndef __TextReader_h__
-#define __TextReader_h__
+#ifndef __TextInputStream_h__
+#define __TextInputStream_h__
 
 #include <stdio.h>
 #include "EncodingConverter.h"
@@ -23,7 +23,7 @@ namespace vconnect
      * テキストファイルを読み込むためのクラス
      * @todo 1 行が BUFFER_SIZE を超えるテキストを読む場合動作がデタラメ
      */
-    class TextReader
+    class TextInputStream
     {
     private:
         /**
@@ -63,7 +63,7 @@ namespace vconnect
          * @param path 開くファイルのパス
          * @param encoding テキストエンコーディング
          */
-        TextReader( string path, string encoding )
+        TextInputStream( string path, string encoding )
         {
             this->converter = new EncodingConverter( encoding, EncodingConverter::getInternalEncoding() );
             this->fileHandle = fopen( path.c_str(), "rb" );
@@ -77,7 +77,7 @@ namespace vconnect
         /**
          * デストラクタ
          */
-        ~TextReader()
+        ~TextInputStream()
         {
             this->close();
         }
@@ -191,7 +191,7 @@ namespace vconnect
         }
 
     private:
-        TextReader()
+        TextInputStream()
         {
         }
 

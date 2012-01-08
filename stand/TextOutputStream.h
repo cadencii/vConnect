@@ -1,5 +1,5 @@
 /*
- * TextWriter.h
+ * TextOutputStream.h
  * Copyright © 2012 kbinani
  *
  * This file is part of vConnect-STAND.
@@ -11,8 +11,8 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#ifndef __TextWriter_h__
-#define __TextWriter_h__
+#ifndef __TextOutputStream_h__
+#define __TextOutputStream_h__
 
 #include "EncodingConverter.h"
 
@@ -24,7 +24,7 @@ namespace vconnect
     /**
      * テキストファイルへの書き込みを行うためのクラス
      */
-    class TextWriter
+    class TextOutputStream
     {
     private:
         EncodingConverter *converter;
@@ -38,7 +38,7 @@ namespace vconnect
          * @param encoding 書きこむテキストのエンコーディング
          * @param newLine 改行文字列
          */
-        TextWriter( string path, string encoding, string newLine )
+        TextOutputStream( string path, string encoding, string newLine )
         {
             this->fileHandle = fopen( path.c_str(), "wb" );
             this->converter = new EncodingConverter( EncodingConverter::getInternalEncoding(), encoding );
@@ -48,7 +48,7 @@ namespace vconnect
         /**
          * デストラクタ
          */
-        ~TextWriter()
+        ~TextOutputStream()
         {
             this->close();
         }
@@ -82,7 +82,7 @@ namespace vconnect
         }
 
     private:
-        TextWriter()
+        TextOutputStream()
         {
         };
     };

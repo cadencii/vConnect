@@ -2,8 +2,8 @@
 #define __vConnectConverter_h__
 
 #include <math.h>
-#include "TextReader.h"
-#include "TextWriter.h"
+#include "TextInputStream.h"
+#include "TextOutputStream.h"
 #include "waveFileEx/waveFileEx.h"
 #include "stand.h"
 #include "vConnectPhoneme.h"
@@ -35,8 +35,8 @@ public:
         srcDir = srcDir.substr( 0, srcDir.rfind( PATH_SEPARATOR ) );
         int count = 0;
 
-        TextReader reader( otoIni, "Shift_JIS" );
-        TextWriter writer( (dstDir_s + "oto.ini").c_str(), "Shift_JIS", "\x0D\x0A" );
+        TextInputStream reader( otoIni, "Shift_JIS" );
+        TextOutputStream writer( (dstDir_s + "oto.ini").c_str(), "Shift_JIS", "\x0D\x0A" );
         while( false == reader.isEOF() ){
             string buffer = reader.readLine();
             if( buffer.length() == 0 ){

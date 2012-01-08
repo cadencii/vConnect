@@ -57,7 +57,6 @@
 		9461B9F214B97F9800F5E0EC /* vConnect-STAND */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "vConnect-STAND"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9461BA0514B97FE200F5E0EC /* corpusManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = corpusManager.cpp; sourceTree = "<group>"; };
 		9461BA0614B97FE200F5E0EC /* corpusManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = corpusManager.h; sourceTree = "<group>"; };
-		9461BA2A14B97FE200F5E0EC /* Doxyfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		9461BA2B14B97FE200F5E0EC /* EncodingConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncodingConverter.h; sourceTree = "<group>"; };
 		9461BA2C14B97FE200F5E0EC /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		9461BA2D14B97FE200F5E0EC /* mb_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mb_text.cpp; sourceTree = "<group>"; };
@@ -66,10 +65,7 @@
 		9461BA5214B97FE200F5E0EC /* Socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Socket.h; sourceTree = "<group>"; };
 		9461BA5314B97FE200F5E0EC /* stand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stand.cpp; sourceTree = "<group>"; };
 		9461BA5414B97FE200F5E0EC /* stand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stand.h; sourceTree = "<group>"; };
-		9461BA5514B97FE200F5E0EC /* stand.vcproj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = stand.vcproj; sourceTree = "<group>"; };
 		9461BA5614B97FE200F5E0EC /* StringUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtil.h; sourceTree = "<group>"; };
-		9461BA6D14B97FE200F5E0EC /* TextReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextReader.h; sourceTree = "<group>"; };
-		9461BA6E14B97FE200F5E0EC /* TextWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextWriter.h; sourceTree = "<group>"; };
 		9461BA7014B97FE200F5E0EC /* UtauDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtauDB.cpp; sourceTree = "<group>"; };
 		9461BA7114B97FE200F5E0EC /* UtauDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauDB.h; sourceTree = "<group>"; };
 		9461BA7214B97FE200F5E0EC /* utauFreq.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utauFreq.cpp; sourceTree = "<group>"; };
@@ -122,6 +118,9 @@
 		9479B90F14B988D600A3CFD4 /* libvorbis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbis.a; path = /usr/local/lib/libvorbis.a; sourceTree = "<absolute>"; };
 		9479B91014B988D600A3CFD4 /* libvorbisenc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbisenc.a; path = /usr/local/lib/libvorbisenc.a; sourceTree = "<absolute>"; };
 		9479B91114B988D600A3CFD4 /* libvorbisfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbisfile.a; path = /usr/local/lib/libvorbisfile.a; sourceTree = "<absolute>"; };
+		9479B92114B9EC3A00A3CFD4 /* Path.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Path.h; sourceTree = "<group>"; };
+		9479B92D14BA1A8100A3CFD4 /* TextInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextInputStream.h; sourceTree = "<group>"; };
+		9479B92E14BA1A8100A3CFD4 /* TextOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextOutputStream.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,19 +162,18 @@
 			children = (
 				9461BA0514B97FE200F5E0EC /* corpusManager.cpp */,
 				9461BA0614B97FE200F5E0EC /* corpusManager.h */,
-				9461BA2A14B97FE200F5E0EC /* Doxyfile */,
 				9461BA2B14B97FE200F5E0EC /* EncodingConverter.h */,
 				9461BA2C14B97FE200F5E0EC /* main.cpp */,
 				9461BA2D14B97FE200F5E0EC /* mb_text.cpp */,
 				9461BA2E14B97FE200F5E0EC /* mb_text.h */,
 				9461BA5114B97FE200F5E0EC /* runtimeOptions.h */,
 				9461BA5214B97FE200F5E0EC /* Socket.h */,
+				9479B92D14BA1A8100A3CFD4 /* TextInputStream.h */,
+				9479B92E14BA1A8100A3CFD4 /* TextOutputStream.h */,
+				9479B92114B9EC3A00A3CFD4 /* Path.h */,
 				9461BA5314B97FE200F5E0EC /* stand.cpp */,
 				9461BA5414B97FE200F5E0EC /* stand.h */,
-				9461BA5514B97FE200F5E0EC /* stand.vcproj */,
 				9461BA5614B97FE200F5E0EC /* StringUtil.h */,
-				9461BA6D14B97FE200F5E0EC /* TextReader.h */,
-				9461BA6E14B97FE200F5E0EC /* TextWriter.h */,
 				9461BA6F14B97FE200F5E0EC /* utauVoiceDB */,
 				9461BA7514B97FE200F5E0EC /* vConnect.cpp */,
 				9461BA7614B97FE200F5E0EC /* vConnect.h */,

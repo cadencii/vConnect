@@ -7,8 +7,8 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 
 #include "EncodingConverterTest.h"
-#include "TextReaderTest.h"
-#include "TextWriterTest.h"
+#include "TextInputStreamTest.h"
+#include "TextOutputStreamTest.h"
 #include "StringUtilTest.h"
 #include "PathTest.h"
 
