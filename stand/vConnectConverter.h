@@ -37,7 +37,7 @@ public:
 
         TextInputStream reader( otoIni, "Shift_JIS" );
         TextOutputStream writer( (dstDir_s + "oto.ini").c_str(), "Shift_JIS", "\x0D\x0A" );
-        while( false == reader.isEOF() ){
+        while( reader.ready() ){
             string buffer = reader.readLine();
             if( buffer.length() == 0 ){
                 continue;

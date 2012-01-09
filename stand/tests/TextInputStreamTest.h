@@ -12,7 +12,7 @@ public:
     {
         TextInputStream reader( "fixture/TextInputStream/shift_jis_crlf.txt", "Shift_JIS" );
 
-        CPPUNIT_ASSERT( false == reader.isEOF() );
+        CPPUNIT_ASSERT( true == reader.ready() );
 
         string actual;
         string expected;
@@ -20,35 +20,38 @@ public:
         expected = "だ・い・じ・け・ん";
         CPPUNIT_ASSERT_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( false == reader.isEOF() );
+        CPPUNIT_ASSERT( true == reader.ready() );
 
         actual = reader.readLine();
         expected = "社会復帰できなくなっちゃうよ";
         CPPUNIT_ASSERT_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( true == reader.isEOF() );
+        CPPUNIT_ASSERT( false == reader.ready() );
     }
 
     void testTextInputStreamUTF8()
     {
-        TextInputStream reader( "fixture/TextInputStream/utf8_lf.txt", "UTF-8" );
+        TextInputStream *textInputStream = new TextInputStream( "fixture/TextInputStream/utf8_lf.txt", "UTF-8" );
+        InputStream *reader = (InputStream *)textInputStream;
 
-        CPPUNIT_ASSERT( false == reader.isEOF() );
+        CPPUNIT_ASSERT( true == reader->ready() );
 
         string actual;
         string expected;
 
-        CPPUNIT_ASSERT( false == reader.isEOF() );
-        actual = reader.readLine();
+        CPPUNIT_ASSERT( true == reader->ready() );
+        actual = reader->readLine();
         expected = "吾輩は猫である。名前はまだ無い。";
         CPPUNIT_ASSERT_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( false == reader.isEOF() );
-        actual = reader.readLine();
+        CPPUNIT_ASSERT( true == reader->ready() );
+        actual = reader->readLine();
         expected = "どこで生れたかとんと見当がつかぬ。";
         CPPUNIT_ASSERT_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( true == reader.isEOF() );
+        CPPUNIT_ASSERT( false == reader->ready() );
+
+        delete textInputStream;
     }
 
     CPPUNIT_TEST_SUITE( TextInputStreamTest );

@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include "EncodingConverter.h"
+#include "InputStream.h"
 
 namespace vconnect
 {
@@ -23,7 +24,7 @@ namespace vconnect
      * テキストファイルを読み込むためのクラス
      * @todo 1 行が BUFFER_SIZE を超えるテキストを読む場合動作がデタラメ
      */
-    class TextInputStream
+    class TextInputStream : public InputStream
     {
     private:
         /**
@@ -159,12 +160,12 @@ namespace vconnect
         }
 
         /**
-         * ファイル読み込みがファイル末尾に達したかどうか
-         * @return ファイル末尾に達している場合 true を、そうでなければ false を返す。
+         * ストリームに対してさらに読み込めるかどうか
+         * @return 読み込める状態であれば true を返す
          */
-        bool isEOF()
+        bool ready()
         {
-            return feof( this->fileHandle ) ? true : false;
+            return feof( this->fileHandle ) ? false : true;
         }
 
         /**
