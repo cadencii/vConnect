@@ -346,6 +346,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Synthesizer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Synthesizer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Task.h"
 				>
 			</File>
@@ -363,14 +371,6 @@
 			</File>
 			<File
 				RelativePath=".\Transcriber.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnect.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnect.h"
 				>
 			</File>
 			<File

@@ -20,7 +20,7 @@ class vConnectPhoneme;
 
 namespace vconnect
 {
-    class Transcriber : Task
+    class Transcriber : public Task
     {
     public:
         Transcriber( RuntimeOption option )

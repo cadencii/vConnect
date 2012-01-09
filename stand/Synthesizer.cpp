@@ -1,18 +1,17 @@
 /*
+ * Synthesizer.cpp
+ * Copyright © 2010-2012 HAL, 2012 kbinani
  *
- *    vConnect.cpp
- *                        (c) HAL 2010-
+ * This file is part of vConnect-STAND.
  *
- *  This files is a part of v.Connect.
- * vConnect class is a main class that connects UTAU and WORLD.
- * It is consisted of spectral, pitch and dynamics calculation.
+ * vConnect-STAND is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
  *
- * These files are distributed in the hope that it will be useful,
+ * vConnect-STAND is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
  */
-#include "vConnect.h"
+#include "Synthesizer.h"
 #include "stand.h"
 #include <time.h>
 
@@ -26,9 +25,9 @@ double temporary1[TRANS_MAX];
 double temporary2[TRANS_MAX];
 double temporary3[TRANS_MAX];
 
-double vConnect::noiseWave[NOISE_LEN];
-double vConnect::mNoteFrequency[NOTE_NUM];
-double vConnect::mVibrato[VIB_NUM];
+double Synthesizer::noiseWave[NOISE_LEN];
+double Synthesizer::mNoteFrequency[NOTE_NUM];
+double Synthesizer::mVibrato[VIB_NUM];
 
 __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg );
 
@@ -78,7 +77,8 @@ public:
     float *buf;
 };
 
-vConnect::vConnect()
+Synthesizer::Synthesizer( RuntimeOption option )
+    : Task( option )
 {
     for( int i = 0; i < NOTE_NUM; i++ )
     {
@@ -102,7 +102,7 @@ vConnect::vConnect()
     mFluctTheta = 2.0 * (double)rand() / (double)RAND_MAX * ST_PI;
 }
 
-vConnect::~vConnect()
+Synthesizer::~Synthesizer()
 {
     for( unsigned int i = 0; i < mManagerList.size(); i++ )
     {
@@ -110,14 +110,14 @@ vConnect::~vConnect()
     }
 }
 
-double vConnect::getPitchFluctuation( double second )
+double Synthesizer::getPitchFluctuation( double second )
 {
     double result = 1.0 + ( sin( 12.7 * ST_PI * second ) + sin ( 7.1 * ST_PI * second ) + sin( 4.7 * ST_PI * second ) / 3.0 ) / 300.0;
 
     return result;
 }
 
-void vConnect::emptyPath( double secOffset, string output )
+void Synthesizer::emptyPath( double secOffset, string output )
 {
     waveFileEx wave;
     wave.setOffset( secOffset );
@@ -286,28 +286,28 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
     }
 }
 
-bool vConnect::synthesize( string input, string output, RuntimeOption option )
+void Synthesizer::run()
 {
+    string input = this->option.getInputPath();
+    string output = this->option.getOutputPath();
 #ifdef _DEBUG
     cout << "vConnect::synthesize; calling vsq.readVsqFile...";
 #endif
     // 読み込みこけたら帰る
-    if( false == mVsq.read( input, option ) )
-    {
+    if( false == mVsq.read( input, this->option ) ){
 #ifdef _DEBUG
         cout << "vConnect::synthesize; calling vsq.readVsqFile...done, failed";
 #endif
-        return false;
+        return;
     }
 #ifdef _DEBUG
     cout << "vConnect::synthesize; calling vsq.readVsqFile...done, successed";
 #endif
 
     // 空のときは空の wave を出力して終了
-    if( mVsq.events.eventList.empty() && UtauDB::dbSize() == 0 )
-    {
+    if( mVsq.events.eventList.empty() && UtauDB::dbSize() == 0 ){
         emptyPath( mVsq.getEndSec(), output );
-        return true;
+        return;
     }
 
     long beginFrame, frameLength, waveLength;
@@ -320,7 +320,7 @@ bool vConnect::synthesize( string input, string output, RuntimeOption option )
     for( int i = 0; i < UtauDB::dbSize(); i++ )
     {
         corpusManager *p = new corpusManager;
-        p->setUtauDB( UtauDB::dbGet( i ), option );
+        p->setUtauDB( UtauDB::dbGet( i ), this->option );
         analyze_list.clear();
         for( int j = 0; j < mVsq.events.eventList.size(); j++) {
             if( mVsq.events.eventList[j]->singerIndex == i ) {
@@ -477,11 +477,9 @@ bool vConnect::synthesize( string input, string output, RuntimeOption option )
     delete[] wave;
     delete[] f0;
     delete[] dynamics;
-
-    return true;
 }
 
-corpusManager::phoneme* vConnect::getPhoneme(string lyric, int singerIndex, vector<corpusManager *> *managers)
+corpusManager::phoneme* Synthesizer::getPhoneme(string lyric, int singerIndex, vector<corpusManager *> *managers)
 {
     corpusManager::phoneme *ret = NULL;
     if( singerIndex < managers->size() )
@@ -642,7 +640,7 @@ void appendNoise(double *wave, int length, double ratio, int *c)
     for(int i = 0; i < length; i++)
     {
         (*c)++;
-        wave[i] += ratio * vConnect::noiseWave[*c];
+        wave[i] += ratio * Synthesizer::noiseWave[*c];
         *c = *c % NOISE_LEN;
     }
 }
@@ -844,7 +842,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 #endif
 }
 
-void vConnect::calculateVsqInfo( void )
+void Synthesizer::calculateVsqInfo( void )
 {
     // 書きづらいので
     vector<vsqEventEx *> *events = &(mVsq.events.eventList);
@@ -987,7 +985,7 @@ void vConnect::calculateVsqInfo( void )
     }
 }
 
-void vConnect::calculateF0( double *f0, double *dynamics )
+void Synthesizer::calculateF0( double *f0, double *dynamics )
 {
     double pitch_change, tmp, vibratoTheta = 0.0, vibratoRate, vibratoDepth;
     long beginFrame = mVsq.events.eventList[0]->beginFrame;

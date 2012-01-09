@@ -11,11 +11,11 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- *----------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  * Mainly, these codes are about File I/O.
  *
  */
-#include "vConnect.h"
+#include "Synthesizer.h"
 #include "Converter.h"
 #include "Transcriber.h"
 #include "EncodingConverter.h"
@@ -88,8 +88,7 @@ int main( int argc, char *argv[] )
     }else if( option.isTranscribe() ){
         task = (Task *)new Transcriber( option );
     }else{
-        vConnect vC;
-        vC.synthesize( input, output, option );
+        task = (Task *)new Synthesizer( option );
     }
 
     if( task ){
