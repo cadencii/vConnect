@@ -12,8 +12,8 @@
 #include "../stand.h"
 
 struct utauParameters {
-    string_t    lyric; // こっちはワイド文字切り替え
-    string_t    fileName; // ファイル名はマルチバイト文字で固定
+    string    lyric; // こっちはワイド文字切り替え
+    string    fileName; // ファイル名はマルチバイト文字で固定
     float    msLeftBlank;
     float    msFixedLength;
     float    msRightBlank;

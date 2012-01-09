@@ -72,7 +72,7 @@ public:
     /// </summary>
     /// <param name="lyric"> 検索する音素片に対応する歌詞 </param>
     /// <returns> 検索に成功したとき該当する音素片へのポインタ，それ以外のときはNULLを返します． </returns>
-    phoneme *getPhoneme( string_t lyric );
+    phoneme *getPhoneme( string lyric );
 
     /// <summary>
     /// 歌詞にマッチする音素片を引数で指定したリストへ追加します．
@@ -80,14 +80,14 @@ public:
     /// </summary>
     /// <param name="lyric"> 検索する音素片に対応する歌詞 </param>
     /// <param name="phonemeList"> 音素片を追加するリスト </param>
-    phoneme *getPhoneme(string_t lyric, list<phoneme*> &phonemeList);
+    phoneme *getPhoneme(string lyric, list<phoneme*> &phonemeList);
 
     /// <summary>
     /// 今のところ分析済みファイルの読み込みを行っています．
     /// 動作が変わる可能性も．
     /// </summary>
     /// <param name="p">解析する音素のリスト．</param>
-    void analyze( vector<string_t> &phonemes );
+    void analyze( vector<string> &phonemes );
 
     void setCorpusSetting(librarySetting *setting);
 
@@ -98,10 +98,10 @@ public:
 
 private:
 
-    map_t<string_t, phoneme *> objectMap;
+    map_t<string, phoneme *> objectMap;
     vector<corpusManager *> mAppendCorpus;
     UtauDB *mUtauDB;
-    string_t mDBPath;
+    string mDBPath;
 
     vConnectSetting setting;
     bool mEnableExtention;

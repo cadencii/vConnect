@@ -14,13 +14,13 @@
 #ifndef __vsqLyric_h__
 #define __vsqLyric_h__
 
-#include "../stand.h" // for string_t
+#include "../stand.h" // for string
 
 class vsqLyric
 {
 public:
 
-    void setLyric( string_t right );
+    void setLyric( string right );
 
     string toString()
     {
@@ -33,8 +33,8 @@ public:
         return ret;
     }
 
-    string_t    lyric;
-    string_t    pronounce;
+    string    lyric;
+    string    pronounce;
     int        lyricDelta;
     short    consonantAdjustment;
     char    protectFlag;

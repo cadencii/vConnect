@@ -17,7 +17,7 @@
 
 #define BUFLEN 80
 
-bool utauFreq::readFrqFile( string_t input )
+bool utauFreq::readFrqFile( string input )
 {
     bool ret = false;
     FILE* fp;

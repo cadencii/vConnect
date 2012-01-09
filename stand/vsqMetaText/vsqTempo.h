@@ -25,13 +25,13 @@ public:
         tempo = DEFAULT_TEMPO;
     }
 
-    void setParameter( string_t left, string_t right );
+    void setParameter( string left, string right );
 
     long secondToTick( double second );
     double tickToSecond( long tick );
 
     /// <summary>
-    /// ƒeƒ“ƒ|’l‚ğæ“¾‚µ‚Ü‚·D
+    /// ï¿½eï¿½ï¿½ï¿½|ï¿½lï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½D
     /// </summary>
     double getTempo()
     {
@@ -41,7 +41,7 @@ public:
 public:
 
     /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg‚Ìƒeƒ“ƒ|’l‚Å‚·
+    /// ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½Ìƒeï¿½ï¿½ï¿½|ï¿½lï¿½Å‚ï¿½
     /// </summary>
     static const double DEFAULT_TEMPO;
 
@@ -49,7 +49,7 @@ public:
 private:
 
     /// <summary>
-    /// ƒeƒ“ƒ|’l
+    /// ï¿½eï¿½ï¿½ï¿½|ï¿½l
     /// </summary>
     double tempo;
 

@@ -16,7 +16,7 @@ vsqEventList::~vsqEventList()
     }
 }
 
-void vsqEventList::setParameter( string_t left, string_t right, map_t<string_t, vsqEventEx *> &id_map )
+void vsqEventList::setParameter( string left, string right, map_t<string, vsqEventEx *> &id_map )
 {
     /* If Back is EOS, Front is End Tick */
     string s;

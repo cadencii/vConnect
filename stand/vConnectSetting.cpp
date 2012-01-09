@@ -15,14 +15,14 @@
 
 #define SETTING_BUF_LEN 4096
 
-const string_t settingName[] = {
+const string settingName[] = {
     _T( "[BaseLibrary]" ),
     _T( "[BrightnessLibrary]" ),
     _T( "[LowLibrary]" ),
     _T( "[HiLibrary]" ),
 };
 
-bool librarySetting::readSetting(string_t left, string_t right)
+bool librarySetting::readSetting(string left, string right)
 {
     bool ret = true;
     string tmp;
@@ -59,15 +59,15 @@ vConnectSetting::vConnectSetting()
 
 vConnectSetting::~vConnectSetting()
 {
-    for(map_t<string_t, librarySetting*>::iterator i = libraryMap.begin(); i != libraryMap.end(); i++){
+    for(map_t<string, librarySetting*>::iterator i = libraryMap.begin(); i != libraryMap.end(); i++){
         delete i->second;
     }
 }
 
-bool vConnectSetting::readSetting( string_t path, string_t fileName, const char *code )
+bool vConnectSetting::readSetting( string path, string fileName, const char *code )
 {
     bool ret = false;
-    string_t iniName = path + fileName;
+    string iniName = path + fileName;
     string pathString;
     TextInputStream stream( pathString, code );
     mb_conv( iniName, pathString );
@@ -78,21 +78,21 @@ bool vConnectSetting::readSetting( string_t path, string_t fileName, const char 
         return ret;
     }
 
-    string_t tmp;
-    string_t left, right;
-    map_t<string_t, librarySetting*>::iterator currentParse = libraryMap.end();
+    string tmp;
+    string left, right;
+    map_t<string, librarySetting*>::iterator currentParse = libraryMap.end();
     int index;
     for( int i = 0; i < SETTING_END; i++ ){
         mb_conv( this->path, libraryArray[i]->path );// = this->path;
     }
     while( stream.ready() ){
         tmp = stream.readLine();
-        if( tmp.find( _T( "[" ) ) != string_t::npos ){
+        if( tmp.find( _T( "[" ) ) != string::npos ){
             currentParse = libraryMap.find( tmp );
             continue;
         }
         index = tmp.find( _T( "=" ) );
-        if( string_t::npos != index ){
+        if( string::npos != index ){
             left = tmp.substr( 0, index );
             right = tmp.substr( index + 1 );
         }else{

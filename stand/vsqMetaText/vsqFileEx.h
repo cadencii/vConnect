@@ -35,7 +35,7 @@ public:
     /// <param name="file_name">読み込むメタテキストファイルのパス．</param>
     /// <param name="options">読み込み時の設定値．</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
-    bool read( string_t file_name, runtimeOptions options );
+    bool read( string file_name, runtimeOptions options );
 
     /// <summary>
     /// ソケットからVSQのメタテキストを読み込みます．
@@ -56,7 +56,7 @@ public:
     /// </summary>
     /// <param name="singer_name">歌手の名前</param>
     /// <returns>歌手を特定するインデックス．歌手が見つけられなかった場合は規定値の0を返します．</returns>
-    int getSingerIndex( string_t singer_name );
+    int getSingerIndex( string singer_name );
 
     /// <summary>
     /// テンポ値を取得します．
@@ -76,7 +76,7 @@ public:
     /// </summary>
     vector<vsqBPList> controlCurves;
 
-    map_t<string_t, vsqBPList *> mMapCurves;
+    map_t<string, vsqBPList *> mMapCurves;
 
     /// <summary>
     /// シーケンス内の音符と歌手変更イベントを格納したリスト．
@@ -91,24 +91,24 @@ public:
     /// <summary>
     /// [ID#]の文字列と，その中身との紐付けを保持するマップ．
     /// </summary>
-    map_t<string_t, vsqEventEx *> mMapIDs;
+    map_t<string, vsqEventEx *> mMapIDs;
 
     /// <summary>
     /// [h#]の文字列と，その中身との紐付けを保持するマップ．
     /// </summary>
-    map_t<string_t, vsqHandle *> mMapHandles;
+    map_t<string, vsqHandle *> mMapHandles;
 
     /// <summary>
     /// メタテキストのセクション名（[]で囲われた部分）と，
     /// その内部の値を保持したオブジェクトとの紐付けを保持する．
     /// </summary>
-    //map_t<string_t, vsqBase *> objectMap;
+    //map_t<string, vsqBase *> objectMap;
 
     /// <summary>
     /// 歌手の名称（だったけ？IDSのぶぶんだったかIconIDの部分だったか忘れた）と，
     /// 歌手のインデックスとの紐付けを保持する．
     /// </summary>
-    map_t<string_t, int> singerMap;
+    map_t<string, int> singerMap;
 
 
 protected:
@@ -129,9 +129,9 @@ private:
     /// <param name="target>設定対象のイベント</param>
     /// <param name="left">メタテキストの"="の左側部分</param>
     /// <param name="right">メタテキストの"="の右側部分</param>
-    void setParamEvent( vsqEventEx *target, string_t left, string_t right );
+    void setParamEvent( vsqEventEx *target, string left, string right );
 
-    void setParamOtoIni( vsqPhonemeDB *target, string_t singerName, string_t otoIniPath );
+    void setParamOtoIni( vsqPhonemeDB *target, string singerName, string otoIniPath );
 
 private:
 
@@ -158,7 +158,7 @@ public:
     void dumpMapIDs()
     {
         cout << "vsqFileEx::dumpMapIDs" << endl;
-        map_t<string_t, vsqEventEx *>::iterator i;
+        map_t<string, vsqEventEx *>::iterator i;
         for( i = mMapIDs.begin(); i != mMapIDs.end(); i++ )
         {
             string s;
@@ -174,7 +174,7 @@ public:
     void dumpMapHandles()
     {
         cout << "vsqFileEx::dumpMapHandles" << endl;
-        map_t<string_t, vsqHandle *>::iterator i;
+        map_t<string, vsqHandle *>::iterator i;
         for( i = mMapHandles.begin(); i != mMapHandles.end(); i++ )
         {
             string s;

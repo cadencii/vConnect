@@ -27,7 +27,7 @@
 /* by the value in phoneme DataBase.                            */
 //#define __UTAU_OFFSET__
 
-const string_t controlCurveName[]={
+const string controlCurveName[]={
     _T("[PitchBendBPList]"),
     _T("[PitchBendSensBPList]"),
     _T("[DynamicsBPList]"),
@@ -55,18 +55,18 @@ enum{
     GENDER
 };
 
-const string_t OBJ_NAME_OTOINI = _T( "[oto.ini]" );
-const string_t OBJ_NAME_EVENT_LIST = _T( "[EventList]" );
-const string_t OBJ_NAME_TEMPO = _T( "[Tempo]" );
+const string OBJ_NAME_OTOINI = _T( "[oto.ini]" );
+const string OBJ_NAME_EVENT_LIST = _T( "[EventList]" );
+const string OBJ_NAME_TEMPO = _T( "[Tempo]" );
 
 /*class vsqBase
 {
 public:
-    
+
     virtual ~vsqBase()
     {
     }
-    
+
     virtual void setParameter( string_t left, string_t right )
     {
     }

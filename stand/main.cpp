@@ -24,15 +24,6 @@
 #define VCONNECT_VERSION "v.Connect-STAND ver2.0.0"
 
 int main( int argc, char *argv[] ){
-#ifdef _DEBUG
-    //setlocale( LC_CTYPE, "japanese" );
-    /*string ws = "あいうえおかきくけこ ";
-    void *v = (void *)ws.c_str();
-    FILE *f = fopen( "ws.txt", "wb" );
-    fwrite( v, sizeof( string::value_type ), ws.size(), f );
-    fclose( f );*/
-    mb_test();
-#endif
     string input = "";
     string output = "";
     vConnect vC;
@@ -128,7 +119,7 @@ int main( int argc, char *argv[] ){
     }
 #endif
 
-    string_t tinput, toutput;
+    string tinput, toutput;
     mb_conv( input, tinput );
     mb_conv( output, toutput );
 #ifdef _DEBUG

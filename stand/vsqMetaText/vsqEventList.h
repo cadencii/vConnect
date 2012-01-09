@@ -16,7 +16,7 @@ public:
 
     ~vsqEventList();
 
-    void setParameter( string_t left, string_t right, map_t<string_t, vsqEventEx *> &id_map );
+    void setParameter( string left, string right, map_t<string, vsqEventEx *> &id_map );
 
 
 public:
@@ -24,7 +24,7 @@ public:
     vector<vsqEventEx *> eventList;
 
     /// <summary>
-    /// ƒV[ƒPƒ“ƒX‚Ì’·‚³itick’PˆÊj
+    /// ï¿½Vï¿½[ï¿½Pï¿½ï¿½ï¿½Xï¿½Ì’ï¿½ï¿½ï¿½ï¿½itickï¿½Pï¿½Êj
     /// </summary>
     long endTick;
 };

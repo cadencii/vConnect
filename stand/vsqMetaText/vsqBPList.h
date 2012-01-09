@@ -28,7 +28,7 @@ public:
 
 //protected:
 
-    void setParameter( string_t left, string_t right );
+    void setParameter( string left, string right );
 
 
 private:

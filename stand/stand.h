@@ -139,19 +139,6 @@ using namespace std;
 // *2 libiconv is required in MacOSX and Linux to convert character set.
 //
 
-// ファイルから読み込んだもの(音符名など)をwstringで扱うかどうか
-// 内部のstring_tが全てwstringに変わるわけではないので注意
-// 将来的には、USE_WSTRING -> _UNICODEな感じで！
-#ifdef USE_WSTRING
-typedef wchar_t char_t;
-#else
-typedef char char_t;
-#endif
-typedef std::basic_string<char_t,
-                          char_traits<char_t>,
-                          allocator<char_t> >
-string_t;
-
 // winnt.hにあるTEXTマクロと同じ
 #ifndef _T
 #ifdef USE_WSTRING

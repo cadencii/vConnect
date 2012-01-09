@@ -12,7 +12,7 @@
  */
 #include "vsqHandle.h"
 
-void vsqLyric::setLyric( string_t right )
+void vsqLyric::setLyric( string right )
 {
     lyric = right.substr( 0, right.find( _T(",") ) );
     lyric = lyric.substr( lyric.find( _T("\"") ) + 1, lyric.rfind( _T("\"") ) - 1 );
@@ -35,7 +35,7 @@ void vsqLyric::setLyric( string_t right )
     protectFlag = atoi( s.c_str() );
 }
 
-void vsqHandle::setParameter( string_t left, string_t right )
+void vsqHandle::setParameter( string left, string right )
 {
     string s;
     if( left.compare( _T("IconID") ) == 0 )
@@ -118,7 +118,7 @@ void vsqHandle::setParameter( string_t left, string_t right )
     {
         parseBP( vibratoRate, right, false );
     }
-    else if( left.find( _T("L") ) != string_t::npos )
+    else if( left.find( _T("L") ) != string::npos )
     {
         lyric.setLyric( right );
     }
@@ -130,7 +130,7 @@ void vsqHandle::setParameter( string_t left, string_t right )
     }
 }
 
-void vsqHandle::parseBPNum( vector<vsqVibratoBP> &list, string_t str )
+void vsqHandle::parseBPNum( vector<vsqVibratoBP> &list, string str )
 {
     string s;
     mb_conv( str, s );
@@ -138,12 +138,12 @@ void vsqHandle::parseBPNum( vector<vsqVibratoBP> &list, string_t str )
     list.resize( new_size );
 }
 
-void vsqHandle::parseBP( vector<vsqVibratoBP> &list, string_t str, bool parse_x )
+void vsqHandle::parseBP( vector<vsqVibratoBP> &list, string str, bool parse_x )
 {
     string s;
-    string_t::size_type indx_comma = str.find( _T(",") );
+    string::size_type indx_comma = str.find( _T(",") );
     int indx = 1;
-    while( indx_comma != string_t::npos )
+    while( indx_comma != string::npos )
     {
         mb_conv( str.substr( 0, indx_comma ), s );
         if( list.size() <= indx )

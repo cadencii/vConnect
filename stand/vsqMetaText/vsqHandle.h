@@ -20,11 +20,11 @@
 class vsqHandle// : public vsqBase 
 {
 public:
-    void    setParameter( string_t left, string_t right );
+    void    setParameter( string left, string right );
 
-    string_t    getLyric( void ){ return lyric.lyric; }
-    string_t    getPronounce( void ){ return lyric.pronounce; }
-    string_t    getIDS( void ){ return IDS; }
+    string    getLyric( void ){ return lyric.lyric; }
+    string    getPronounce( void ){ return lyric.pronounce; }
+    string    getIDS( void ){ return IDS; }
     /**
      * ビブラート深さの値を取得しする
      * @param position 値を取得する位置．ビブラートの開始位置が0，終了位置が1となるような値を渡す
@@ -51,9 +51,9 @@ public:
 
 
 private:
-    string_t    iconID;
-    string_t    IDS;
-    string_t    caption;
+    string    iconID;
+    string    IDS;
+    string    caption;
     short    original;
     short    length;
     short    language;
@@ -77,7 +77,7 @@ private:
      * @param str 解釈するソース文字列の，"="の右側．例："DepthBPNum=1"なら"1"を渡す
      * @return [void]
      */
-    void parseBPNum( vector<vsqVibratoBP>& list, string_t str );
+    void parseBPNum( vector<vsqVibratoBP>& list, string str );
 
     /**
      * DepthBPX, DepthBPY, RateBPX, RateBPYの解釈を行う．setParameterから呼ばれる内部関数
@@ -86,7 +86,7 @@ private:
      * @param parse_x *BPXを解釈する場合にtrue, *BPYを解釈する場合にfalse
      * @return [void]
      */
-    void parseBP( vector<vsqVibratoBP>& list, string_t str, bool parse_x );
+    void parseBP( vector<vsqVibratoBP>& list, string str, bool parse_x );
 };
 
 #endif

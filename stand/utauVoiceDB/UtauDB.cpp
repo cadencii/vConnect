@@ -8,12 +8,12 @@
 
 vector<UtauDB *> UtauDB::mDBs;
 
-map_t<string_t, utauParameters *>::iterator UtauDB::begin()
+map_t<string, utauParameters *>::iterator UtauDB::begin()
 {
     return mSettingMap.begin();
 }
 
-map_t<string_t, utauParameters *>::iterator UtauDB::end()
+map_t<string, utauParameters *>::iterator UtauDB::end()
 {
     return mSettingMap.end();
 }
@@ -54,11 +54,11 @@ UtauDB::~UtauDB()
     }
 }
 
-int UtauDB::read( string_t path_oto_ini, const char *codepage )
+int UtauDB::read( string path_oto_ini, const char *codepage )
 {
     int result = 2;
 
-    string_t temp;
+    string temp;
     int index;
     path_oto_ini = Path::normalize( path_oto_ini );
 
@@ -74,8 +74,8 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
         temp = stream.readLine();
         utauParameters *current = new utauParameters();
         if( current ){
-            if( ( index = temp.find( _T(".wav") ) ) == string_t::npos ){
-                if( ( index = temp.find( _T(".stf") ) ) == string_t::npos ){
+            if( ( index = temp.find( _T(".wav") ) ) == string::npos ){
+                if( ( index = temp.find( _T(".stf") ) ) == string::npos ){
                     index = temp.find( _T("=") );
                 }
                 current->isWave = false;
@@ -134,10 +134,10 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
     return result;
 }
 
-int UtauDB::getParams( utauParameters &parameters, string_t search )
+int UtauDB::getParams( utauParameters &parameters, string search )
 {
     int    result = 0;
-    map_t<string_t, utauParameters *>::iterator i = mSettingMap.find( search );
+    map_t<string, utauParameters *>::iterator i = mSettingMap.find( search );
     if( i != mSettingMap.end() )
     {
         if( i->second )
@@ -156,7 +156,7 @@ int UtauDB::getParams( utauParameters &parameters, string_t search )
     return result;
 }
 
-int UtauDB::getDBPath( string_t &dst )
+int UtauDB::getDBPath( string &dst )
 {
     dst = mDBPath;
     return 1;

@@ -34,7 +34,7 @@ LIBFFT=fftw3
 all: vConnect-STAND.exe
 
 vConnect-STAND.exe: $(SRC) $(HEADER) libiconv-1.13/lib/*.o
-	g++ -finput-charset=UTF-8 -DSTND_MULTI_THREAD -DUNICODE -g -s -O2 $(IPATHFFTW) $(SRC) libiconv-1.13/lib/*.o $(LPATHFFTW) -lpthread -l$(LIBFFT) -logg -lvorbis -lvorbisfile -lvorbisenc -o vConnect-STAND.exe
+	g++ -finput-charset=UTF-8 -DSTND_MULTI_THREAD -g -s -O2 $(IPATHFFTW) $(SRC) libiconv-1.13/lib/*.o $(LPATHFFTW) -lpthread -l$(LIBFFT) -logg -lvorbis -lvorbisfile -lvorbisenc -o vConnect-STAND.exe
 
 libiconv-1.13/lib/*.o: libiconv-1.13.tar.gz
 
@@ -48,7 +48,7 @@ libiconv-1.13.tar.gz:
 	wget http://www2d.biglobe.ne.jp/~msyk/software/libiconv/libiconv-1.13-ja-1.patch.gz
 	gunzip libiconv-1.13-ja-1.patch.gz
 	cd libiconv-1.13 && patch -p1 -N < ../libiconv-1.13-ja-1.patch
-	cd libiconv-1.13 && ./configure --enable-static --disable-shared && make
+	cd libiconv-1.13 && ./configure --enable-static --disable-shared CFLAGS=" -O -arch i386 -arch x86_64 " && make
 
 clean:
 	rm -f vConnect-STAND.exe

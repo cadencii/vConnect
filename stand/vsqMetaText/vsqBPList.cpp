@@ -13,7 +13,7 @@
  */
 #include "vsqBPList.h"
 
-void vsqBPList::setParameter( string_t left, string_t right )
+void vsqBPList::setParameter( string left, string right )
 {
     vsqBP current;
     string s;

@@ -15,7 +15,7 @@
 
 const double vsqTempo::DEFAULT_TEMPO = 120.0;
 
-void vsqTempo::setParameter( string_t left, string_t right )
+void vsqTempo::setParameter( string left, string right )
 {
     string s;
     mb_conv( left, s );

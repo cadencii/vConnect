@@ -29,7 +29,7 @@ public: // public method
     /// </summary>
     /// <param name="path_oto_ini">oto.iniファイルのパス．</param>
     /// <param name="codepage">oto.iniファイルのテキスト・エンコーディング．</param>
-    int read( string_t fileName, const char *codepage );
+    int read( string fileName, const char *codepage );
 
     /// <summary>
     /// 指定した音素の原音のパラメータを取得します
@@ -37,7 +37,7 @@ public: // public method
     /// <param name="parameters">パラメータの格納先</param>
     /// <param name="search">パラメータを取得する音素</param>
     /// <returns>取得に失敗した場合に0，成功した場合は0以外の値を返します．</returns>
-    int getParams( utauParameters &parameters, string_t search );
+    int getParams( utauParameters &parameters, string search );
 
     int getParams( utauParameters &parameters, int index );
 
@@ -46,7 +46,7 @@ public: // public method
     /// </summary>
     /// <param name="dst">ファイルパスの格納先．</param>
     /// <returns>1を返します．</returns>
-    int getDBPath( string_t &dst );
+    int getDBPath( string &dst );
 
     /// <summary>
     /// 音素の数が0かどうかを取得します．
@@ -57,9 +57,9 @@ public: // public method
 
     int size();
 
-    map_t<string_t, utauParameters *>::iterator begin();
+    map_t<string, utauParameters *>::iterator begin();
 
-    map_t<string_t, utauParameters *>::iterator end();
+    map_t<string, utauParameters *>::iterator end();
 
 public: // public static method
 
@@ -93,9 +93,9 @@ protected: // protected field
     /// <summary>
     /// oto.iniファイルのパス．
     /// </summary>
-    string_t mDBPath;
+    string mDBPath;
 
-    map_t<string_t, utauParameters *> mSettingMap;
+    map_t<string, utauParameters *> mSettingMap;
 
     list<utauParameters *> mSettingList;
 

@@ -7,14 +7,14 @@
 
 
 // 転写システム
-bool vConnectTranscriber::transcribe(string_t &src_path, string_t &dst_path, const char *codepage)
+bool vConnectTranscriber::transcribe(string &src_path, string &dst_path, const char *codepage)
 {
     bool ret = false;
     UtauDB src, dst;
 
     src.read(src_path, codepage);
     dst.read(dst_path, codepage);
-    map_t<string_t, int> analyzedItems;
+    map_t<string, int> analyzedItems;
 
     for(int i = 0; i < src.size(); i++)
     {
@@ -24,7 +24,7 @@ bool vConnectTranscriber::transcribe(string_t &src_path, string_t &dst_path, con
         mb_conv(src_param.lyric, s);
         cout << "Begin analysis : " << s.c_str() << endl;
 
-        map_t<string_t, int>::iterator itr = analyzedItems.find(src_param.fileName);
+        map_t<string, int>::iterator itr = analyzedItems.find(src_param.fileName);
         if(itr != analyzedItems.end())
         {
             cout << " Already analyzed." << endl;
@@ -51,7 +51,7 @@ bool vConnectTranscriber::transcribe(string_t &src_path, string_t &dst_path, con
             // 圧縮形式のマッチング．
             vConnectPhoneme src_phoneme, dst_phoneme;
 
-            string_t tmp_path;
+            string tmp_path;
             src.getDBPath(tmp_path);
             tmp_path += src_param.fileName;
             mb_conv(tmp_path, s);

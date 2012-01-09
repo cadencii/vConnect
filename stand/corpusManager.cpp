@@ -23,12 +23,12 @@ corpusManager::corpusManager()
     mFrequency = 440.0;
 }
 
-void corpusManager::analyze( vector<string_t> &phonemes )
+void corpusManager::analyze( vector<string> &phonemes )
 {
     int size = phonemes.size();
     for( int i = 0; i < size; i++ )
     {
-        string_t lyric = phonemes[i];
+        string lyric = phonemes[i];
         getPhoneme( lyric );
         string str_lyric;
         mb_conv( lyric, str_lyric );
@@ -47,7 +47,7 @@ void corpusManager::analyze( vector<string_t> &phonemes )
 
 corpusManager::~corpusManager()
 {
-    map_t<string_t, phoneme *>::iterator i;
+    map_t<string, phoneme *>::iterator i;
     for( i = objectMap.begin(); i != objectMap.end(); i++ )
     {
         SAFE_DELETE( i->second->p );
@@ -65,11 +65,11 @@ corpusManager::~corpusManager()
     }
 }
 
-corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
+corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
 {
     phoneme *ret = NULL;
-    map_t<string_t, phoneme *>::iterator i;
-    string_t alphabet, vtd_path;
+    map_t<string, phoneme *>::iterator i;
+    string alphabet, vtd_path;
 
 #ifdef STND_MULTI_THREAD
     if( hMutex )
@@ -130,7 +130,7 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
         if( mUtauDB->getParams( parameters, lyric ) )
         {
             target->p = new vConnectPhoneme;
-            string_t path = mDBPath + parameters.fileName;
+            string path = mDBPath + parameters.fileName;
             string str_path;
             mb_conv( path, str_path );
             bool bResult = false;
@@ -168,7 +168,7 @@ corpusManager::phoneme *corpusManager::getPhoneme( string_t lyric )
 }
 
 
-corpusManager::phoneme *corpusManager::getPhoneme(string_t lyric, list<phoneme*> &phonemeList)
+corpusManager::phoneme *corpusManager::getPhoneme(string lyric, list<phoneme*> &phonemeList)
 {
     phoneme *p = NULL;
 
@@ -193,7 +193,7 @@ corpusManager::phoneme *corpusManager::getPhoneme(string_t lyric, list<phoneme*>
 
 void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
 {
-    string_t tmp;
+    string tmp;
     mUtauDB = p;
     if( p )
     {

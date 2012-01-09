@@ -14,7 +14,7 @@ public:
     /// <param name="src_path">転写元ディレクトリパス．</param>
     /// <param name="dst_path">転写先ディレクトリパス．</param>
     /// <returns>転写に成功したときは true，失敗時は false を返します．</returns>
-    static bool transcribe(string_t &src_path, string_t &dst_path, const char *codepage);
+    static bool transcribe(string &src_path, string &dst_path, const char *codepage);
 private:
 
     static void _transcribe_compressed(vConnectPhoneme *src, vConnectPhoneme *dst);

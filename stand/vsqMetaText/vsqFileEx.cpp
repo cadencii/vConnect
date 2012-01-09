@@ -5,7 +5,7 @@
  */
 #include "vsqFileEx.h"
 
-void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string_t singerName, string_t otoIniPath )
+void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string singerName, string otoIniPath )
 {
     // 名前登録して
     singerMap.insert( make_pair( singerName, target->singerIndex ) );
@@ -17,7 +17,7 @@ void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string_t singerName, strin
     target->singerIndex++;
 }
 
-void vsqFileEx::setParamEvent( vsqEventEx *target, string_t left, string_t right )
+void vsqFileEx::setParamEvent( vsqEventEx *target, string left, string right )
 {
     string s;
     if( left.compare( _T("Type") ) == 0 )
@@ -116,7 +116,7 @@ double vsqFileEx::getTempo()
 
 vsqFileEx::vsqFileEx()
 {
-    string_t temp;
+    string temp;
 
     controlCurves.resize( CONTROL_CURVE_NUM );
 
@@ -136,7 +136,7 @@ vsqFileEx::vsqFileEx()
     //objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
 }
 
-bool vsqFileEx::read( string_t file_name, runtimeOptions options )
+bool vsqFileEx::read( string file_name, runtimeOptions options )
 {
     bool result = false;
     voiceDataBase.setRuntimeOptions( options );
@@ -150,8 +150,8 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
 {
     if( !stream ) return false;
 
-    string_t temp, search, left, right;
-    //map_t<string_t, vsqBase *>::iterator i;
+    string temp, search, left, right;
+    //map_t<string, vsqBase *>::iterator i;
 
     while( stream->ready() ){
         temp = stream->readLine();
@@ -163,8 +163,8 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
             search = temp;
             continue;
         }
-        string_t::size_type indx_equal = temp.find( _T("=") );
-        if( indx_equal == string_t::npos ){
+        string::size_type indx_equal = temp.find( _T("=") );
+        if( indx_equal == string::npos ){
             left = temp;
             right = _T("");
         }else{
@@ -174,10 +174,10 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
 
         if( search.compare( OBJ_NAME_EVENT_LIST ) == 0 ){
             // [EventList]
-            string_t::size_type indx_comma = right.find( _T(",") );
-            while( indx_comma != string_t::npos ){
+            string::size_type indx_comma = right.find( _T(",") );
+            while( indx_comma != string::npos ){
                 // コンマが見つからなくなるまでループ
-                string_t tright = right.substr( 0, indx_comma );
+                string tright = right.substr( 0, indx_comma );
                 this->events.setParameter( left, tright, mMapIDs );
                 right = right.substr( indx_comma + 1 );
                 indx_comma = right.find( _T(",") );
@@ -185,10 +185,10 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
             this->events.setParameter( left, right, mMapIDs );
         }else if( search.compare( OBJ_NAME_OTOINI ) == 0 ){
             // [oto.ini]
-            string_t::size_type index = left.find( _T( "\t" ) );
-            string_t singerName, otoIniPath;
+            string::size_type index = left.find( _T( "\t" ) );
+            string singerName, otoIniPath;
 
-            if( index == string_t::npos ){
+            if( index == string::npos ){
                 singerName = _T( "" );
                 otoIniPath = left;
             }else{
@@ -205,21 +205,21 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
             this->vsqTempoBp.setParameter( left, right );
         }else if( search.find( _T( "[ID#" ) ) == 0 ){
             // ID
-            map_t<string_t, vsqEventEx *>::iterator i;
+            map_t<string, vsqEventEx *>::iterator i;
             i = mMapIDs.find( search );
             if( i != mMapIDs.end() && i->second ){
                 setParamEvent( i->second, left, right );
             }
         }else if( search.find( _T( "[h#" ) ) == 0 ){
             // handle
-            map_t<string_t, vsqHandle *>::iterator i;
+            map_t<string, vsqHandle *>::iterator i;
             i = mMapHandles.find( search );
             if( i != mMapHandles.end() && i->second ){
                 i->second->setParameter( left, right );
             }
         }else{
             // たぶんコントロールカーブ
-            map_t<string_t, vsqBPList *>::iterator i;
+            map_t<string, vsqBPList *>::iterator i;
             i = mMapCurves.find( search );
             if( i != mMapCurves.end() && i->second ){
                 i->second->setParameter( left, right );
@@ -252,10 +252,10 @@ double vsqFileEx::getEndSec()
      return this->vsqTempoBp.tickToSecond( getEndTick() );
 }
 
-int vsqFileEx::getSingerIndex( string_t t_search )
+int vsqFileEx::getSingerIndex( string t_search )
 {
     int ret = 0;
-    map_t<string_t, int>::iterator i = singerMap.find( t_search );
+    map_t<string, int>::iterator i = singerMap.find( t_search );
     if( i != singerMap.end() )
     {
         ret = i->second;

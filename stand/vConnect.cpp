@@ -117,7 +117,7 @@ double vConnect::getPitchFluctuation( double second )
     return result;
 }
 
-void vConnect::emptyPath( double secOffset, string_t output )
+void vConnect::emptyPath( double secOffset, string output )
 {
     waveFileEx wave;
     wave.setOffset( secOffset );
@@ -146,8 +146,9 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
 
     // 音符ごとに対応する音素を計算して合成リストへ追加していく．
     for(int i = 0; i < vsq.events.eventList.size(); i++) {
-        vsqEventEx *itemThis = vsq.events.eventList[i], *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
-        string_t lyric = itemThis->lyricHandle.getLyric();
+        vsqEventEx *itemThis = vsq.events.eventList[i];
+        vsqEventEx *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
+        string lyric = itemThis->lyricHandle.getLyric();
         list<corpusManager::phoneme *> phonemeList;
         corpusManager::phoneme *p;
         managers[itemThis->singerIndex]->getPhoneme(lyric, phonemeList);
@@ -287,7 +288,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
     }
 }
 
-bool vConnect::synthesize( string_t input, string_t output, runtimeOptions options )
+bool vConnect::synthesize( string input, string output, runtimeOptions options )
 {
 #ifdef _DEBUG
     cout << "vConnect::synthesize; calling vsq.readVsqFile...";
@@ -317,7 +318,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
 
     double *wave;
 
-    vector<string_t> analyze_list;
+    vector<string> analyze_list;
     for( int i = 0; i < UtauDB::dbSize(); i++ )
     {
         corpusManager *p = new corpusManager;
@@ -339,7 +340,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     mVsq.dumpMapIDs();
     cout << "vConnect::synthesize; calling mVsq.dumpMapIDs...done" << endl;
 #endif
-    
+
     aperiodicityLength = fftLength = getFFTLengthForStar(fs);
 
     // 準備２．合成に必要なローカル変数の初期化
@@ -434,7 +435,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     arg2.frames += i;
     arg2.wave += (int)(currentTime * fs);
     arg2.waveLength -= currentTime * fs;
-    
+
 
     hThread[0] = stnd_thread_create( synthesizeFromList, &arg1 );
     hThread[1] = stnd_thread_create( synthesizeFromList, &arg2 );
@@ -456,7 +457,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     synthesizeFromList(&arg1);
 #endif
 
-    printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / CLOCKS_PER_SEC, framePeriod * frameLength / 1000.0); 
+    printf("Done: elapsed time = %f[s] for %f[s]'s synthesis.\n", (double)(clock() - cl) / CLOCKS_PER_SEC, framePeriod * frameLength / 1000.0);
 
     // 波形のノーマライズ（振幅の絶対値が 1.0 を超えたら絶対値を 1.0 に丸める）．
     for(int i = 0; i < waveLength; i++)
@@ -484,7 +485,7 @@ bool vConnect::synthesize( string_t input, string_t output, runtimeOptions optio
     return true;
 }
 
-corpusManager::phoneme* vConnect::getPhoneme(string_t lyric, int singerIndex, vector<corpusManager *> *managers)
+corpusManager::phoneme* vConnect::getPhoneme(string lyric, int singerIndex, vector<corpusManager *> *managers)
 {
     corpusManager::phoneme *ret = NULL;
     if( singerIndex < managers->size() )
@@ -496,8 +497,8 @@ corpusManager::phoneme* vConnect::getPhoneme(string_t lyric, int singerIndex, ve
 
 int getFirstItem(
     vsqEventEx **p1,
-    vsqEventEx **p2, 
-    corpusManager::phoneme **ph1, 
+    vsqEventEx **p2,
+    corpusManager::phoneme **ph1,
     corpusManager::phoneme **ph2,
     vsqFileEx *vsq,
     vector<corpusManager *> &managers,
@@ -588,13 +589,13 @@ void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames,
                 long samples = ov_read_float(&(itr->second->ovf), &pcm_channels, fftLength - count, &bitStream);
                 // 読み込み失敗．
                 if(samples <= 0){ break; }
-                
+
                 for(int j = 0, k = count; j < samples && k < fftLength; j++, k++)
                 {
                     itr->second->buf[k] = pcm_channels[0][j];
                     dst[k] += pcm_channels[0][j] * (*i)->morphRatio;
                 }
-                
+
                 count += samples;
             }
             // 今の位置と前の位置を更新
@@ -695,7 +696,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         if( (*(p->phonemes))[i]->vorbisOpen(&(vf->ovf) ) )
         {
             vorbisMap.insert( make_pair( (*(p->phonemes))[i], vf ) );
-        } 
+        }
         else
         {
             delete vf;
@@ -733,13 +734,13 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         /* ToDo : MelCepstrum の合成結果を melCepstrum に書き込む．
                   残差波形の合成結果を starSpec に書き込む．      */
         list<vConnectData *> *frames = &(p->frames[currentFrame].dataList);
-        cepstrumLength = 
-            calculateMelCepstrum( melCepstrum, 
-                                 p->fftLength, 
+        cepstrumLength =
+            calculateMelCepstrum( melCepstrum,
+                                 p->fftLength,
                                  *frames );
-        calculateResidual( starSpec, 
-                          p->fftLength, 
-                          *frames, 
+        calculateResidual( starSpec,
+                          p->fftLength,
+                          *frames,
                           vorbisMap );
 
         if(cepstrumLength > 0)
@@ -767,7 +768,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
         fftw_execute(forward_r2c);
 
         // 合成単位に波形が含まれる場合分析して加算する．
-        calculateRawWave(impulse, residual, p->fftLength, *frames, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse); 
+        calculateRawWave(impulse, residual, p->fftLength, *frames, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse);
 
         // Gender Factor を適用したスペクトルを starSpec に書き込む．
         double stretchRatio = pow(2.0 , (double)((*(p->controlCurves))[GENDER][genIndex].value - 64) / 64.0);
@@ -851,7 +852,7 @@ void vConnect::calculateVsqInfo( void )
 {
     // 書きづらいので
     vector<vsqEventEx *> *events = &(mVsq.events.eventList);
-    string_t temp;
+    string temp;
     //vector<UtauDB*> *pDBs = this->vsq.getVoiceDBs();
     UtauDB* voiceDB;
 
@@ -865,7 +866,7 @@ void vConnect::calculateVsqInfo( void )
     for( unsigned int i = 0; i < events->size(); i++ )
     {
         vsqEventEx *itemi = mVsq.events.eventList[i];
-        
+
         // タイプ判定
         while( itemi->type == _T( "Singer" ) )
         {
@@ -909,7 +910,7 @@ void vConnect::calculateVsqInfo( void )
         itemi->utauSetting.msVoiceOverlap = msVoiceOverlap;
 
         // 空白文字が存在したときはVCV音素片
-        itemi->isVCV = ( temp.find( _T(" ") ) != string_t::npos );
+        itemi->isVCV = ( temp.find( _T(" ") ) != string::npos );
 
         // 休符の文字はとりあえず 'R', 'r' を対象にしてUTAUパラメタを初期化しておこう．
         itemi->isRest = ( temp.compare( _T("R") ) == 0 || temp.compare( _T("r") ) == 0);
@@ -940,7 +941,7 @@ void vConnect::calculateVsqInfo( void )
             (*events)[i-1]->isContinuousBack = ( (*events)[i]->beginFrame <= (*events)[i-1]->endFrame );
 
             ////* 連続時のオーバーラップの設定 */
-            
+
             if( (*events)[i-1]->isContinuousBack )
             {
                 // i 番目が CV 音素片の場合
@@ -1063,7 +1064,7 @@ void vConnect::calculateF0( double *f0, double *dynamics )
             {
                 dynamics[index] *= 1.0 - (double)( index - portamentoBegin ) / 50.0;
             }
-            
+
             /* Vibrato */
             if( index > vibratoBeginFrame )
             {

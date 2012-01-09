@@ -43,14 +43,14 @@ public: // public method
     /// <param name="options">合成時の設定．</param>
     /// <returns>合成に成功した場合true，それ以外はfalseを返します．</returns>
     bool synthesize(
-        string_t input,
-        string_t output,
+        string input,
+        string output,
         runtimeOptions options );
 
 public: // public static method
 
     static corpusManager::phoneme *getPhoneme(
-        string_t lyric,
+        string lyric,
         int singerIndex,
         vector<corpusManager *> *managers
         );
@@ -69,7 +69,7 @@ private: // private method
 private: // private static method
     // vConnect内でしか使わない関数．
     static double getPitchFluctuation( double second );
-    static void emptyPath( double secOffset, string_t output );
+    static void emptyPath( double secOffset, string output );
     
 private: // private field
     vsqFileEx mVsq;

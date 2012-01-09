@@ -30,10 +30,10 @@ public:
     librarySetting(){
         enabled = false;
     }
-    bool readSetting( string_t left, string_t right );
+    bool readSetting( string left, string right );
 
     bool enabled;
-    string_t path;
+    string path;
     int brightness;
     int noteNumber;
     double frequency;
@@ -43,10 +43,10 @@ class vConnectSetting{
 public:
     vConnectSetting();
     ~vConnectSetting();
-    bool readSetting(string_t path, string_t fileName, const char *code);
+    bool readSetting(string path, string fileName, const char *code);
     librarySetting *getLibrarySetting(vConnectSettingList settingKind){return libraryArray[settingKind];}
 private:
-    map_t<string_t, librarySetting*> libraryMap;
+    map_t<string, librarySetting*> libraryMap;
     vector<librarySetting*>          libraryArray;
     string path;
 };

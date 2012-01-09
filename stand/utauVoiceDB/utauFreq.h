@@ -20,7 +20,7 @@
 
 class utauFreq{
 public:
-    bool readFrqFile( string_t input );
+    bool readFrqFile( string input );
     void getF0Contour( double* f0, double msLeftBlank, double msRightBlank, int length );
     void getDynamics( double* dynamics, double msLeftBlank, double msRightBlank, int length );
 protected:

@@ -42,7 +42,7 @@ public:
 
         singerIndex = 0;
     }
-    //void    setParameter( string_t left, string_t right );
+    //void    setParameter( string left, string right );
 
     string toString()
     {
@@ -57,7 +57,7 @@ public:
     vsqHandle    lyricHandle;
     vsqHandle    iconHandle;
 
-    string_t            type;
+    string            type;
     long            tick;
     long            length;
     long            vibratoDelay;
