@@ -298,6 +298,14 @@
 			Name="stand"
 			>
 			<File
+				RelativePath=".\Configuration.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Converter.h"
+				>
+			</File>
+			<File
 				RelativePath=".\corpusManager.cpp"
 				>
 			</File>
@@ -338,6 +346,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Task.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TextInputStream.h"
 				>
 			</File>
@@ -346,15 +358,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Transcriber.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Transcriber.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vConnect.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\vConnect.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectConverter.h"
 				>
 			</File>
 			<File
@@ -371,14 +387,6 @@
 			</File>
 			<File
 				RelativePath=".\vConnectSetting.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectTranscriber.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vConnectTranscriber.h"
 				>
 			</File>
 			<File

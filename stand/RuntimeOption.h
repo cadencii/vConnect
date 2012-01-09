@@ -1,6 +1,6 @@
 /**
- * runtimeOptions.h
- * Copyright (C) 2010 kbinani, HAL
+ * RuntimeOption.h
+ * Copyright (C) 2010-2012 kbinani, HAL
  *
  *  This files is a part of v.Connect.
  * runtimeOptions contains data that is necessary in v.Connect.
@@ -14,6 +14,7 @@
 #define __RuntimeOption_h__
 
 #include <string>
+#include <iostream>
 
 namespace vconnect
 {

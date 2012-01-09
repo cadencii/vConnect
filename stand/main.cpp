@@ -17,7 +17,7 @@
  */
 #include "vConnect.h"
 #include "Converter.h"
-#include "vConnectTranscriber.h"
+#include "Transcriber.h"
 #include "EncodingConverter.h"
 #include "Configuration.h"
 #include <locale>
@@ -86,8 +86,7 @@ int main( int argc, char *argv[] )
     if( option.isConvert() ){
         task = (Task *)new Converter( option );
     }else if( option.isTranscribe() ){
-        const char *encoding = option.getEncodingOtoIni().c_str();
-        vConnectTranscriber::transcribe( input, output, encoding );
+        task = (Task *)new Transcriber( option );
     }else{
         vConnect vC;
         vC.synthesize( input, output, option );

@@ -15,7 +15,6 @@
 		9461BAAA14B97FE200F5E0EC /* vConnect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9461BA7514B97FE200F5E0EC /* vConnect.cpp */; };
 		9461BAAB14B97FE200F5E0EC /* vConnectPhoneme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9461BA7814B97FE200F5E0EC /* vConnectPhoneme.cpp */; };
 		9461BAAC14B97FE200F5E0EC /* vConnectSetting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9461BA7A14B97FE200F5E0EC /* vConnectSetting.cpp */; };
-		9461BAAD14B97FE200F5E0EC /* vConnectTranscriber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9461BA7C14B97FE200F5E0EC /* vConnectTranscriber.cpp */; };
 		9461BAAE14B97FE200F5E0EC /* vConnectUtility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9461BA7E14B97FE200F5E0EC /* vConnectUtility.cpp */; };
 		9461BAAF14B97FE200F5E0EC /* vsqBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9461BA8114B97FE200F5E0EC /* vsqBase.cpp */; };
 		9461BAB014B97FE200F5E0EC /* vsqBPList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9461BA8414B97FE200F5E0EC /* vsqBPList.cpp */; };
@@ -37,6 +36,7 @@
 		9479B91214B988D600A3CFD4 /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B90F14B988D600A3CFD4 /* libvorbis.a */; };
 		9479B91314B988D600A3CFD4 /* libvorbisenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B91014B988D600A3CFD4 /* libvorbisenc.a */; };
 		9479B91414B988D600A3CFD4 /* libvorbisfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B91114B988D600A3CFD4 /* libvorbisfile.a */; };
+		9479B95414BB1AE200A3CFD4 /* Transcriber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9479B95214BB1AE200A3CFD4 /* Transcriber.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -69,13 +69,10 @@
 		9461BA7414B97FE200F5E0EC /* utauParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utauParameters.h; sourceTree = "<group>"; };
 		9461BA7514B97FE200F5E0EC /* vConnect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnect.cpp; sourceTree = "<group>"; };
 		9461BA7614B97FE200F5E0EC /* vConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnect.h; sourceTree = "<group>"; };
-		9461BA7714B97FE200F5E0EC /* vConnectConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectConverter.h; sourceTree = "<group>"; };
 		9461BA7814B97FE200F5E0EC /* vConnectPhoneme.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectPhoneme.cpp; sourceTree = "<group>"; };
 		9461BA7914B97FE200F5E0EC /* vConnectPhoneme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectPhoneme.h; sourceTree = "<group>"; };
 		9461BA7A14B97FE200F5E0EC /* vConnectSetting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectSetting.cpp; sourceTree = "<group>"; };
 		9461BA7B14B97FE200F5E0EC /* vConnectSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectSetting.h; sourceTree = "<group>"; };
-		9461BA7C14B97FE200F5E0EC /* vConnectTranscriber.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectTranscriber.cpp; sourceTree = "<group>"; };
-		9461BA7D14B97FE200F5E0EC /* vConnectTranscriber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectTranscriber.h; sourceTree = "<group>"; };
 		9461BA7E14B97FE200F5E0EC /* vConnectUtility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectUtility.cpp; sourceTree = "<group>"; };
 		9461BA7F14B97FE200F5E0EC /* vConnectUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectUtility.h; sourceTree = "<group>"; };
 		9461BA8114B97FE200F5E0EC /* vsqBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vsqBase.cpp; sourceTree = "<group>"; };
@@ -119,6 +116,11 @@
 		9479B92E14BA1A8100A3CFD4 /* TextOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextOutputStream.h; sourceTree = "<group>"; };
 		9479B94414BAF55D00A3CFD4 /* Configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Configuration.h; sourceTree = "<group>"; };
 		9479B94A14BB00F800A3CFD4 /* RuntimeOption.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuntimeOption.h; sourceTree = "<group>"; };
+		9479B95114BB1ADC00A3CFD4 /* Converter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Converter.h; sourceTree = "<group>"; };
+		9479B95214BB1AE200A3CFD4 /* Transcriber.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Transcriber.cpp; sourceTree = "<group>"; };
+		9479B95314BB1AE200A3CFD4 /* Transcriber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Transcriber.h; sourceTree = "<group>"; };
+		9479B95514BB1AF400A3CFD4 /* Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
+		9479B95714BB1B2000A3CFD4 /* InputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputStream.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,29 +160,31 @@
 		9461BA0414B97FE200F5E0EC /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				9479B94414BAF55D00A3CFD4 /* Configuration.h */,
+				9479B95114BB1ADC00A3CFD4 /* Converter.h */,
 				9461BA0514B97FE200F5E0EC /* corpusManager.cpp */,
 				9461BA0614B97FE200F5E0EC /* corpusManager.h */,
 				9461BA2B14B97FE200F5E0EC /* EncodingConverter.h */,
+				9479B95714BB1B2000A3CFD4 /* InputStream.h */,
 				9461BA2C14B97FE200F5E0EC /* main.cpp */,
-				9479B94414BAF55D00A3CFD4 /* Configuration.h */,
-				9461BA5214B97FE200F5E0EC /* Socket.h */,
-				9479B92D14BA1A8100A3CFD4 /* TextInputStream.h */,
-				9479B92E14BA1A8100A3CFD4 /* TextOutputStream.h */,
 				9479B92114B9EC3A00A3CFD4 /* Path.h */,
 				9479B94A14BB00F800A3CFD4 /* RuntimeOption.h */,
+				9461BA5214B97FE200F5E0EC /* Socket.h */,
 				9461BA5314B97FE200F5E0EC /* stand.cpp */,
 				9461BA5414B97FE200F5E0EC /* stand.h */,
 				9461BA5614B97FE200F5E0EC /* StringUtil.h */,
+				9479B95514BB1AF400A3CFD4 /* Task.h */,
+				9479B92D14BA1A8100A3CFD4 /* TextInputStream.h */,
+				9479B92E14BA1A8100A3CFD4 /* TextOutputStream.h */,
+				9479B95214BB1AE200A3CFD4 /* Transcriber.cpp */,
+				9479B95314BB1AE200A3CFD4 /* Transcriber.h */,
 				9461BA6F14B97FE200F5E0EC /* utauVoiceDB */,
 				9461BA7514B97FE200F5E0EC /* vConnect.cpp */,
 				9461BA7614B97FE200F5E0EC /* vConnect.h */,
-				9461BA7714B97FE200F5E0EC /* vConnectConverter.h */,
 				9461BA7814B97FE200F5E0EC /* vConnectPhoneme.cpp */,
 				9461BA7914B97FE200F5E0EC /* vConnectPhoneme.h */,
 				9461BA7A14B97FE200F5E0EC /* vConnectSetting.cpp */,
 				9461BA7B14B97FE200F5E0EC /* vConnectSetting.h */,
-				9461BA7C14B97FE200F5E0EC /* vConnectTranscriber.cpp */,
-				9461BA7D14B97FE200F5E0EC /* vConnectTranscriber.h */,
 				9461BA7E14B97FE200F5E0EC /* vConnectUtility.cpp */,
 				9461BA7F14B97FE200F5E0EC /* vConnectUtility.h */,
 				9461BA8014B97FE200F5E0EC /* vsqMetaText */,
@@ -323,7 +327,6 @@
 				9461BAAA14B97FE200F5E0EC /* vConnect.cpp in Sources */,
 				9461BAAB14B97FE200F5E0EC /* vConnectPhoneme.cpp in Sources */,
 				9461BAAC14B97FE200F5E0EC /* vConnectSetting.cpp in Sources */,
-				9461BAAD14B97FE200F5E0EC /* vConnectTranscriber.cpp in Sources */,
 				9461BAAE14B97FE200F5E0EC /* vConnectUtility.cpp in Sources */,
 				9461BAAF14B97FE200F5E0EC /* vsqBase.cpp in Sources */,
 				9461BAB014B97FE200F5E0EC /* vsqBPList.cpp in Sources */,
@@ -341,6 +344,7 @@
 				9461BABC14B97FE200F5E0EC /* synthesis.cpp in Sources */,
 				9461BABD14B97FE200F5E0EC /* synthesis_v4.cpp in Sources */,
 				9461BABE14B97FE200F5E0EC /* worldParameters.cpp in Sources */,
+				9479B95414BB1AE200A3CFD4 /* Transcriber.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
