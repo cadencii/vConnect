@@ -16,7 +16,7 @@
  *
  */
 #include "vConnect.h"
-#include "vConnectConverter.h"
+#include "Converter.h"
 #include "vConnectTranscriber.h"
 #include "EncodingConverter.h"
 #include "Configuration.h"
@@ -81,15 +81,22 @@ int main( int argc, char *argv[] )
     cout << "::main; output=" << output << endl;
 #endif
 
+    Task *task = NULL;
+
     if( option.isConvert() ){
-        vConnectConverter converter;
-        converter.convert( input.c_str(), output.c_str() );
+        task = (Task *)new Converter( option );
     }else if( option.isTranscribe() ){
         const char *encoding = option.getEncodingOtoIni().c_str();
         vConnectTranscriber::transcribe( input, output, encoding );
     }else{
         vConnect vC;
         vC.synthesize( input, output, option );
+    }
+
+    if( task ){
+        task->run();
+        delete task;
+        task = NULL;
     }
 
     return 0;

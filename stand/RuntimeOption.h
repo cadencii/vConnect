@@ -23,18 +23,27 @@ namespace vconnect
      * vConnectでの合成時のオプション
      */
     class RuntimeOption{
+    private:
+        string encodingOtoIni;
+        string encodingVsqText;
+        string encodingVowelTable;
+        string encodingVoiceTexture;
+        string pathInput;
+        string pathOutput;
+
+        bool convert;
+        bool transcribe;
+        bool printCodesetList;
+
     public:
+        RuntimeOption()
+        {
+            this->fillDefault();
+        }
+
         RuntimeOption( int argc, char *argv[] )
         {
-            this->convert = false;
-            this->transcribe = false;
-            this->printCodesetList = false;
-            this->encodingOtoIni = "Shift_JIS";
-            this->encodingVsqText = "Shift_JIS";
-            this->encodingVowelTable = "Shift_JIS";
-            this->encodingVoiceTexture = "Shift_JIS";
-            this->pathInput = "";
-            this->pathOutput = "";
+            this->fillDefault();
 
             // 引数を読み取る
             string current_parse = "";  // いま読んでるオプション(-i, -o等)
@@ -141,20 +150,19 @@ namespace vconnect
         }
 
     private:
-        RuntimeOption()
+        void fillDefault()
         {
+            this->convert = false;
+            this->transcribe = false;
+            this->printCodesetList = false;
+            this->encodingOtoIni = "Shift_JIS";
+            this->encodingVsqText = "Shift_JIS";
+            this->encodingVowelTable = "Shift_JIS";
+            this->encodingVoiceTexture = "Shift_JIS";
+            this->pathInput = "";
+            this->pathOutput = "";
         }
 
-        string encodingOtoIni;
-        string encodingVsqText;
-        string encodingVowelTable;
-        string encodingVoiceTexture;
-        string pathInput;
-        string pathOutput;
-
-        bool convert;
-        bool transcribe;
-        bool printCodesetList;
     };
 }
 

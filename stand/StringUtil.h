@@ -75,6 +75,11 @@ namespace vconnect
             }
             return result;
         }
+
+    private:
+        StringUtil()
+        {
+        }
     };
 
 }
