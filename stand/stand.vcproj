@@ -314,14 +314,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\mb_text.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\mb_text.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Path.h"
 				>
 			</File>

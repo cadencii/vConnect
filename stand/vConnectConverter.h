@@ -2,6 +2,7 @@
 #define __vConnectConverter_h__
 
 #include <math.h>
+#include <time.h>
 #include "TextInputStream.h"
 #include "TextOutputStream.h"
 #include "waveFileEx/waveFileEx.h"

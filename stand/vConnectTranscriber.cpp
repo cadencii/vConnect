@@ -1,6 +1,5 @@
 #include "vConnectTranscriber.h"
 
-#include "mb_text.h"
 #include "utauVoiceDB/UtauDB.h"
 #include "vConnectPhoneme.h"
 #include "vConnectUtility.h"

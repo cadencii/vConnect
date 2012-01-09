@@ -30,7 +30,6 @@
 #include <vector>
 #include <list>
 
-#include "mb_text.h"
 #include "world/world.h"
 #include "waveFileEx/waveFileEx.h"
 

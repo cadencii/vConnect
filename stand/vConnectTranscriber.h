@@ -2,6 +2,7 @@
 #define __vConnectTranscriber_h__
 
 #include "stand.h"
+#include <time.h>
 
 class vConnectPhoneme;
 
