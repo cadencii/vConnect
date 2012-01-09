@@ -140,62 +140,42 @@ bool vsqFileEx::read( string_t file_name, runtimeOptions options )
 {
     bool result = false;
     voiceDataBase.setRuntimeOptions( options );
-
-    MB_FILE *fp = mb_fopen( file_name, options.encodingVsqText.c_str() );
-
-    bool ret = readCore( fp, file_name );
-    mb_fclose( fp );
+    TextInputStream *stream = new TextInputStream( file_name, options.encodingVsqText );
+    bool ret = readCore( stream, file_name );
+    delete stream;
     return ret;
 }
 
-bool vsqFileEx::readCore( MB_FILE *fp, string vsqFilePath )
+bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
 {
-    if( !fp ) return false;
+    if( !stream ) return false;
 
     string_t temp, search, left, right;
     //map_t<string_t, vsqBase *>::iterator i;
 
-    while( true )
-    {
-        bool ret = mb_fgets( temp, fp );
-#if defined( _DEBUG )
-        if( !ret )
-        {
-            cout << "vsqFileEx::readCore; mb_fgets returned false" << endl;
-        }
-        string s;
-        mb_conv( temp, s );
-        cout << "vsqFileEx::readCore; temp=" << s << endl;
-#endif
-        if( !ret ) break;
+    while( stream->ready() ){
+        temp = stream->readLine();
 
         // 空文字の場合は次へ
         if( temp.size() <= 0 ) continue;
 
-        if( temp.find( _T("[") ) == 0 )
-        {
+        if( temp.find( _T("[") ) == 0 ){
             search = temp;
             continue;
         }
         string_t::size_type indx_equal = temp.find( _T("=") );
-        if( indx_equal == string_t::npos )
-        {
+        if( indx_equal == string_t::npos ){
             left = temp;
             right = _T("");
-        }
-        else
-        {
+        }else{
             left = temp.substr( 0, indx_equal );
             right = temp.substr( indx_equal + 1 );
         }
 
-#if 1
-        if( search.compare( OBJ_NAME_EVENT_LIST ) == 0 )
-        {
+        if( search.compare( OBJ_NAME_EVENT_LIST ) == 0 ){
             // [EventList]
             string_t::size_type indx_comma = right.find( _T(",") );
-            while( indx_comma != string_t::npos )
-            {
+            while( indx_comma != string_t::npos ){
                 // コンマが見つからなくなるまでループ
                 string_t tright = right.substr( 0, indx_comma );
                 this->events.setParameter( left, tright, mMapIDs );
@@ -203,9 +183,7 @@ bool vsqFileEx::readCore( MB_FILE *fp, string vsqFilePath )
                 indx_comma = right.find( _T(",") );
             }
             this->events.setParameter( left, right, mMapIDs );
-        }
-        else if( search.compare( OBJ_NAME_OTOINI ) == 0 )
-        {
+        }else if( search.compare( OBJ_NAME_OTOINI ) == 0 ){
             // [oto.ini]
             string_t::size_type index = left.find( _T( "\t" ) );
             string_t singerName, otoIniPath;
@@ -222,43 +200,30 @@ bool vsqFileEx::readCore( MB_FILE *fp, string vsqFilePath )
                 otoIniPath = Path::combine( directory, otoIniPath );
             }
             this->setParamOtoIni( &this->voiceDataBase, singerName, otoIniPath );
-        }
-        else if( search.compare( OBJ_NAME_TEMPO ) == 0 )
-        {
+        }else if( search.compare( OBJ_NAME_TEMPO ) == 0 ){
             // [Tempo]
             this->vsqTempoBp.setParameter( left, right );
-        }
-        else if( search.find( _T( "[ID#" ) ) == 0 )
-        {
+        }else if( search.find( _T( "[ID#" ) ) == 0 ){
             // ID
             map_t<string_t, vsqEventEx *>::iterator i;
             i = mMapIDs.find( search );
-            if( i != mMapIDs.end() && i->second )
-            {
+            if( i != mMapIDs.end() && i->second ){
                 setParamEvent( i->second, left, right );
             }
-        }
-        else if( search.find( _T( "[h#" ) ) == 0 )
-        {
+        }else if( search.find( _T( "[h#" ) ) == 0 ){
             // handle
             map_t<string_t, vsqHandle *>::iterator i;
             i = mMapHandles.find( search );
-            if( i != mMapHandles.end() && i->second )
-            {
+            if( i != mMapHandles.end() && i->second ){
                 i->second->setParameter( left, right );
             }
-        }
-        else
-        {
+        }else{
             // たぶんコントロールカーブ
             map_t<string_t, vsqBPList *>::iterator i;
             i = mMapCurves.find( search );
-            if( i != mMapCurves.end() && i->second )
-            {
+            if( i != mMapCurves.end() && i->second ){
                 i->second->setParameter( left, right );
-            }
-            else
-            {
+            }else{
                 // そんなセクション名知らねー
                 string message;
                 string t_search;
@@ -267,44 +232,6 @@ bool vsqFileEx::readCore( MB_FILE *fp, string vsqFilePath )
                 cout << message << endl;
             }
         }
-
-#else
-        i = objectMap.find( search );
-        if( i != objectMap.end() )
-        {
-            if( i->second )
-            {
-                if( search.compare( _T("[EventList]") ) == 0 )
-                {
-                    string_t::size_type indx_comma = right.find( _T(",") );
-                    while( indx_comma != string_t::npos )
-                    {
-                        // コンマが見つからなくなるまでループ
-                        string_t tright = right.substr( 0, indx_comma );
-                        i->second->setParameter( left, tright );
-                        right = right.substr( indx_comma + 1 );
-                        indx_comma = right.find( _T(",") );
-                    }
-                }
-#if defined( _DEBUG )
-                string s1;
-                mb_conv( left, s1 );
-                cout << "vsqFileEx::readCore; left=" << s1 << endl;
-                mb_conv( right, s1 );
-                cout << "vsqFileEx::readCore; right=" << s1 << endl;
-#endif
-                i->second->setParameter( left, right );
-            }
-        }
-        else
-        {
-            string message;
-            string t_search;
-            mb_conv( search, t_search );
-            message = "vsqFileEx::readCore; not found: " + t_search;
-            vsqBase::outputError( message.c_str() );
-        }
-#endif
     }
 
     // utau音源が無ければ合成しようがないので false.

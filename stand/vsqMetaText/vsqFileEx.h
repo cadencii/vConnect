@@ -13,6 +13,8 @@
 #include "../runtimeOptions.h"
 #include "../Socket.h"
 #include "../Path.h"
+#include "../InputStream.h"
+#include "../TextInputStream.h"
 
 using namespace vconnect;
 
@@ -116,10 +118,10 @@ private:
     /// <summary>
     /// VSQのメタテキストを読み込みます．
     /// </summary>
-    /// <param name="fp">読み込むストリーム．</param>
+    /// <param name="stream">読み込むストリーム．</param>
     /// <param name="vsqFilePath">読み込むファイルのパス</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
-    bool readCore( MB_FILE *fp, string vsqFilePath );
+    bool readCore( InputStream *stream, string vsqFilePath );
 
     /// <summary>
     /// 指定したイベントの内容を，メタテキストの行データを元に設定します．
