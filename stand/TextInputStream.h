@@ -165,7 +165,11 @@ namespace vconnect
          */
         bool ready()
         {
-            return feof( this->fileHandle ) ? false : true;
+            if( this->fileHandle ){
+                return feof( this->fileHandle ) ? false : true;
+            }else{
+                return false;
+            }
         }
 
         /**

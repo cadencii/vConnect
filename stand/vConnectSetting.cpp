@@ -29,7 +29,7 @@ bool librarySetting::readSetting(string_t left, string_t right)
     if( left.compare( _T( "Enable" ) ) == 0 ){
         enabled = (right.compare( _T( "0" ) ) == 1);
     }else if( left.compare( _T( "Brightness" ) ) == 0 ){
-        mb_conv( right, tmp ); 
+        mb_conv( right, tmp );
         brightness = atoi( tmp.c_str() );
     }else if( left.compare( _T( "NoteNumber" ) ) == 0 ){
         mb_conv( right, tmp );
@@ -64,18 +64,17 @@ vConnectSetting::~vConnectSetting()
     }
 }
 
-bool vConnectSetting::readSetting(string_t path, string_t fileName, const char *code)
+bool vConnectSetting::readSetting( string_t path, string_t fileName, const char *code )
 {
     bool ret = false;
     string_t iniName = path + fileName;
     string pathString;
-    MB_FILE *fp;
+    TextInputStream stream( pathString, code );
     mb_conv( iniName, pathString );
-    fp = mb_fopen( pathString, code );
 
     mb_conv( path + _T( "" ), this->path );
 
-    if( !fp ){
+    if( false == stream.ready() ){
         return ret;
     }
 
@@ -86,7 +85,8 @@ bool vConnectSetting::readSetting(string_t path, string_t fileName, const char *
     for( int i = 0; i < SETTING_END; i++ ){
         mb_conv( this->path, libraryArray[i]->path );// = this->path;
     }
-    while( mb_fgets( tmp, fp ) ){
+    while( stream.ready() ){
+        tmp = stream.readLine();
         if( tmp.find( _T( "[" ) ) != string_t::npos ){
             currentParse = libraryMap.find( tmp );
             continue;
@@ -104,7 +104,7 @@ bool vConnectSetting::readSetting(string_t path, string_t fileName, const char *
         }
     }
     ret = true;
-    mb_fclose( fp );
+    stream.close();
 
     return ret;
 }

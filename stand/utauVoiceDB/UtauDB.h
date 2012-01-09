@@ -10,6 +10,10 @@
 #include "utauParameters.h"
 #include "utauFreq.h"
 #include "../stand.h"
+#include "../TextInputStream.h"
+#include "../Path.h"
+
+using namespace vconnect;
 
 /// <summary>
 /// UTAU音源を管理する機能を提供します．
@@ -54,11 +58,11 @@ public: // public method
     int size();
 
     map_t<string_t, utauParameters *>::iterator begin();
-    
+
     map_t<string_t, utauParameters *>::iterator end();
-    
+
 public: // public static method
-    
+
     /// <summary>
     /// 読込済みのUTAU音源の個数を取得します．
     /// </summary>
