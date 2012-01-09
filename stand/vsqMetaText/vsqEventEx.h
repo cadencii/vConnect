@@ -78,7 +78,7 @@ public:
     long            beginFrame;
     long            endFrame;
 
-    utauParameters    utauSetting;
+    UtauParameter    utauSetting;
 };
 
 #endif

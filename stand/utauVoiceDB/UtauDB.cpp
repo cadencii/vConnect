@@ -1,19 +1,26 @@
 /*
  * UtauDB.cpp
+ * Copyright © 2009-2012 HAL, 2012 kbinani
  *
- * Copyright (C) 2009-2011 HAL,
- * Copyright (C) 2011 kbinani.
+ * This file is part of vConnect-STAND.
+ *
+ * vConnect-STAND is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
+ *
+ * vConnect-STAND is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "UtauDB.h"
 
 vector<UtauDB *> UtauDB::mDBs;
 
-map_t<string, utauParameters *>::iterator UtauDB::begin()
+map_t<string, UtauParameter *>::iterator UtauDB::begin()
 {
     return mSettingMap.begin();
 }
 
-map_t<string, utauParameters *>::iterator UtauDB::end()
+map_t<string, UtauParameter *>::iterator UtauDB::end()
 {
     return mSettingMap.end();
 }
@@ -44,7 +51,7 @@ void UtauDB::dbClear()
 
 UtauDB::~UtauDB()
 {
-    list<utauParameters*>::iterator i;
+    list<UtauParameter*>::iterator i;
     for( i = mSettingList.begin(); i != mSettingList.end(); i++ )
     {
         if( (*i) )
@@ -58,7 +65,6 @@ int UtauDB::read( string path_oto_ini, const char *codepage )
 {
     int result = 2;
 
-    string temp;
     int index;
     path_oto_ini = Path::normalize( path_oto_ini );
 
@@ -71,54 +77,13 @@ int UtauDB::read( string path_oto_ini, const char *codepage )
     mDBPath = path_oto_ini.substr( 0, path_oto_ini.rfind( Path::getDirectorySeparator() ) + 1 );
 
     while( stream.ready() ){
-        temp = stream.readLine();
-        utauParameters *current = new utauParameters();
-        if( current ){
-            if( ( index = temp.find( ".wav" ) ) == string::npos ){
-                if( ( index = temp.find( ".stf" ) ) == string::npos ){
-                    index = temp.find( "=" );
-                }
-                current->isWave = false;
-            }else{
-                current->isWave = true;
-            }
-
-            current->fileName = Path::normalize( current->fileName );
-            current->fileName = temp.substr( 0, index );
-
-            /* When no lyric symbol exists, voiceDB will use fileName instead. */
-            if( temp.find( "=" ) + 1 == temp.find( "," ) ){
-                current->lyric = current->fileName;
-            }else{
-                current->lyric = temp.substr( temp.find( "=" ) + 1 );
-                current->lyric = current->lyric.substr( 0, current->lyric.find( "," ) );
-            }
-
-            temp = temp.substr( temp.find( "," ) + 1 );
-            current->msLeftBlank = (float)atof( temp.c_str() );
-
-            temp = temp.substr( temp.find( "," ) + 1 );
-            current->msFixedLength = (float)atof( temp.c_str() );
-
-            temp = temp.substr( temp.find( "," ) + 1 );
-            current->msRightBlank = (float)atof( temp.c_str() );
-
-            temp = temp.substr( temp.find( "," ) + 1 );
-            current->msPreUtterance = (float)atof( temp.c_str() );
-
-            temp = temp.substr( temp.find( "," ) + 1 );
-            current->msVoiceOverlap = (float)atof( temp.c_str() );
-
-            mSettingMap.insert( make_pair( current->lyric, current ) );
-            if( current->lyric.compare( current->fileName ) != 0 ){
-                mSettingMap.insert( make_pair( current->fileName, current ) );
-            }
-            mSettingList.push_back( current );
-
-        }else{
-            result = 3;
-            break;
+        string line = stream.readLine();
+        UtauParameter *current = new UtauParameter( line );
+        mSettingMap.insert( make_pair( current->lyric, current ) );
+        if( current->lyric.compare( current->fileName ) != 0 ){
+            mSettingMap.insert( make_pair( current->fileName, current ) );
         }
+        mSettingList.push_back( current );
     }
     if( result != 3 ){
         result = 1;
@@ -128,10 +93,10 @@ int UtauDB::read( string path_oto_ini, const char *codepage )
     return result;
 }
 
-int UtauDB::getParams( utauParameters &parameters, string search )
+int UtauDB::getParams( UtauParameter &parameters, string search )
 {
     int    result = 0;
-    map_t<string, utauParameters *>::iterator i = mSettingMap.find( search );
+    map_t<string, UtauParameter *>::iterator i = mSettingMap.find( search );
     if( i != mSettingMap.end() )
     {
         if( i->second )
@@ -166,10 +131,10 @@ int UtauDB::size()
     return mSettingList.size();
 }
 
-int UtauDB::getParams(utauParameters &parameters, int index)
+int UtauDB::getParams(UtauParameter &parameters, int index)
 {
     int ret = 0;
-    list<utauParameters*>::iterator it = mSettingList.begin();
+    list<UtauParameter*>::iterator it = mSettingList.begin();
     for(int i = 0; i < size() && it != mSettingList.end(); i++, it++)
     {
         if(index == i)

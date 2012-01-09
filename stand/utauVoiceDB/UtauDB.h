@@ -1,13 +1,20 @@
 /*
  * UtauDB.h
+ * Copyright © 2009-2012 HAL, 2012 kbinani
  *
- * Copyright (C) 2009-2011 HAL,
- * Copyright (C) 2011 kbinani.
+ * This file is part of vConnect-STAND.
+ *
+ * vConnect-STAND is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
+ *
+ * vConnect-STAND is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #ifndef __UtauDB_h__
 #define __UtauDB_h__
 
-#include "utauParameters.h"
+#include "UtauParameter.h"
 #include "utauFreq.h"
 #include "../stand.h"
 #include "../TextInputStream.h"
@@ -37,9 +44,9 @@ public: // public method
     /// <param name="parameters">パラメータの格納先</param>
     /// <param name="search">パラメータを取得する音素</param>
     /// <returns>取得に失敗した場合に0，成功した場合は0以外の値を返します．</returns>
-    int getParams( utauParameters &parameters, string search );
+    int getParams( UtauParameter &parameters, string search );
 
-    int getParams( utauParameters &parameters, int index );
+    int getParams( UtauParameter &parameters, int index );
 
     /// <summary>
     /// oto.iniファイルのパスを取得します．
@@ -57,9 +64,9 @@ public: // public method
 
     int size();
 
-    map_t<string, utauParameters *>::iterator begin();
+    map_t<string, UtauParameter *>::iterator begin();
 
-    map_t<string, utauParameters *>::iterator end();
+    map_t<string, UtauParameter *>::iterator end();
 
 public: // public static method
 
@@ -95,9 +102,9 @@ protected: // protected field
     /// </summary>
     string mDBPath;
 
-    map_t<string, utauParameters *> mSettingMap;
+    map_t<string, UtauParameter *> mSettingMap;
 
-    list<utauParameters *> mSettingList;
+    list<UtauParameter *> mSettingList;
 
 
 private: // private static field

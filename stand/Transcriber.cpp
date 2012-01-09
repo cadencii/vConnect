@@ -32,7 +32,7 @@ void Transcriber::run()
     map_t<string, int> analyzedItems;
 
     for( int i = 0; i < src.size(); i++ ){
-        utauParameters src_param, dst_param;
+        UtauParameter src_param, dst_param;
         src.getParams(src_param, i);
         cout << "Begin analysis : " << src_param.lyric << endl;
 

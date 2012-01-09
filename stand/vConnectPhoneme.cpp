@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "vConnectUtility.h"
 #include "world/world.h"
-#include "utauVoiceDB/utauParameters.h"
 #include "waveFileEx/waveFileEx.h"
 #include "worldParameters.h"
 
@@ -444,7 +443,7 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
     }
 }
 
-bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauParams, double framePeriod)
+bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauParams, double framePeriod)
 {
     if(!utauParams)
     {

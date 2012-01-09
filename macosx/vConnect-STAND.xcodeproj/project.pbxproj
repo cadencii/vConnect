@@ -66,7 +66,6 @@
 		9461BA7114B97FE200F5E0EC /* UtauDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauDB.h; sourceTree = "<group>"; };
 		9461BA7214B97FE200F5E0EC /* utauFreq.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utauFreq.cpp; sourceTree = "<group>"; };
 		9461BA7314B97FE200F5E0EC /* utauFreq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utauFreq.h; sourceTree = "<group>"; };
-		9461BA7414B97FE200F5E0EC /* utauParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utauParameters.h; sourceTree = "<group>"; };
 		9461BA7814B97FE200F5E0EC /* vConnectPhoneme.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectPhoneme.cpp; sourceTree = "<group>"; };
 		9461BA7914B97FE200F5E0EC /* vConnectPhoneme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectPhoneme.h; sourceTree = "<group>"; };
 		9461BA7A14B97FE200F5E0EC /* vConnectSetting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectSetting.cpp; sourceTree = "<group>"; };
@@ -121,6 +120,7 @@
 		9479B95714BB1B2000A3CFD4 /* InputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputStream.h; sourceTree = "<group>"; };
 		9479B95D14BB459400A3CFD4 /* Synthesizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Synthesizer.cpp; sourceTree = "<group>"; };
 		9479B95E14BB459400A3CFD4 /* Synthesizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Synthesizer.h; sourceTree = "<group>"; };
+		9479B96614BB54C800A3CFD4 /* UtauParameter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauParameter.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,8 +203,8 @@
 				9461BA7014B97FE200F5E0EC /* UtauDB.cpp */,
 				9461BA7114B97FE200F5E0EC /* UtauDB.h */,
 				9461BA7214B97FE200F5E0EC /* utauFreq.cpp */,
+				9479B96614BB54C800A3CFD4 /* UtauParameter.h */,
 				9461BA7314B97FE200F5E0EC /* utauFreq.h */,
-				9461BA7414B97FE200F5E0EC /* utauParameters.h */,
 			);
 			path = utauVoiceDB;
 			sourceTree = "<group>";

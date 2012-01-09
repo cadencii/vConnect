@@ -107,7 +107,7 @@ corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
     }
     else
     {                              // 希望するデータが存在しないので作成する．
-        utauParameters parameters;
+        UtauParameter parameters;
         phoneme *target = new phoneme;  // ハッシュには先に突っ込んでしまう．
         objectMap.insert( make_pair( lyric, target ) );
 

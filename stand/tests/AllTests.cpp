@@ -5,6 +5,7 @@
 #include "TextOutputStreamTest.h"
 #include "StringUtilTest.h"
 #include "PathTest.h"
+#include "UtauParameterTest.h"
 
 int main( int argc, char* argv[] )
 {

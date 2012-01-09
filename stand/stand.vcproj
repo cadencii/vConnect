@@ -254,7 +254,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utauVoiceDB\utauParameters.h"
+				RelativePath=".\utauVoiceDB\UtauParameter.h"
 				>
 			</File>
 		</Filter>

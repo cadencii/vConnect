@@ -5,8 +5,10 @@
 #include <fftw3.h>
 #include <string>
 #include "vsqMetaText/vsqBase.h"
+#include "utauVoiceDB/UtauParameter.h"
 
 using namespace std;
+using namespace vconnect;
 
 // 音量正規化用のマジックナンバー
 const double VOL_NORMALIZE = 0.06;
@@ -19,8 +21,6 @@ enum phonemeMode {
     VCNT_COMPRESSED = 0,     // Ogg + MelCepstrum に圧縮された形式．
     VCNT_RAW = 1,            // 波形データをそのまま使う形式．
 };
-
-struct utauParameters;
 
 /// <summary>
 /// vConnect-STANDの１音素片を格納するクラスです．
@@ -69,7 +69,7 @@ public: // public method
     /// <param name="params">UTAU 原音設定．</param>
     /// <param name="framePeriod">フレーム単位時間．</param>
     /// <returns>読み込みに成功したときは true，失敗時は false を返します．</returns>
-    bool readRawWave( string dir_path, const utauParameters *params, double framePeriod );
+    bool readRawWave( string dir_path, const UtauParameter *params, double framePeriod );
 
     /// <summary>
     /// 今保持している音素片の該当箇所のメルケプストラムを取得します．
