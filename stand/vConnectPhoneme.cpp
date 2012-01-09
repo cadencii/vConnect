@@ -451,9 +451,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const utauParameters *utauPar
         return false;
     }
     waveFileEx waveFile;
-    string fileName;
-
-    mb_conv(utauParams->fileName, fileName);
+    string fileName = utauParams->fileName;
     fileName = dir_path + fileName;
 
     if(waveFile.readWaveFile(fileName + ".wav") == 1)

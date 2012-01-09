@@ -26,18 +26,13 @@ corpusManager::corpusManager()
 void corpusManager::analyze( vector<string> &phonemes )
 {
     int size = phonemes.size();
-    for( int i = 0; i < size; i++ )
-    {
+    for( int i = 0; i < size; i++ ){
         string lyric = phonemes[i];
         getPhoneme( lyric );
-        string str_lyric;
-        mb_conv( lyric, str_lyric );
-        cout << "corpusManager::analyze; lyric=" << str_lyric << endl;
+        cout << "corpusManager::analyze; lyric=" << lyric << endl;
     }
-    for( int i = 0; i < mAppendCorpus.size(); i++)
-    {
-        if(mAppendCorpus[i])
-        {
+    for( int i = 0; i < mAppendCorpus.size(); i++ ){
+        if( mAppendCorpus[i] ){
             mAppendCorpus[i]->analyze(phonemes);
         }
     }
@@ -131,21 +126,13 @@ corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
         {
             target->p = new vConnectPhoneme;
             string path = mDBPath + parameters.fileName;
-            string str_path;
-            mb_conv( path, str_path );
             bool bResult = false;
-            if( parameters.isWave )
-            {
-                string dir_path;
-                mb_conv( mDBPath, dir_path );
-                bResult = target->p->readRawWave( dir_path, &parameters, framePeriod );
+            if( parameters.isWave ){
+                bResult = target->p->readRawWave( mDBPath, &parameters, framePeriod );
+            }else{
+                bResult = target->p->readPhoneme( path.c_str() );
             }
-            else
-            {
-                bResult = target->p->readPhoneme( str_path.c_str() );
-            }
-            if( bResult )
-            {
+            if( bResult ){
                 target->isValid = true;
                 target->fixedLength = parameters.msFixedLength;
                 ret = target;

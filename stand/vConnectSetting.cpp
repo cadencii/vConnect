@@ -25,15 +25,12 @@ const string settingName[] = {
 bool librarySetting::readSetting(string left, string right)
 {
     bool ret = true;
-    string tmp;
     if( left.compare( _T( "Enable" ) ) == 0 ){
         enabled = (right.compare( _T( "0" ) ) == 1);
     }else if( left.compare( _T( "Brightness" ) ) == 0 ){
-        mb_conv( right, tmp );
-        brightness = atoi( tmp.c_str() );
+        brightness = atoi( right.c_str() );
     }else if( left.compare( _T( "NoteNumber" ) ) == 0 ){
-        mb_conv( right, tmp );
-        noteNumber = atoi( tmp.c_str() );
+        noteNumber = atoi( right.c_str() );
         frequency = A4_PITCH * pow( 2.0, (double)(noteNumber - A4_NOTE) / 12.0 );
     }else if( left.compare( _T( "Directory" ) ) == 0 ){
         path += right;
@@ -68,11 +65,9 @@ bool vConnectSetting::readSetting( string path, string fileName, const char *cod
 {
     bool ret = false;
     string iniName = path + fileName;
-    string pathString;
-    TextInputStream stream( pathString, code );
-    mb_conv( iniName, pathString );
+    TextInputStream stream( iniName, code );
 
-    mb_conv( path + _T( "" ), this->path );
+    this->path = path;
 
     if( false == stream.ready() ){
         return ret;
@@ -83,7 +78,7 @@ bool vConnectSetting::readSetting( string path, string fileName, const char *cod
     map_t<string, librarySetting*>::iterator currentParse = libraryMap.end();
     int index;
     for( int i = 0; i < SETTING_END; i++ ){
-        mb_conv( this->path, libraryArray[i]->path );// = this->path;
+        libraryArray[i]->path = this->path;
     }
     while( stream.ready() ){
         tmp = stream.readLine();

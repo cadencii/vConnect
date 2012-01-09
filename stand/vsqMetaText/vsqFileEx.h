@@ -6,6 +6,7 @@
 #ifndef __vsqFileEx_h__
 #define __vsqFileEx_h__
 
+#include "vsqBase.h"
 #include "vsqEventList.h"
 #include "vsqBPList.h"
 #include "vsqTempo.h"
@@ -159,12 +160,9 @@ public:
     {
         cout << "vsqFileEx::dumpMapIDs" << endl;
         map_t<string, vsqEventEx *>::iterator i;
-        for( i = mMapIDs.begin(); i != mMapIDs.end(); i++ )
-        {
-            string s;
-            mb_conv( i->first, s );
+        for( i = mMapIDs.begin(); i != mMapIDs.end(); i++ ){
             vsqEventEx *item = i->second;
-            cout << s << ":" << item->toString() << endl;
+            cout << i->first << ":" << item->toString() << endl;
         }
     }
 
@@ -175,21 +173,14 @@ public:
     {
         cout << "vsqFileEx::dumpMapHandles" << endl;
         map_t<string, vsqHandle *>::iterator i;
-        for( i = mMapHandles.begin(); i != mMapHandles.end(); i++ )
-        {
-            string s;
-            mb_conv( i->first, s );
-            cout << s << ":" << i->second->toString() << endl;
+        for( i = mMapHandles.begin(); i != mMapHandles.end(); i++ ){
+            cout << i->first << ":" << i->second->toString() << endl;
         }
     }
 
 private:
-
-    //double tempo;
-
-    //long endTick;
-
     vsqPhonemeDB voiceDataBase;
+
 };
 
 #endif

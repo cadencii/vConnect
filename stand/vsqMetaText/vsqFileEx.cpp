@@ -19,85 +19,41 @@ void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string singerName, string 
 
 void vsqFileEx::setParamEvent( vsqEventEx *target, string left, string right )
 {
-    string s;
-    if( left.compare( _T("Type") ) == 0 )
-    {
+    if( left.compare( _T("Type") ) == 0 ){
         target->type = right;
-    }
-    else if( left.compare( _T("Length") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->length = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("Note#") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->note = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("Dynamics") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->velocity = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("PMBendDepth") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->portamentoDepth = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("PMBendLength") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->portamentoLength = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("PMbPortamentoUse") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->portamentoUse = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("DEMdecGainRate") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->decay = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("DEMaccent") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->attack = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("VibratoDelay") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->vibratoDelay = atoi( s.c_str() );
-    }
-    else if( left.compare( _T("PreUtterance") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->utauSetting.msPreUtterance = (float)atof( s.c_str() );
-    }
-    else if( left.compare( _T("VoiceOverlap") ) == 0 )
-    {
-        mb_conv( right, s );
-        target->utauSetting.msVoiceOverlap = (float)atof( s.c_str() );
-    }
-    else if( left.compare( _T("LyricHandle") ) == 0 )
-    {
+    }else if( left.compare( _T("Length") ) == 0 ){
+        target->length = atoi( right.c_str() );
+    }else if( left.compare( _T("Note#") ) == 0 ){
+        target->note = atoi( right.c_str() );
+    }else if( left.compare( _T("Dynamics") ) == 0 ){
+        target->velocity = atoi( right.c_str() );
+    }else if( left.compare( _T("PMBendDepth") ) == 0 ){
+        target->portamentoDepth = atoi( right.c_str() );
+    }else if( left.compare( _T("PMBendLength") ) == 0 ){
+        target->portamentoLength = atoi( right.c_str() );
+    }else if( left.compare( _T("PMbPortamentoUse") ) == 0 ){
+        target->portamentoUse = atoi( right.c_str() );
+    }else if( left.compare( _T("DEMdecGainRate") ) == 0 ){
+        target->decay = atoi( right.c_str() );
+    }else if( left.compare( _T("DEMaccent") ) == 0 ){
+        target->attack = atoi( right.c_str() );
+    }else if( left.compare( _T("VibratoDelay") ) == 0 ){
+        target->vibratoDelay = atoi( right.c_str() );
+    }else if( left.compare( _T("PreUtterance") ) == 0 ){
+        target->utauSetting.msPreUtterance = (float)atof( right.c_str() );
+    }else if( left.compare( _T("VoiceOverlap") ) == 0 ){
+        target->utauSetting.msVoiceOverlap = (float)atof( right.c_str() );
+    }else if( left.compare( _T("LyricHandle") ) == 0 ){
         right = _T("[") + right + _T("]");
         mMapHandles.insert( make_pair( right, &target->lyricHandle ) );
-    }
-    else if( left.compare( _T("VibratoHandle") ) == 0 )
-    {
+    }else if( left.compare( _T("VibratoHandle") ) == 0 ){
         right = _T("[") + right + _T("]");
         mMapHandles.insert( make_pair( right, &target->vibratoHandle ) );
-    }
-    else if( left.compare( _T("IconHandle") ) == 0 )
-    {
+    }else if( left.compare( _T("IconHandle") ) == 0 ){
         right = _T("[") + right + _T("]");
         mMapHandles.insert( make_pair( right, &target->iconHandle ) );
-    }
-    else
-    {
-        mb_conv( left, s );
-        string message = "warning: unknown Property in VsqEvent : " + s;
+    }else{
+        string message = "warning: unknown Property in VsqEvent : " + left;
         cout << message << endl;//outputError( message.c_str() );
     }
 
@@ -226,9 +182,7 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
             }else{
                 // そんなセクション名知らねー
                 string message;
-                string t_search;
-                mb_conv( search, t_search );
-                message = "vsqFileEx::readCore; not found: " + t_search;
+                message = "vsqFileEx::readCore; not found: " + search;
                 cout << message << endl;
             }
         }

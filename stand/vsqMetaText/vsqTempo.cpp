@@ -17,10 +17,7 @@ const double vsqTempo::DEFAULT_TEMPO = 120.0;
 
 void vsqTempo::setParameter( string left, string right )
 {
-    string s;
-    mb_conv( left, s );
-    tempo = atof( s.c_str() );
-
+    tempo = atof( left.c_str() );
 }
 
 long vsqTempo::secondToTick( double second )

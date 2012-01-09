@@ -1,7 +1,7 @@
 /*
  *
  *    utauFreq.cpp
- *                              (c) HAL 2010-           
+ *                              (c) HAL 2010-
  *
  *  This file is a part of v.Connect.
  * utauFreq contains UTAU frequency table.
@@ -24,10 +24,8 @@ bool utauFreq::readFrqFile( string input )
     char buf[BUFLEN];
     int numPoints;
     double f,v;
-    
-    string s;
-    mb_conv( input, s );
-    fp = fopen( s.c_str(), "rb" );
+
+    fp = fopen( input.c_str(), "rb" );
     if( fp ){
         fread( buf, sizeof(char), 8, fp );
         buf[8] = '\0';

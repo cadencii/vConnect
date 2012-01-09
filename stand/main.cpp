@@ -18,10 +18,14 @@
 #include "vConnect.h"
 #include "vConnectConverter.h"
 #include "vConnectTranscriber.h"
+#include "EncodingConverter.h"
+#include "Configuration.h"
 #include <locale>
 //#define __TEST__
 
 #define VCONNECT_VERSION "v.Connect-STAND ver2.0.0"
+
+using namespace vconnect;
 
 int main( int argc, char *argv[] ){
     string input = "";
@@ -69,11 +73,12 @@ int main( int argc, char *argv[] ){
     }
 
     if( print_list_charset ){
-        int num_charset = sizeof( CHARSET_SUPPORT ) / sizeof( unsigned int );
-        int i;
-        for( i = 0; i < num_charset; i++ ){
-            if( mb_is_valid_codepage( CHARSET_SUPPORT[i] ) ){
-                cout << mb_charset_name_from_codepage( CHARSET_SUPPORT[i] ) << endl;
+        list<string> supportedCodesets = Configuration::supportedCodesets();
+        list<string>::iterator i = supportedCodesets.begin();
+        for( ;i != supportedCodesets.end(); i++ ){
+            string codeset = *i;
+            if( EncodingConverter::isValidEncoding( codeset ) ){
+                cout << codeset << endl;
             }
         }
     }
@@ -119,22 +124,16 @@ int main( int argc, char *argv[] ){
     }
 #endif
 
-    string tinput, toutput;
-    mb_conv( input, tinput );
-    mb_conv( output, toutput );
 #ifdef _DEBUG
-    string mbs_input, mbs_output;
-    mb_conv( tinput, mbs_input );
-    mb_conv( toutput, mbs_output );
-    cout << "::main; input=" << input << "; mbs_input=" << mbs_input << endl;
-    cout << "::main; output=" << output << "; mbs_output=" << mbs_output << endl;
+    cout << "::main; input=" << input << endl;
+    cout << "::main; output=" << output << endl;
 #endif
     if( options.convert == false ){
         if( options.transcribe ){
             const char *encoding = options.encodingOtoIni.c_str();
-            vConnectTranscriber::transcribe( tinput, toutput, encoding );
+            vConnectTranscriber::transcribe( input, output, encoding );
         } else {
-            vC.synthesize( tinput, toutput, options );
+            vC.synthesize( input, output, options );
         }
     } else {
         vConnectConverter converter;

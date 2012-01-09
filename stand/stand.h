@@ -160,17 +160,6 @@ using namespace stdext;
 #define map_t hash_map
 #endif
 
-// サポートするcharset
-#ifdef MB_USE_ICONV
-static unsigned int CHARSET_SUPPORT[] = { 932, 51932, 50220, 1208, 1202, 1200, 1232, 1234 };
-#else
-#ifdef _WIN32
-static unsigned int CHARSET_SUPPORT[] = { CP_UTF8, CP_ACP };
-#else
-static unsigned int CHARSET_SUPPORT[] = {};
-#endif
-#endif
-
 #define LINEBUFF_LEN 4096
 
 /*  マルチスレッド実装の種類             動かせる？

@@ -19,18 +19,12 @@ vsqEventList::~vsqEventList()
 void vsqEventList::setParameter( string left, string right, map_t<string, vsqEventEx *> &id_map )
 {
     /* If Back is EOS, Front is End Tick */
-    string s;
-    if( right.compare( _T("EOS") ) == 0 )
-    {
-        mb_conv( left, s );
-        endTick = atol( s.c_str() );
-    }
-    else
-    {
+    if( right.compare( _T("EOS") ) == 0 ){
+        endTick = atol( left.c_str() );
+    }else{
         vsqEventEx *target = new vsqEventEx();
         right = _T("[") + right + _T("]");
-        mb_conv( left, s );
-        target->tick = atoi( s.c_str() );
+        target->tick = atoi( left.c_str() );
         eventList.push_back( target );
         id_map.insert( make_pair( right, target ) );
     }

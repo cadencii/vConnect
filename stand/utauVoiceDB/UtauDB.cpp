@@ -94,26 +94,20 @@ int UtauDB::read( string path_oto_ini, const char *codepage )
                 current->lyric = current->lyric.substr( 0, current->lyric.find( _T(",") ) );
             }
 
-            string t;
             temp = temp.substr( temp.find( _T(",") ) + 1 );
-            mb_conv( temp, t );
-            current->msLeftBlank = (float)atof( t.c_str() );
+            current->msLeftBlank = (float)atof( temp.c_str() );
 
             temp = temp.substr( temp.find( _T(",") ) + 1 );
-            mb_conv( temp, t );
-            current->msFixedLength = (float)atof( t.c_str() );
+            current->msFixedLength = (float)atof( temp.c_str() );
 
             temp = temp.substr( temp.find( _T( "," ) ) + 1 );
-            mb_conv( temp, t );
-            current->msRightBlank = (float)atof( t.c_str() );
+            current->msRightBlank = (float)atof( temp.c_str() );
 
             temp = temp.substr( temp.find( _T( "," ) ) + 1 );
-            mb_conv( temp, t );
-            current->msPreUtterance = (float)atof( t.c_str() );
+            current->msPreUtterance = (float)atof( temp.c_str() );
 
             temp = temp.substr( temp.find( _T( "," ) ) + 1 );
-            mb_conv( temp, t );
-            current->msVoiceOverlap = (float)atof( t.c_str() );
+            current->msVoiceOverlap = (float)atof( temp.c_str() );
 
             mSettingMap.insert( make_pair( current->lyric, current ) );
             if( current->lyric.compare( current->fileName ) != 0 ){

@@ -171,6 +171,34 @@ namespace vconnect
             }
         }
 
+        /**
+         * 有効なエンコーディングかどうかを取得する
+         * @param codeset エンコーディング名
+         * @return 有効なエンコーディングであれば true を、そうでなければ false を返す
+         */
+        static bool isValidEncoding( string codeset )
+        {
+            // まずUTF-8が有効かどうか
+            iconv_t cnv = iconv_open( "UTF-8", "UTF-8" );
+            if( false == isValidConverter( cnv ) ){
+                return false;
+            }
+            iconv_close( cnv );
+
+            iconv_t cnv2 = iconv_open( "UTF-8", codeset.c_str() );
+            if( false == isValidConverter( cnv2 ) ){
+                return false;
+            }
+            iconv_close( cnv2 );
+
+            iconv_t cnv3 = iconv_open( codeset.c_str(), "UTF-8" );
+            if( false == isValidConverter( cnv3 ) ){
+                return false;
+            }
+            iconv_close( cnv3 );
+            return true;
+        }
+
     protected:
         EncodingConverter()
         {
@@ -222,34 +250,6 @@ namespace vconnect
         {
             iconv_t invalid = (iconv_t) - 1;
             return (converter == invalid) ? false : true;
-        }
-
-        /**
-         * 有効なエンコーディングかどうかを取得する
-         * @param codeset エンコーディング名
-         * @return 有効なエンコーディングであれば true を、そうでなければ false を返す
-         */
-        static bool isValidEncoding( string codeset )
-        {
-            // まずUTF-8が有効かどうか
-            iconv_t cnv = iconv_open( "UTF-8", "UTF-8" );
-            if( false == isValidConverter( cnv ) ){
-                return false;
-            }
-            iconv_close( cnv );
-
-            iconv_t cnv2 = iconv_open( "UTF-8", codeset.c_str() );
-            if( false == isValidConverter( cnv2 ) ){
-                return false;
-            }
-            iconv_close( cnv2 );
-
-            iconv_t cnv3 = iconv_open( codeset.c_str(), "UTF-8" );
-            if( false == isValidConverter( cnv3 ) ){
-                return false;
-            }
-            iconv_close( cnv3 );
-            return true;
         }
     };
 }

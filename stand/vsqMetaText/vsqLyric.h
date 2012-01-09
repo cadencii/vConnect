@@ -25,11 +25,7 @@ public:
     string toString()
     {
         string ret;
-        string str_lyric;
-        string str_pronounce;
-        mb_conv( lyric, str_lyric );
-        mb_conv( pronounce, str_pronounce );
-        ret += "{lyric=" + str_lyric + ",pronounce=" + str_pronounce + "}";
+        ret += "{lyric=" + lyric + ",pronounce=" + pronounce + "}";
         return ret;
     }
 

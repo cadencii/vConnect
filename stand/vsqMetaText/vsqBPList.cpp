@@ -16,11 +16,8 @@
 void vsqBPList::setParameter( string left, string right )
 {
     vsqBP current;
-    string s;
-    mb_conv( left, s );
-    current.tick = atoi( s.c_str() );
-    mb_conv( right, s );
-    current.value = atoi( s.c_str() );
+    current.tick = atoi( left.c_str() );
+    current.value = atoi( right.c_str() );
 
     data.push_back( current );
 }

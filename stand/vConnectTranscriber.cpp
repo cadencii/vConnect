@@ -18,11 +18,9 @@ bool vConnectTranscriber::transcribe(string &src_path, string &dst_path, const c
 
     for(int i = 0; i < src.size(); i++)
     {
-        string s;      // 表示用
         utauParameters src_param, dst_param;
         src.getParams(src_param, i);
-        mb_conv(src_param.lyric, s);
-        cout << "Begin analysis : " << s.c_str() << endl;
+        cout << "Begin analysis : " << src_param.lyric << endl;
 
         map_t<string, int>::iterator itr = analyzedItems.find(src_param.fileName);
         if(itr != analyzedItems.end())
@@ -33,40 +31,31 @@ bool vConnectTranscriber::transcribe(string &src_path, string &dst_path, const c
 
         clock_t cl = clock();
 
-        if(dst.getParams(dst_param, src_param.lyric) != 1)
-        {
-            mb_conv(src_param.lyric, s);
-            cout << " error; not found : " << s.c_str() << endl;
+        if( dst.getParams(dst_param, src_param.lyric) != 1 ){
+            cout << " error; not found : " << src_param.lyric << endl;
             continue;
         }
-        if(dst_param.isWave != src_param.isWave)
-        {
-            mb_conv(src_param.fileName, s);
-            cout << " error; conflting format : " << s.c_str() << endl;
+        if( dst_param.isWave != src_param.isWave ){
+            cout << " error; conflting format : " << src_param.fileName << endl;
             continue;
         }
 
-        if(dst_param.isWave == false)
-        {
+        if( false == dst_param.isWave ){
             // 圧縮形式のマッチング．
             vConnectPhoneme src_phoneme, dst_phoneme;
 
             string tmp_path;
             src.getDBPath(tmp_path);
             tmp_path += src_param.fileName;
-            mb_conv(tmp_path, s);
-            if(!src_phoneme.readPhoneme(s.c_str()))
-            {
-                cout << " error; can't read file : " << s.c_str() << endl;
+            if( !src_phoneme.readPhoneme( tmp_path.c_str() ) ){
+                cout << " error; can't read file : " << tmp_path << endl;
                 continue;
             }
 
             dst.getDBPath(tmp_path);
             tmp_path += dst_param.fileName;
-            mb_conv(tmp_path, s);
-            if(!dst_phoneme.readPhoneme(s.c_str()))
-            {
-                cout << " error; can't read file : " << s.c_str() << endl;
+            if( !dst_phoneme.readPhoneme( tmp_path.c_str() ) ){
+                cout << " error; can't read file : " << tmp_path << endl;
                 continue;
             }
 
@@ -79,11 +68,8 @@ bool vConnectTranscriber::transcribe(string &src_path, string &dst_path, const c
 */
             dst.getDBPath(tmp_path);
             tmp_path += dst_param.fileName;
-            mb_conv(tmp_path, s);
-            dst_phoneme.writePhoneme(s.c_str());
-        }
-        else
-        {
+            dst_phoneme.writePhoneme( tmp_path.c_str() );
+        }else{
             vConnectPhoneme src_phoneme, dst_phoneme;
             /* ここは生波形用 */
         }

@@ -121,9 +121,7 @@ void vConnect::emptyPath( double secOffset, string output )
 {
     waveFileEx wave;
     wave.setOffset( secOffset );
-    string toutput;
-    mb_conv( output, toutput );
-    wave.writeWaveFile( toutput );
+    wave.writeWaveFile( output );
     return;
 }
 
@@ -465,9 +463,7 @@ bool vConnect::synthesize( string input, string output, runtimeOptions options )
         wave[i] = max(-1.0, min(1.0, wave[i]));
     }
     // ファイルに書き下す．
-    string str_output;
-    mb_conv( output, str_output );
-    waveFileEx::writeWaveFile( str_output, wave, waveLength, (double)beginFrame * framePeriod / 1000.0 );
+    waveFileEx::writeWaveFile( output, wave, waveLength, (double)beginFrame * framePeriod / 1000.0 );
 
     for(int i = 0; i < frameLength; i++)
     {
