@@ -18,18 +18,3 @@
 mutex_t hMutex = NULL;
 mutex_t hFFTWMutex = NULL;
 #endif
-
-/**
- * str中の文字列searchをreplaceに置換する
- */
-void string_replace( string_t& str, string_t search, string_t replace )
-{
-    int indx = str.find( search, 0 );
-    int slen = search.length();
-    int rlen = replace.length();
-    while( indx != string_t::npos )
-    {
-        str.replace( indx, slen, replace );
-        indx = str.find( search, indx - slen + rlen + 1 );
-    }
-}

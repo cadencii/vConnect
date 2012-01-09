@@ -184,18 +184,6 @@ static unsigned int CHARSET_SUPPORT[] = {};
 #endif
 #endif
 
-// パスの区切り文字を決める
-const string_t PATH_SEPARATOR_SLANT = _T("/");
-const string_t PATH_SEPARATOR_BACKSLASH = _T("\\");
-const int NUM_PSUDE_PATH_SEPARATOR = 2;
-// ウォン記号と円記号．円記号の方はバックスラッシュの代替としての円記号ではなく，Unicodeのマジな円記号なので書き換えるとき注意
-static string_t PSUDE_PATH_SEPARATOR[NUM_PSUDE_PATH_SEPARATOR] = { _T("¥"), _T("₩") };
-#ifdef STND_OS_WIN
-const string_t PATH_SEPARATOR = PATH_SEPARATOR_BACKSLASH;
-#else
-const string_t PATH_SEPARATOR = PATH_SEPARATOR_SLANT;
-#endif
-
 #define LINEBUFF_LEN 4096
 
 /*  マルチスレッド実装の種類             動かせる？

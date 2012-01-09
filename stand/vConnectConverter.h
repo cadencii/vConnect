@@ -28,15 +28,15 @@ public:
      * @param dstDir 出力先ディレクトリ名．
      * @returns 分析に成功した場合true，それ以外はfalseを返します．
      */
-    bool convert( const char *otoIni, const char *dstDir )
+    bool convert( const char *otoIni, const char *directory )
     {
-        string srcDir = otoIni;
-        string dstDir_s = dstDir;
-        srcDir = srcDir.substr( 0, srcDir.rfind( PATH_SEPARATOR ) );
+        string sourceDirectory = Path::getDirectoryName( otoIni );
+        string destinationDirectory = directory;
         int count = 0;
 
         TextInputStream reader( otoIni, "Shift_JIS" );
-        TextOutputStream writer( (dstDir_s + "oto.ini").c_str(), "Shift_JIS", "\x0D\x0A" );
+        string destinationOtoIni = Path::combine( destinationDirectory, "oto.ini" );
+        TextOutputStream writer( destinationOtoIni, "Shift_JIS", "\x0D\x0A" );
         while( reader.ready() ){
             string buffer = reader.readLine();
             if( buffer.length() == 0 ){
@@ -44,7 +44,7 @@ public:
             }
             count++;
 
-            string line = this->processRecord( buffer, count, srcDir, dstDir_s );
+            string line = this->processRecord( buffer, count, sourceDirectory, destinationDirectory );
 
             if( line.length() > 0 ){
                 writer.writeLine( line );
@@ -91,8 +91,9 @@ private:
         cerr << "Begin analysis : " << alias << " @ " << fileName << endl;
 
         waveFileEx waveFile;
-        if( waveFile.readWaveFile( sourceDirectory + PATH_SEPARATOR + fileName ) != 1 ){
-            cout << "error ; can't open the file, " << (sourceDirectory + PATH_SEPARATOR + fileName).c_str() << endl;
+        string waveFilePath = Path::combine( sourceDirectory, fileName );
+        if( waveFile.readWaveFile( waveFilePath ) != 1 ){
+            cout << "error ; can't open the file, " << waveFilePath << endl;
             return "";
         }
         int waveLength = waveFile.getWaveLength( leftBlank, rightBlank );
@@ -125,11 +126,11 @@ private:
         phoneme.computeWave( wave, waveLength, 44100, 2.0 );
         cerr << "  Done. Elapsed time = " << (clock() - cl) << "[ms]" << endl;
 
-        fileName = destinationDirectory + vvdName;
-        if( phoneme.writePhoneme( fileName.c_str() ) ){
-            cerr << "Wrote file : " << fileName << endl;
+        string vvdFilePath = Path::combine( destinationDirectory, vvdName );
+        if( phoneme.writePhoneme( vvdFilePath.c_str() ) ){
+            cerr << "Wrote file : " << vvdFilePath << endl;
         }else{
-            cerr << "Error. Failed to write : " << fileName << endl;
+            cerr << "Error. Failed to write : " << vvdFilePath << endl;
         }
         cerr << "====" << endl;
 
