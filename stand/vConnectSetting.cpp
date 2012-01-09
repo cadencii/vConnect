@@ -16,23 +16,23 @@
 #define SETTING_BUF_LEN 4096
 
 const string settingName[] = {
-    _T( "[BaseLibrary]" ),
-    _T( "[BrightnessLibrary]" ),
-    _T( "[LowLibrary]" ),
-    _T( "[HiLibrary]" ),
+    "[BaseLibrary]",
+    "[BrightnessLibrary]",
+    "[LowLibrary]",
+    "[HiLibrary]",
 };
 
 bool librarySetting::readSetting(string left, string right)
 {
     bool ret = true;
-    if( left.compare( _T( "Enable" ) ) == 0 ){
-        enabled = (right.compare( _T( "0" ) ) == 1);
-    }else if( left.compare( _T( "Brightness" ) ) == 0 ){
+    if( left.compare( "Enable" ) == 0 ){
+        enabled = (right.compare( "0" ) == 1);
+    }else if( left.compare( "Brightness" ) == 0 ){
         brightness = atoi( right.c_str() );
-    }else if( left.compare( _T( "NoteNumber" ) ) == 0 ){
+    }else if( left.compare( "NoteNumber" ) == 0 ){
         noteNumber = atoi( right.c_str() );
         frequency = A4_PITCH * pow( 2.0, (double)(noteNumber - A4_NOTE) / 12.0 );
-    }else if( left.compare( _T( "Directory" ) ) == 0 ){
+    }else if( left.compare( "Directory" ) == 0 ){
         path += right;
     }else{
         ret = false;
@@ -49,7 +49,7 @@ vConnectSetting::vConnectSetting()
         libraryArray[i]->enabled = false;
         libraryArray[i]->frequency = A4_PITCH;
         libraryArray[i]->noteNumber = A4_NOTE;
-        libraryArray[i]->path = _T( "" );
+        libraryArray[i]->path = "";
         libraryMap.insert(make_pair(settingName[i], libraryArray[i]));
     }
 }
@@ -82,17 +82,17 @@ bool vConnectSetting::readSetting( string path, string fileName, const char *cod
     }
     while( stream.ready() ){
         tmp = stream.readLine();
-        if( tmp.find( _T( "[" ) ) != string::npos ){
+        if( tmp.find( "[" ) != string::npos ){
             currentParse = libraryMap.find( tmp );
             continue;
         }
-        index = tmp.find( _T( "=" ) );
+        index = tmp.find( "=" );
         if( string::npos != index ){
             left = tmp.substr( 0, index );
             right = tmp.substr( index + 1 );
         }else{
             left = tmp;
-            right = _T( "" );
+            right = "";
         }
         if( currentParse != libraryMap.end() ){
             currentParse->second->readSetting( left, right );

@@ -864,7 +864,7 @@ void vConnect::calculateVsqInfo( void )
         vsqEventEx *itemi = mVsq.events.eventList[i];
 
         // タイプ判定
-        while( itemi->type == _T( "Singer" ) )
+        while( itemi->type == "Singer" )
         {
             // 歌手なら歌手番号拾ってきて
             singerIndex = mVsq.getSingerIndex( itemi->iconHandle.getIDS() );
@@ -906,10 +906,10 @@ void vConnect::calculateVsqInfo( void )
         itemi->utauSetting.msVoiceOverlap = msVoiceOverlap;
 
         // 空白文字が存在したときはVCV音素片
-        itemi->isVCV = ( temp.find( _T(" ") ) != string::npos );
+        itemi->isVCV = ( temp.find( " " ) != string::npos );
 
         // 休符の文字はとりあえず 'R', 'r' を対象にしてUTAUパラメタを初期化しておこう．
-        itemi->isRest = ( temp.compare( _T("R") ) == 0 || temp.compare( _T("r") ) == 0);
+        itemi->isRest = ( temp.compare( "R" ) == 0 || temp.compare( "r" ) == 0);
         if(itemi->isRest){
             itemi->utauSetting.msPreUtterance = itemi->utauSetting.msVoiceOverlap = 0.0;
         }

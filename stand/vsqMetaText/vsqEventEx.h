@@ -18,13 +18,13 @@
 #include "vsqBase.h"
 #include "vsqHandle.h"
 
-class vsqEventEx// : public vsqBase 
+class vsqEventEx// : public vsqBase
 {
 public:
 
     vsqEventEx(){
-        utauSetting.fileName = _T("");
-        utauSetting.lyric = _T("");
+        utauSetting.fileName = "";
+        utauSetting.lyric = "";
         utauSetting.msLeftBlank = 0.0f;
         utauSetting.msFixedLength = 0.0f;
         utauSetting.msRightBlank = 0.0f;
@@ -52,7 +52,7 @@ public:
         string str_buff = buff;
         return "{singerIndex=" + str_buff + "}";
     }
-    
+
     vsqHandle    vibratoHandle;
     vsqHandle    lyricHandle;
     vsqHandle    iconHandle;

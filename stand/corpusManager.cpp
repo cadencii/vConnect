@@ -186,7 +186,7 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
     {
         p->getDBPath( mDBPath );
     }
-    tmp = _T("vConnect.ini");
+    tmp = "vConnect.ini";
     mEnableExtention =  setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
 
     if(mEnableExtention)
@@ -198,7 +198,7 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
             UtauDB *db = new UtauDB();
             mAppendCorpus.resize(1, NULL);
             mAppendCorpus[0] = new corpusManager();
-            db->read(brightnessSetting->path + _T("oto.ini"), options.encodingOtoIni.c_str());
+            db->read(brightnessSetting->path + "oto.ini", options.encodingOtoIni.c_str());
             mAppendCorpus[0]->setBrightness(brightnessSetting->brightness);
             mAppendCorpus[0]->setUtauDB(db, options);
             mAppendCorpus[0]->setIsAppend(true);

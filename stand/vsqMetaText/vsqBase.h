@@ -28,13 +28,13 @@
 //#define __UTAU_OFFSET__
 
 const string controlCurveName[]={
-    _T("[PitchBendBPList]"),
-    _T("[PitchBendSensBPList]"),
-    _T("[DynamicsBPList]"),
-    _T("[EpRResidualBPList]"),            /* BRE Curve */
-    _T("[EpRESlopeBPList]"),            /* BRI Curve */
-    _T("[EpRESlopeDepthBPList]"),        /* CLE Curve */
-    _T("[GenderFactorBPList]")            /* GEN Curve */
+    "[PitchBendBPList]",
+    "[PitchBendSensBPList]",
+    "[DynamicsBPList]",
+    "[EpRResidualBPList]",            /* BRE Curve */
+    "[EpRESlopeBPList]",            /* BRI Curve */
+    "[EpRESlopeDepthBPList]",        /* CLE Curve */
+    "[GenderFactorBPList]"            /* GEN Curve */
 };
 const int controlCurveDefaultValue[] = {
     0,
@@ -55,9 +55,9 @@ enum{
     GENDER
 };
 
-const string OBJ_NAME_OTOINI = _T( "[oto.ini]" );
-const string OBJ_NAME_EVENT_LIST = _T( "[EventList]" );
-const string OBJ_NAME_TEMPO = _T( "[Tempo]" );
+const string OBJ_NAME_OTOINI = "[oto.ini]";
+const string OBJ_NAME_EVENT_LIST = "[EventList]";
+const string OBJ_NAME_TEMPO = "[Tempo]";
 
 /*class vsqBase
 {

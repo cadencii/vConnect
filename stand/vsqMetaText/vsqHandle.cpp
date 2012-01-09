@@ -14,39 +14,39 @@
 
 void vsqLyric::setLyric( string right )
 {
-    lyric = right.substr( 0, right.find( _T(",") ) );
-    lyric = lyric.substr( lyric.find( _T("\"") ) + 1, lyric.rfind( _T("\"") ) - 1 );
-    right = right.substr( right.find( _T(",") ) + 1 );
+    lyric = right.substr( 0, right.find( "," ) );
+    lyric = lyric.substr( lyric.find( "\"" ) + 1, lyric.rfind( "\"" ) - 1 );
+    right = right.substr( right.find( "," ) + 1 );
     pronounce = right.substr( 0, right.find( "," ) );
-    pronounce = pronounce.substr( pronounce.find( _T("\"") ) + 1, pronounce.rfind( _T("\"") ) - 1 );
+    pronounce = pronounce.substr( pronounce.find( "\"" ) + 1, pronounce.rfind( "\"" ) - 1 );
 
-    right = right.substr( right.find( _T(",") ) + 1 );
-    lyricDelta = atoi( right.substr( 0, right.find( _T(",") ) ).c_str() );
+    right = right.substr( right.find( "," ) + 1 );
+    lyricDelta = atoi( right.substr( 0, right.find( "," ) ).c_str() );
 
-    right = right.substr( right.find( _T(",") ) + 1 );
-    consonantAdjustment = atoi( right.substr( 0, right.find( _T(",") ) ).c_str() );
+    right = right.substr( right.find( "," ) + 1 );
+    consonantAdjustment = atoi( right.substr( 0, right.find( "," ) ).c_str() );
 
-    right = right.substr( right.find( _T(",") ) + 1 );
-    protectFlag = atoi( right.substr( 0, right.find( _T(",") ) ).c_str() );
+    right = right.substr( right.find( "," ) + 1 );
+    protectFlag = atoi( right.substr( 0, right.find( "," ) ).c_str() );
 }
 
 void vsqHandle::setParameter( string left, string right )
 {
-    if( left.compare( _T("IconID") ) == 0 ){
+    if( left.compare( "IconID" ) == 0 ){
         iconID = right;
-    }else if( left.compare( _T("IDS") ) == 0 ){
+    }else if( left.compare( "IDS" ) == 0 ){
         IDS = right;
-    }else if( left.compare( _T("Caption") ) == 0 ){
+    }else if( left.compare( "Caption" ) == 0 ){
         caption = right;
-    }else if( left.compare( _T("Length") ) == 0 ){
+    }else if( left.compare( "Length" ) == 0 ){
         length = atoi( right.c_str() );
-    }else if( left.compare( _T("Language") ) == 0 ){
+    }else if( left.compare( "Language" ) == 0 ){
         language = atoi( right.c_str() );
-    }else if( left.compare( _T("Program") ) == 0 ){
+    }else if( left.compare( "Program" ) == 0 ){
         program = atoi( right.c_str() );
-    }else if( left.compare( _T("Original") ) == 0 ){
+    }else if( left.compare( "Original" ) == 0 ){
         original = atoi( right.c_str() );
-    }else if( left.compare( _T("StartDepth") ) == 0 ){
+    }else if( left.compare( "StartDepth" ) == 0 ){
         vsqVibratoBP point;
         point.value = atoi( right.c_str() );
         point.position = -1.0;
@@ -55,13 +55,13 @@ void vsqHandle::setParameter( string left, string right )
             vibratoDepth.resize( 1 );
         }
         vibratoDepth[0] = point;
-    }else if( left.compare( _T("DepthBPNum") ) == 0 ){
+    }else if( left.compare( "DepthBPNum" ) == 0 ){
         parseBPNum( vibratoDepth, right );
-    }else if( left.compare( _T("DepthBPX") ) == 0 ){
+    }else if( left.compare( "DepthBPX" ) == 0 ){
         parseBP( vibratoDepth, right, true );
-    }else if( left.compare( _T("DepthBPY") ) == 0 ){
+    }else if( left.compare( "DepthBPY" ) == 0 ){
         parseBP( vibratoDepth, right, false );
-    }else if( left.compare( _T("StartRate") ) == 0 ){
+    }else if( left.compare( "StartRate" ) == 0 ){
         vsqVibratoBP point;
         point.value = atoi( right.c_str() );
         point.position = -1.0;
@@ -70,13 +70,13 @@ void vsqHandle::setParameter( string left, string right )
             vibratoRate.resize( 1 );
         }
         vibratoRate[0] = point;
-    }else if( left.compare( _T("RateBPNum") ) == 0 ){
+    }else if( left.compare( "RateBPNum" ) == 0 ){
         parseBPNum( vibratoRate, right );
-    }else if( left.compare( _T("RateBPX") ) == 0 ){
+    }else if( left.compare( "RateBPX" ) == 0 ){
         parseBP( vibratoRate, right, true );
-    }else if( left.compare( _T("RateBPY") ) == 0 ){
+    }else if( left.compare( "RateBPY" ) == 0 ){
         parseBP( vibratoRate, right, false );
-    }else if( left.find( _T("L") ) != string::npos ){
+    }else if( left.find( "L" ) != string::npos ){
         lyric.setLyric( right );
     }else{
         string Message = "warning: unknown Property in VsqHandle : " + left;
@@ -93,7 +93,7 @@ void vsqHandle::parseBPNum( vector<vsqVibratoBP> &list, string str )
 void vsqHandle::parseBP( vector<vsqVibratoBP> &list, string str, bool parse_x )
 {
     string s;
-    string::size_type indx_comma = str.find( _T(",") );
+    string::size_type indx_comma = str.find( "," );
     int indx = 1;
     while( indx_comma != string::npos )
     {
@@ -108,7 +108,7 @@ void vsqHandle::parseBP( vector<vsqVibratoBP> &list, string str, bool parse_x )
             list[indx].value = atoi( s.c_str() );
         }
         str = str.substr( indx_comma + 1 );
-        indx_comma = str.find( _T(",") );
+        indx_comma = str.find( "," );
         indx++;
     }
     if( str.size() > 0 ){

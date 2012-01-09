@@ -19,38 +19,38 @@ void vsqFileEx::setParamOtoIni( vsqPhonemeDB *target, string singerName, string 
 
 void vsqFileEx::setParamEvent( vsqEventEx *target, string left, string right )
 {
-    if( left.compare( _T("Type") ) == 0 ){
+    if( left.compare( "Type" ) == 0 ){
         target->type = right;
-    }else if( left.compare( _T("Length") ) == 0 ){
+    }else if( left.compare( "Length" ) == 0 ){
         target->length = atoi( right.c_str() );
-    }else if( left.compare( _T("Note#") ) == 0 ){
+    }else if( left.compare( "Note#" ) == 0 ){
         target->note = atoi( right.c_str() );
-    }else if( left.compare( _T("Dynamics") ) == 0 ){
+    }else if( left.compare( "Dynamics" ) == 0 ){
         target->velocity = atoi( right.c_str() );
-    }else if( left.compare( _T("PMBendDepth") ) == 0 ){
+    }else if( left.compare( "PMBendDepth" ) == 0 ){
         target->portamentoDepth = atoi( right.c_str() );
-    }else if( left.compare( _T("PMBendLength") ) == 0 ){
+    }else if( left.compare( "PMBendLength" ) == 0 ){
         target->portamentoLength = atoi( right.c_str() );
-    }else if( left.compare( _T("PMbPortamentoUse") ) == 0 ){
+    }else if( left.compare( "PMbPortamentoUse" ) == 0 ){
         target->portamentoUse = atoi( right.c_str() );
-    }else if( left.compare( _T("DEMdecGainRate") ) == 0 ){
+    }else if( left.compare( "DEMdecGainRate" ) == 0 ){
         target->decay = atoi( right.c_str() );
-    }else if( left.compare( _T("DEMaccent") ) == 0 ){
+    }else if( left.compare( "DEMaccent" ) == 0 ){
         target->attack = atoi( right.c_str() );
-    }else if( left.compare( _T("VibratoDelay") ) == 0 ){
+    }else if( left.compare( "VibratoDelay" ) == 0 ){
         target->vibratoDelay = atoi( right.c_str() );
-    }else if( left.compare( _T("PreUtterance") ) == 0 ){
+    }else if( left.compare( "PreUtterance" ) == 0 ){
         target->utauSetting.msPreUtterance = (float)atof( right.c_str() );
-    }else if( left.compare( _T("VoiceOverlap") ) == 0 ){
+    }else if( left.compare( "VoiceOverlap" ) == 0 ){
         target->utauSetting.msVoiceOverlap = (float)atof( right.c_str() );
-    }else if( left.compare( _T("LyricHandle") ) == 0 ){
-        right = _T("[") + right + _T("]");
+    }else if( left.compare( "LyricHandle" ) == 0 ){
+        right = "[" + right + "]";
         mMapHandles.insert( make_pair( right, &target->lyricHandle ) );
-    }else if( left.compare( _T("VibratoHandle") ) == 0 ){
-        right = _T("[") + right + _T("]");
+    }else if( left.compare( "VibratoHandle" ) == 0 ){
+        right = "[" + right + "]";
         mMapHandles.insert( make_pair( right, &target->vibratoHandle ) );
-    }else if( left.compare( _T("IconHandle") ) == 0 ){
-        right = _T("[") + right + _T("]");
+    }else if( left.compare( "IconHandle" ) == 0 ){
+        right = "[" + right + "]";
         mMapHandles.insert( make_pair( right, &target->iconHandle ) );
     }else{
         string message = "warning: unknown Property in VsqEvent : " + left;
@@ -84,11 +84,11 @@ vsqFileEx::vsqFileEx()
         mMapCurves.insert( make_pair( controlCurveName[i], &controlCurves[i] ) );
     }
 
-    //temp = _T("[EventList]");
+    //temp = "[EventList]";
     //objectMap.insert( make_pair( temp, (vsqBase *)&events ) );
-    //temp = _T("[Tempo]");
+    //temp = "[Tempo]";
     //objectMap.insert( make_pair( temp, (vsqBase *)&vsqTempoBp ) );
-    //temp = _T("[oto.ini]");
+    //temp = "[oto.ini]";
     //objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
 }
 
@@ -115,14 +115,14 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
         // 空文字の場合は次へ
         if( temp.size() <= 0 ) continue;
 
-        if( temp.find( _T("[") ) == 0 ){
+        if( temp.find( "[" ) == 0 ){
             search = temp;
             continue;
         }
-        string::size_type indx_equal = temp.find( _T("=") );
+        string::size_type indx_equal = temp.find( "=" );
         if( indx_equal == string::npos ){
             left = temp;
-            right = _T("");
+            right = "";
         }else{
             left = temp.substr( 0, indx_equal );
             right = temp.substr( indx_equal + 1 );
@@ -130,22 +130,22 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
 
         if( search.compare( OBJ_NAME_EVENT_LIST ) == 0 ){
             // [EventList]
-            string::size_type indx_comma = right.find( _T(",") );
+            string::size_type indx_comma = right.find( "," );
             while( indx_comma != string::npos ){
                 // コンマが見つからなくなるまでループ
                 string tright = right.substr( 0, indx_comma );
                 this->events.setParameter( left, tright, mMapIDs );
                 right = right.substr( indx_comma + 1 );
-                indx_comma = right.find( _T(",") );
+                indx_comma = right.find( "," );
             }
             this->events.setParameter( left, right, mMapIDs );
         }else if( search.compare( OBJ_NAME_OTOINI ) == 0 ){
             // [oto.ini]
-            string::size_type index = left.find( _T( "\t" ) );
+            string::size_type index = left.find( "\t" );
             string singerName, otoIniPath;
 
             if( index == string::npos ){
-                singerName = _T( "" );
+                singerName = "";
                 otoIniPath = left;
             }else{
                 singerName = left.substr( 0, index );
@@ -159,14 +159,14 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
         }else if( search.compare( OBJ_NAME_TEMPO ) == 0 ){
             // [Tempo]
             this->vsqTempoBp.setParameter( left, right );
-        }else if( search.find( _T( "[ID#" ) ) == 0 ){
+        }else if( search.find( "[ID#" ) == 0 ){
             // ID
             map_t<string, vsqEventEx *>::iterator i;
             i = mMapIDs.find( search );
             if( i != mMapIDs.end() && i->second ){
                 setParamEvent( i->second, left, right );
             }
-        }else if( search.find( _T( "[h#" ) ) == 0 ){
+        }else if( search.find( "[h#" ) == 0 ){
             // handle
             map_t<string, vsqHandle *>::iterator i;
             i = mMapHandles.find( search );

@@ -74,9 +74,9 @@ int UtauDB::read( string path_oto_ini, const char *codepage )
         temp = stream.readLine();
         utauParameters *current = new utauParameters();
         if( current ){
-            if( ( index = temp.find( _T(".wav") ) ) == string::npos ){
-                if( ( index = temp.find( _T(".stf") ) ) == string::npos ){
-                    index = temp.find( _T("=") );
+            if( ( index = temp.find( ".wav" ) ) == string::npos ){
+                if( ( index = temp.find( ".stf" ) ) == string::npos ){
+                    index = temp.find( "=" );
                 }
                 current->isWave = false;
             }else{
@@ -87,26 +87,26 @@ int UtauDB::read( string path_oto_ini, const char *codepage )
             current->fileName = temp.substr( 0, index );
 
             /* When no lyric symbol exists, voiceDB will use fileName instead. */
-            if( temp.find( _T("=") ) + 1 == temp.find( _T(",") ) ){
+            if( temp.find( "=" ) + 1 == temp.find( "," ) ){
                 current->lyric = current->fileName;
             }else{
-                current->lyric = temp.substr( temp.find( _T("=") ) + 1 );
-                current->lyric = current->lyric.substr( 0, current->lyric.find( _T(",") ) );
+                current->lyric = temp.substr( temp.find( "=" ) + 1 );
+                current->lyric = current->lyric.substr( 0, current->lyric.find( "," ) );
             }
 
-            temp = temp.substr( temp.find( _T(",") ) + 1 );
+            temp = temp.substr( temp.find( "," ) + 1 );
             current->msLeftBlank = (float)atof( temp.c_str() );
 
-            temp = temp.substr( temp.find( _T(",") ) + 1 );
+            temp = temp.substr( temp.find( "," ) + 1 );
             current->msFixedLength = (float)atof( temp.c_str() );
 
-            temp = temp.substr( temp.find( _T( "," ) ) + 1 );
+            temp = temp.substr( temp.find( "," ) + 1 );
             current->msRightBlank = (float)atof( temp.c_str() );
 
-            temp = temp.substr( temp.find( _T( "," ) ) + 1 );
+            temp = temp.substr( temp.find( "," ) + 1 );
             current->msPreUtterance = (float)atof( temp.c_str() );
 
-            temp = temp.substr( temp.find( _T( "," ) ) + 1 );
+            temp = temp.substr( temp.find( "," ) + 1 );
             current->msVoiceOverlap = (float)atof( temp.c_str() );
 
             mSettingMap.insert( make_pair( current->lyric, current ) );

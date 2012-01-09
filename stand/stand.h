@@ -138,15 +138,6 @@ using namespace std;
 // *2 libiconv is required in MacOSX and Linux to convert character set.
 //
 
-// winnt.hにあるTEXTマクロと同じ
-#ifndef _T
-#ifdef USE_WSTRING
-#define _T(x) L##x
-#else
-#define _T(x) x
-#endif
-#endif
-
 // std::map、stdext::hash_mapのどちらを使うかを決める
 // g++では、hash_map<string_t ...>が出来ないのでこれを回避する
 #ifdef __GNUC__
