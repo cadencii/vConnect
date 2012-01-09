@@ -16,7 +16,7 @@
 #define __corpusManager_h__
 
 #include "vConnectSetting.h"
-#include "runtimeOptions.h"
+#include "RuntimeOption.h"
 #include <list>
 
 class vConnectPhoneme;
@@ -65,7 +65,7 @@ public:
         list<vsqEventEx*> itemList;
     };
 
-    void setUtauDB( UtauDB *p, runtimeOptions &options );
+    void setUtauDB( UtauDB *p, RuntimeOption &option );
 
     /// <summary>
     /// 歌詞にマッチする音素片を得ます．

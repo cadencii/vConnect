@@ -178,7 +178,7 @@ corpusManager::phoneme *corpusManager::getPhoneme(string lyric, list<phoneme*> &
     return p;
 }
 
-void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
+void corpusManager::setUtauDB( UtauDB *p, RuntimeOption &options )
 {
     string tmp;
     mUtauDB = p;
@@ -187,7 +187,7 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
         p->getDBPath( mDBPath );
     }
     tmp = "vConnect.ini";
-    mEnableExtention =  setting.readSetting( mDBPath, tmp, options.encodingOtoIni.c_str()); // 文字コード指定は暫定処置
+    mEnableExtention =  setting.readSetting( mDBPath, tmp, options.getEncodingOtoIni().c_str()); // 文字コード指定は暫定処置
 
     if(mEnableExtention)
     {
@@ -198,7 +198,10 @@ void corpusManager::setUtauDB( UtauDB *p, runtimeOptions &options )
             UtauDB *db = new UtauDB();
             mAppendCorpus.resize(1, NULL);
             mAppendCorpus[0] = new corpusManager();
-            db->read(brightnessSetting->path + "oto.ini", options.encodingOtoIni.c_str());
+            db->read(
+                Path::combine( brightnessSetting->path, "oto.ini" ),
+                options.getEncodingOtoIni().c_str()
+            );
             mAppendCorpus[0]->setBrightness(brightnessSetting->brightness);
             mAppendCorpus[0]->setUtauDB(db, options);
             mAppendCorpus[0]->setIsAppend(true);

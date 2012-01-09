@@ -27,55 +27,14 @@
 
 using namespace vconnect;
 
-int main( int argc, char *argv[] ){
-    string input = "";
-    string output = "";
-    vConnect vC;
-    runtimeOptions options;
-    bool print_list_charset = false; // サポートするキャラクタセットのリストをプリントアウトするかどうか
+int main( int argc, char *argv[] )
+{
+    RuntimeOption option( argc, argv );
 
-    // 引数を読み取る
-    string current_parse = "";  // いま読んでるオプション(-i, -o等)
-    for( int i = 1; i < argc; i++ ){
-        string s = argv[i];
-        if( s.substr( 0, 1 ) == "-" ){
-            // "-"で始まるので
-            if( s == "-c" ){
-                options.convert = true;
-                options.transcribe = false;
-                current_parse = "";
-            }else if( s == "-t" ){
-                options.transcribe = true;
-                options.convert = false;
-                current_parse = "";
-            }else if( s == "-list-charset" ){
-                print_list_charset = true;
-                current_parse = "";
-            }else{
-                // 次の引数で、オプションsの項目を設定するよ
-                current_parse = s;
-            }
-        }else{
-            // "-"以外で始まる
-            if( current_parse == "-i" ){
-                input = s;
-            }else if( current_parse == "-o" ){
-                output = s;
-            }else if( current_parse == "-charset-otoini" ){
-                options.encodingOtoIni = s;
-            }else if( current_parse == "-charset-vxt" ){
-                options.encodingVsqText = s;
-            }else{
-                cout << "unknown argument: " << s << endl;
-            }
-            current_parse = "";
-        }
-    }
-
-    if( print_list_charset ){
+    if( option.isPrintCodeset() ){
         list<string> supportedCodesets = Configuration::supportedCodesets();
         list<string>::iterator i = supportedCodesets.begin();
-        for( ;i != supportedCodesets.end(); i++ ){
+        for( ; i != supportedCodesets.end(); i++ ){
             string codeset = *i;
             if( EncodingConverter::isValidEncoding( codeset ) ){
                 cout << codeset << endl;
@@ -83,26 +42,19 @@ int main( int argc, char *argv[] ){
         }
     }
 
+    string input = option.getInputPath();
+    string output = option.getOutputPath();
 #ifdef __TEST__
     input = "test.txt";
     output = "log.wav";
 #else
 
-    // 引数の読み取りでin,outファイル指定が存在しなかった場合
-    if( input == "" || output == "" ){
-        // 引数の個数がちょうど3だったらば、引数の順番依存とみなして。
-        if( argc == 3 ){
-            input = argv[1];
-            output = argv[2];
-        }
-    }
-
 #ifdef _DEBUG
-    cout << "::main; options.encodingOtoIni=" << options.encodingOtoIni << endl;
-    cout << "::main; options.encodingVsqText=" << options.encodingVsqText << endl;
+    cout << "::main; encodingOtoIni=" << option.getEncodingOtoIni() << endl;
+    cout << "::main; encodingVsqText=" << option.getEncodingVsqText() << endl;
 #endif
 
-    if( ( input == "" || output == "" ) && !print_list_charset ){
+    if( (input == "" || output == "") && false == option.isPrintCodeset() ){
         // ファイルの指定のどちらかが欠けている場合
         // 説明文を表示してbailout
         cout << VCONNECT_VERSION << endl;
@@ -128,16 +80,16 @@ int main( int argc, char *argv[] ){
     cout << "::main; input=" << input << endl;
     cout << "::main; output=" << output << endl;
 #endif
-    if( options.convert == false ){
-        if( options.transcribe ){
-            const char *encoding = options.encodingOtoIni.c_str();
-            vConnectTranscriber::transcribe( input, output, encoding );
-        } else {
-            vC.synthesize( input, output, options );
-        }
-    } else {
+
+    if( option.isConvert() ){
         vConnectConverter converter;
-        converter.convert(input.c_str(), output.c_str());
+        converter.convert( input.c_str(), output.c_str() );
+    }else if( option.isTranscribe() ){
+        const char *encoding = option.getEncodingOtoIni().c_str();
+        vConnectTranscriber::transcribe( input, output, encoding );
+    }else{
+        vConnect vC;
+        vC.synthesize( input, output, option );
     }
 
     return 0;

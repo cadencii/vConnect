@@ -16,7 +16,9 @@
 #define __vsqPhonemeDB_h__
 
 #include "vsqBase.h"
-#include "../runtimeOptions.h"
+#include "../RuntimeOption.h"
+
+using namespace vconnect;
 
 class vsqPhonemeDB// : public vsqBase
 {
@@ -37,21 +39,21 @@ public:
         voiceDBs.clear();*/
     }
 
-    void setRuntimeOptions( runtimeOptions options )
+    void setRuntimeOption( RuntimeOption &option )
     {
-        _codepage_otoini = options.encodingOtoIni;
+        _codepage_otoini = option.getEncodingOtoIni();
     }
 
 
 public:
-    
+
     int singerIndex;
 
     string _codepage_otoini;
 
 
 private:
-    
+
     bool isInitialized;
 
 

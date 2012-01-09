@@ -11,7 +11,7 @@
 #include "vsqBPList.h"
 #include "vsqTempo.h"
 #include "vsqPhonemeDB.h"
-#include "../runtimeOptions.h"
+#include "../RuntimeOption.h"
 #include "../Socket.h"
 #include "../Path.h"
 #include "../InputStream.h"
@@ -36,7 +36,7 @@ public:
     /// <param name="file_name">読み込むメタテキストファイルのパス．</param>
     /// <param name="options">読み込み時の設定値．</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
-    bool read( string file_name, runtimeOptions options );
+    bool read( string file_name, RuntimeOption option );
 
     /// <summary>
     /// ソケットからVSQのメタテキストを読み込みます．
@@ -44,7 +44,7 @@ public:
     /// <param name="socket">読み込むソケット．</param>
     /// <param name="options">読み込み時の設定値．</param>
     /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
-    bool read( Socket socket, runtimeOptions options );
+    bool read( Socket socket, RuntimeOption option );
 
     /// <summary>
     /// シーケンスの演奏長さを取得します．単位は秒です．

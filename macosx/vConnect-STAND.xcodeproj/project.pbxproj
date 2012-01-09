@@ -58,7 +58,6 @@
 		9461BA0614B97FE200F5E0EC /* corpusManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = corpusManager.h; sourceTree = "<group>"; };
 		9461BA2B14B97FE200F5E0EC /* EncodingConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EncodingConverter.h; sourceTree = "<group>"; };
 		9461BA2C14B97FE200F5E0EC /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		9461BA5114B97FE200F5E0EC /* runtimeOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = runtimeOptions.h; sourceTree = "<group>"; };
 		9461BA5214B97FE200F5E0EC /* Socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Socket.h; sourceTree = "<group>"; };
 		9461BA5314B97FE200F5E0EC /* stand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stand.cpp; sourceTree = "<group>"; };
 		9461BA5414B97FE200F5E0EC /* stand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stand.h; sourceTree = "<group>"; };
@@ -119,6 +118,7 @@
 		9479B92D14BA1A8100A3CFD4 /* TextInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextInputStream.h; sourceTree = "<group>"; };
 		9479B92E14BA1A8100A3CFD4 /* TextOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextOutputStream.h; sourceTree = "<group>"; };
 		9479B94414BAF55D00A3CFD4 /* Configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Configuration.h; sourceTree = "<group>"; };
+		9479B94A14BB00F800A3CFD4 /* RuntimeOption.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuntimeOption.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,11 +163,11 @@
 				9461BA2B14B97FE200F5E0EC /* EncodingConverter.h */,
 				9461BA2C14B97FE200F5E0EC /* main.cpp */,
 				9479B94414BAF55D00A3CFD4 /* Configuration.h */,
-				9461BA5114B97FE200F5E0EC /* runtimeOptions.h */,
 				9461BA5214B97FE200F5E0EC /* Socket.h */,
 				9479B92D14BA1A8100A3CFD4 /* TextInputStream.h */,
 				9479B92E14BA1A8100A3CFD4 /* TextOutputStream.h */,
 				9479B92114B9EC3A00A3CFD4 /* Path.h */,
+				9479B94A14BB00F800A3CFD4 /* RuntimeOption.h */,
 				9461BA5314B97FE200F5E0EC /* stand.cpp */,
 				9461BA5414B97FE200F5E0EC /* stand.h */,
 				9461BA5614B97FE200F5E0EC /* StringUtil.h */,

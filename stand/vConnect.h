@@ -18,11 +18,13 @@
 #include <string.h>
 #include "corpusManager.h"
 #include "vsqMetaText/vsqFileEx.h"
-#include "runtimeOptions.h"
+#include "RuntimeOption.h"
 
 #define NOTE_NUM 128
 #define VIB_NUM 128
 #define NOISE_LEN 8192
+
+using namespace vconnect;
 
 class vConnectPhoneme;
 
@@ -45,7 +47,7 @@ public: // public method
     bool synthesize(
         string input,
         string output,
-        runtimeOptions options );
+        RuntimeOption options );
 
 public: // public static method
 
@@ -65,12 +67,12 @@ private: // private method
     void calculateF0(
         double *f0,
         double *dynamics );
-    
+
 private: // private static method
     // vConnect内でしか使わない関数．
     static double getPitchFluctuation( double second );
     static void emptyPath( double secOffset, string output );
-    
+
 private: // private field
     vsqFileEx mVsq;
     corpusManager mManager;

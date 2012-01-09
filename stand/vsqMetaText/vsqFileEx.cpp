@@ -92,11 +92,11 @@ vsqFileEx::vsqFileEx()
     //objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
 }
 
-bool vsqFileEx::read( string file_name, runtimeOptions options )
+bool vsqFileEx::read( string file_name, RuntimeOption option )
 {
     bool result = false;
-    voiceDataBase.setRuntimeOptions( options );
-    TextInputStream *stream = new TextInputStream( file_name, options.encodingVsqText );
+    voiceDataBase.setRuntimeOption( option );
+    TextInputStream *stream = new TextInputStream( file_name, option.getEncodingVsqText() );
     bool ret = readCore( stream, file_name );
     delete stream;
     return ret;

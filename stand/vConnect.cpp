@@ -286,13 +286,13 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
     }
 }
 
-bool vConnect::synthesize( string input, string output, runtimeOptions options )
+bool vConnect::synthesize( string input, string output, RuntimeOption option )
 {
 #ifdef _DEBUG
     cout << "vConnect::synthesize; calling vsq.readVsqFile...";
 #endif
     // 読み込みこけたら帰る
-    if( false == mVsq.read( input, options ) )
+    if( false == mVsq.read( input, option ) )
     {
 #ifdef _DEBUG
         cout << "vConnect::synthesize; calling vsq.readVsqFile...done, failed";
@@ -320,7 +320,7 @@ bool vConnect::synthesize( string input, string output, runtimeOptions options )
     for( int i = 0; i < UtauDB::dbSize(); i++ )
     {
         corpusManager *p = new corpusManager;
-        p->setUtauDB( UtauDB::dbGet( i ), options );
+        p->setUtauDB( UtauDB::dbGet( i ), option );
         analyze_list.clear();
         for( int j = 0; j < mVsq.events.eventList.size(); j++) {
             if( mVsq.events.eventList[j]->singerIndex == i ) {
