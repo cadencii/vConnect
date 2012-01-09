@@ -1,6 +1,6 @@
 #ifndef TEST_TextInputStreamTest
 #define TEST_TextInputStreamTest
-#include <cppunit/extensions/HelperMacros.h>
+#include "AllTests.h"
 #include "../TextInputStream.h"
 
 using namespace vconnect;
@@ -60,5 +60,5 @@ public:
     CPPUNIT_TEST_SUITE_END();
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( TextInputStreamTest );
+REGISTER_TEST_SUITE( TextInputStreamTest );
 #endif

@@ -205,8 +205,8 @@ namespace vconnect
          */
         static string toLower( string text )
         {
-            int length = text.length();
-            int i;
+            string::size_type length = text.length();
+            string::size_type i;
             for( i = 0; i < length; i++ ){
                 text[i] = tolower( text[i] );
             }

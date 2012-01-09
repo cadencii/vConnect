@@ -1,12 +1,12 @@
 #ifndef TEST_PathTest
 #define TEST_PathTest
-#include "cppunit/extensions/HelperMacros.h"
+#include "AllTests.h"
 #include "../Path.h"
 
 using namespace std;
 using namespace vconnect;
 
-class PathTest : public CppUnit::TestFixture
+class PathTest : public CppUnit::TestFixture, public Path
 {
 public:
     void getFullPath()
@@ -46,6 +46,15 @@ public:
         CPPUNIT_ASSERT_EQUAL( true, Path::exists( "/bin/sh" ) );
     }
 
+    void testNormalize()
+    {
+        string fixture = "abc/def\\ghi¥jkl₩mno";
+        string separator = Path::getDirectorySeparator();
+        string expected = "abc" + separator + "def" + separator + "ghi" + separator + "jkl" + separator + "mno";
+        string actual = Path::normalize( fixture );
+        CPPUNIT_ASSERT_EQUAL( expected, actual );
+    }
+
     CPPUNIT_TEST_SUITE( PathTest );
     CPPUNIT_TEST( getFullPath );
     CPPUNIT_TEST( combine );
@@ -54,5 +63,5 @@ public:
     CPPUNIT_TEST_SUITE_END();
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( PathTest );
+REGISTER_TEST_SUITE( PathTest );
 #endif

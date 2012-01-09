@@ -60,7 +60,7 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
 
     string_t temp;
     int index;
-    normalize_path_separator( path_oto_ini );
+    path_oto_ini = Path::normalize( path_oto_ini );
 
     TextInputStream stream( path_oto_ini, codepage );
 
@@ -83,7 +83,7 @@ int UtauDB::read( string_t path_oto_ini, const char *codepage )
                 current->isWave = true;
             }
 
-            normalize_path_separator( current->fileName );
+            current->fileName = Path::normalize( current->fileName );
             current->fileName = temp.substr( 0, index );
 
             /* When no lyric symbol exists, voiceDB will use fileName instead. */

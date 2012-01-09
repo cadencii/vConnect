@@ -1,6 +1,6 @@
 #ifndef TEST_EncodingConverterTest
 #define TEST_EncodingConverterTest
-#include <cppunit/extensions/HelperMacros.h>
+#include "AllTests.h"
 #include "../EncodingConverter.h"
 
 using namespace vconnect;
@@ -61,5 +61,5 @@ public:
     CPPUNIT_TEST_SUITE_END();
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( EncodingConverterTest );
+REGISTER_TEST_SUITE( EncodingConverterTest );
 #endif

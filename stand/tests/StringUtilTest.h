@@ -1,6 +1,6 @@
 #ifndef TEST_StringUtilTest
 #define TEST_StringUtilTest
-#include "cppunit/extensions/HelperMacros.h"
+#include "AllTests.h"
 #include "../StringUtil.h"
 
 using namespace std;
@@ -62,12 +62,24 @@ public:
         CPPUNIT_ASSERT_EQUAL( expected, actual );
     }
 
+    void testReplace()
+    {
+        string actual = StringUtil::replace( "abc", "a", "A" );
+        string expected = "Abc";
+        CPPUNIT_ASSERT_EQUAL( expected, actual );
+
+        actual = StringUtil::replace( "abc", "a", "a" );
+        expected = "abc";
+        CPPUNIT_ASSERT_EQUAL( expected, actual );
+    }
+
     CPPUNIT_TEST_SUITE( StringUtilTest );
     CPPUNIT_TEST( explode );
     CPPUNIT_TEST( explodeNonLimit );
     CPPUNIT_TEST( explodeDelimiterNotFound );
+    CPPUNIT_TEST( testReplace );
     CPPUNIT_TEST_SUITE_END();
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( StringUtilTest );
+REGISTER_TEST_SUITE( StringUtilTest );
 #endif

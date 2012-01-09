@@ -1,10 +1,4 @@
-#include <cppunit/TestRunner.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/HelperMacros.h>
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
+#include "AllTests.h"
 
 #include "EncodingConverterTest.h"
 #include "TextInputStreamTest.h"

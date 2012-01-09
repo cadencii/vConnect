@@ -21,6 +21,8 @@
 #include <string>
 #include <sys/stat.h>
 
+#include "StringUtil.h"
+
 namespace vconnect
 {
 
@@ -117,7 +119,22 @@ namespace vconnect
             #endif
         }
 
-    private:
+        /**
+         * パス区切り文字を、システムデフォルトのものに変換する
+         * @param path パス
+         * @return パス
+         */
+        static string normalize( string path )
+        {
+            string separator = getDirectorySeparator();
+            string result = StringUtil::replace( path, "¥", separator );
+            result = StringUtil::replace( result, "₩", separator );
+            result = StringUtil::replace( result, "/", separator );
+            result = StringUtil::replace( result, "\\", separator );
+            return result;
+        }
+
+    protected:
         /**
          * 隠蔽されたコンストラクタ
          */

@@ -196,8 +196,6 @@ const string_t PATH_SEPARATOR = PATH_SEPARATOR_BACKSLASH;
 const string_t PATH_SEPARATOR = PATH_SEPARATOR_SLANT;
 #endif
 
-void normalize_path_separator( string_t& path );
-
 #define LINEBUFF_LEN 4096
 
 /*  マルチスレッド実装の種類             動かせる？
