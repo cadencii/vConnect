@@ -57,7 +57,7 @@ using namespace std;
 //     (1-1) download http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.13.tar.gz
 //           and http://www2d.biglobe.ne.jp/~msyk/software/libiconv/libiconv-1.13-ja-1.patch.gz
 //     (1-2) unzip
-//     (1-3) apply patch: 
+//     (1-3) apply patch:
 //           patch -p1 -N < ../libiconv-1.13-ja-1.patch
 //     (1-4) build
 //           ./configure --enable-static --disable-shared
@@ -87,25 +87,10 @@ typedef UINT MB_CODEPAGE_DESCRIPTER;
 // 無効な記述子
 #define MB_INVALID ((MB_CODEPAGE_DESCRIPTER)-1)
 
-// コードページ指定込みのファイルを表す型．
-typedef struct{
-    // wcharに変換するための記述子
-    MB_CODEPAGE_DESCRIPTER descripter_for_wchar;
-    // charに変換するための記述子
-    MB_CODEPAGE_DESCRIPTER descripter_for_char;
-    FILE *file;
-    int unit_len;
-} MB_FILE;
-
 /**
  * 指定したコードページを取り扱いできるかどうかを調べます．
  */
 bool mb_is_valid_codepage( unsigned int codepage );
-
-/**
- * コードページの名称から、読込み時の読込単位長さ(通常はバイト)を調べます
- */
-int mb_unitlen_from_charset_name( const char *name );
 
 /**
  * ASCII文字列のアルファベットを全て小文字に変換します
@@ -113,71 +98,15 @@ int mb_unitlen_from_charset_name( const char *name );
 void mb_tolower( string& s );
 
 /**
- * コードページの名称から、コードページ番号を取得します
- */
-unsigned int mb_codepage_from_charset_name( const char *name );
-
-/**
  * コードページ番号から、コードページの名称を取得します
  */
 const char *mb_charset_name_from_codepage( unsigned int codepage );
-
-/**
- * 指定したコードページを使って、読込み専用のテキストファイルを開く
- */
-MB_FILE *mb_fopen( const char *file_name, const char *codepage );
-
-/**
- * 指定したコードページを使って、読込み専用のテキストファイルを開く
- */
-MB_FILE *mb_fopen( string file_name, const char *codepage );
-
-/**
- * 指定したコードページを使って、読込み専用のテキストファイルを開く
- */
-MB_FILE *mb_fopen( wstring file_name, const char *codepage );
-
-/**
- * ファイルを閉じる
- */
-int mb_fclose( MB_FILE *fp );
-
-/**
- * 内部関数
- * マルチバイト文字列が、指定したコードの制御文字を表すかどうかを調べます
- * @param buf 調査対象のマルチバイト文字列のバッファ
- * @param len バッファbufの長さ
- * @param check_char チェックする制御文字コード
- * @return バッファの文字列が指定した制御文字を表すならtrue、そうでなければfalse
- */
-bool mb_code_check( char *buf, int len, char check_char );
 
 /**
  * 内部関数．
  * バイト列を指定したコードページ記述子を用いて変換します．
  */
 void mb_code_conv( char *buf, int buflen, MB_CODEPAGE_DESCRIPTER descripter );
-
-/**
- * ファイルから1行読み込む．
- * mb_fopenでファイルを開いたときに指定したコードページは無視される．
- * 改行はCR,CRLF,LFの3種類に対応．
- */
-bool mb_fgets( string& line, MB_FILE *fp );
-
-/**
- * ファイルから1行読み込む．
- * mb_fopenでファイルを開いたときに指定したコードページとみなして読み込む．
- * 改行はCR,CRLF,LFの3種類に対応．
- */
-bool mb_fgets( wstring& line, MB_FILE *fp );
-
-#ifdef _DEBUG
-/**
- * いろんなエンコーディングのテキストファイルを読み込むテストを実行します．
- */
-int mb_test();
-#endif
 
 /**
  * ワイド文字列をマルチバイト文字列に変換します．
