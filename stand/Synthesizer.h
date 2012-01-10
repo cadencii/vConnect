@@ -21,6 +21,7 @@
 #include "vsqMetaText/vsqFileEx.h"
 #include "Task.h"
 #include "RuntimeOption.h"
+#include "FrameBP.h"
 
 #define NOTE_NUM 128
 #define VIB_NUM 128
@@ -74,7 +75,7 @@ namespace vconnect
         vector<corpusManager *> mManagerList;
         long mEndFrame;
         double mFluctTheta;
-        vector<vector<standBP> > mControlCurves;
+        vector<vector<FrameBP> > mControlCurves;
 
     private: // private static field
         static double mNoteFrequency[NOTE_NUM];

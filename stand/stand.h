@@ -304,14 +304,4 @@ extern mutex_t hFFTWMutex;
 const int    fs = 44100;
 const double framePeriod = 2.0;
 
-struct standBP{
-    long frameTime;
-    int  value;
-};
-
-struct standComplex{
-    float re;
-    float im;
-};
-
 #endif

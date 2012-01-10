@@ -33,7 +33,7 @@ namespace vconnect
         data.push_back( current );
     }
 
-    void BPList::getList( vector<standBP>& dst, double tempo )
+    void BPList::getList( vector<FrameBP>& dst, double tempo )
     {
         vector<BP>::size_type size = this->data.size();
         dst.clear();

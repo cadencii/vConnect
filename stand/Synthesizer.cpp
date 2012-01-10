@@ -12,7 +12,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "Synthesizer.h"
-#include "stand.h"
 #include <time.h>
 
 #include <vorbis/vorbisfile.h>
@@ -53,7 +52,7 @@ struct vConnectArg {
     vConnectFrame *frames;
     vector<vConnectPhoneme *> *phonemes;
     vsqEventList *eventList;
-    vector<vector<standBP> > *controlCurves;
+    vector<vector<FrameBP> > *controlCurves;
 };
 
 class vorbisFile {
@@ -125,7 +124,7 @@ void Synthesizer::emptyPath( double secOffset, string output )
     return;
 }
 
-void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, vector<standBP> &briCurve, int beginFrame)
+void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, vector<FrameBP> &briCurve, int beginFrame)
 {
     vector<int> briArray;
     vsqEventEx *itemPrev = NULL;

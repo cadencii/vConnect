@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 #include "BP.h"
-#include "../stand.h"
+#include "../FrameBP.h"
 
 namespace vconnect
 {
@@ -28,7 +28,7 @@ namespace vconnect
     class BPList
     {
     public:
-        void getList( vector<standBP> &dst, double tempo );
+        void getList( vector<FrameBP> &dst, double tempo );
 
         void setParameter( long tick, int value );
 

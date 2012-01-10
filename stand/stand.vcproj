@@ -318,6 +318,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FrameBP.h"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -422,23 +426,23 @@
 			Name="vsqMetaText"
 			>
 			<File
+				RelativePath=".\vsqMetaText\BP.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\BPList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\BPList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vsqMetaText\vsqBase.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\vsqMetaText\vsqBase.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqBP.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqBPList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqBPList.h"
 				>
 			</File>
 			<File
