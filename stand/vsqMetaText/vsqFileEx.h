@@ -8,7 +8,7 @@
 
 #include "vsqBase.h"
 #include "vsqEventList.h"
-#include "vsqBPList.h"
+#include "BPList.h"
 #include "vsqTempo.h"
 #include "vsqPhonemeDB.h"
 #include "../RuntimeOption.h"
@@ -75,9 +75,9 @@ public:
     /// <summary>
     /// ダイナミクスなどのコントロールカーブを格納したvector．
     /// </summary>
-    vector<vsqBPList> controlCurves;
+    vector<BPList> controlCurves;
 
-    map_t<string, vsqBPList *> mMapCurves;
+    map_t<string, BPList *> mMapCurves;
 
     /// <summary>
     /// シーケンス内の音符と歌手変更イベントを格納したリスト．

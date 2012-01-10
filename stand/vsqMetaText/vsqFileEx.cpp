@@ -175,7 +175,7 @@ bool vsqFileEx::readCore( InputStream *stream, string vsqFilePath )
             }
         }else{
             // たぶんコントロールカーブ
-            map_t<string, vsqBPList *>::iterator i;
+            map_t<string, BPList *>::iterator i;
             i = mMapCurves.find( search );
             if( i != mMapCurves.end() && i->second ){
                 i->second->setParameter( left, right );
