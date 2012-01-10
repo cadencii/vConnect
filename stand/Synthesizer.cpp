@@ -187,27 +187,23 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
         for(int j = itemThis->beginFrame, index = itemThis->beginFrame - beginFrame; j < itemThis->endFrame && index < frameLength; j++, index++)
         {
             if(index < 0){ continue; }
-            int frameIndex = (j - itemThis->beginFrame) * vel;
+            int frameIndex = (int)((j - itemThis->beginFrame) * vel);
             int briVal = briArray[index];                       // 現在の bri 値．
             int minBri = -1, maxBri = 129;
 
-            frameIndex = max(2, min(frameIndex, itemThis->utauSetting.msFixedLength / framePeriod));
+            frameIndex = (int)max( 2, min( frameIndex, itemThis->utauSetting.msFixedLength / framePeriod ) );
 
             // 同じフレームを使いまわしたくない場合はここを使うとよい．
 
-            frameIndex = max(2, frameIndex);
-            if(frameIndex > itemThis->utauSetting.msFixedLength / framePeriod)
-            {
-                int tmpDiff = frameIndex - itemThis->utauSetting.msFixedLength / framePeriod;
-                int tmpRoom = (p->p->getTimeLength() - itemThis->utauSetting.msFixedLength / framePeriod ) * 2 / 3;
+            frameIndex = max( 2, frameIndex );
+            if( frameIndex > itemThis->utauSetting.msFixedLength / framePeriod ){
+                int tmpDiff = frameIndex - (int)(itemThis->utauSetting.msFixedLength / framePeriod);
+                int tmpRoom = (p->p->getTimeLength() - (int)(itemThis->utauSetting.msFixedLength / framePeriod)) * 2 / 3;
 
-                frameIndex = itemThis->utauSetting.msFixedLength / framePeriod;
-                if(tmpDiff / tmpRoom % 2 == 0)
-                {
+                frameIndex = (int)(itemThis->utauSetting.msFixedLength / framePeriod);
+                if( tmpDiff / tmpRoom % 2 == 0 ){
                     frameIndex += tmpDiff % tmpRoom;
-                }
-                else
-                {
+                }else{
                     frameIndex += tmpRoom - tmpDiff % tmpRoom;
                 }
             }
@@ -273,10 +269,10 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                     data->morphRatio = morphRatio;
                 }
                 double tmpIndex = (phoneme->getFrameTime(frameIndex) * (1.0 - baseBriRatio) + frameIndex * framePeriod * baseBriRatio / 1000.0) / framePeriod * 1000.0;
-                data->index = tmpIndex;
+                data->index = (int)tmpIndex;
                 if((*it)->children)
                 {
-                    data->index = ((*it)->children->p->getBaseFrameTime(data->index) * (1.0 - baseBriRatio) + tmpIndex * framePeriod * baseBriRatio / 1000.0) / framePeriod * 1000.0;
+                    data->index = (int)(((*it)->children->p->getBaseFrameTime(data->index) * (1.0 - baseBriRatio) + tmpIndex * framePeriod * baseBriRatio / 1000.0) / framePeriod * 1000.0);
                 }
                 data->morphRatio *= baseBriRatio;
                 dst[index].dataList.push_back(data);
@@ -344,7 +340,7 @@ void Synthesizer::run()
     // 準備２．合成に必要なローカル変数の初期化
     beginFrame = mVsq.events.eventList[0]->beginFrame;
     frameLength = mEndFrame - beginFrame;
-    waveLength = frameLength * framePeriod * fs / 1000;
+    waveLength = (long int)(frameLength * framePeriod * fs / 1000);
 
     wave = new double[waveLength];
     memset(wave, 0, sizeof(double) * waveLength);
@@ -407,7 +403,7 @@ void Synthesizer::run()
         f0[i] = (f0[i] == 0.0)? DEFAULT_F0 : f0[i];
         double T = 1.0 / f0[i];
         currentTime += T;
-        i = currentTime * 1000.0 / framePeriod;
+        i = (int)(currentTime * 1000.0 / framePeriod);
         c++;
     }
     maxCount = c;
@@ -421,7 +417,7 @@ void Synthesizer::run()
         }
         double T = 1.0 / f0[i];
         currentTime += T;
-        i = currentTime * 1000.0 / framePeriod;
+        i = (int)(currentTime * 1000.0 / framePeriod);
         c++;
     }
 
@@ -432,7 +428,7 @@ void Synthesizer::run()
     arg2.f0 += i;
     arg2.frames += i;
     arg2.wave += (int)(currentTime * fs);
-    arg2.waveLength -= currentTime * fs;
+    arg2.waveLength -= (int)(currentTime * fs);
 
 
     hThread[0] = stnd_thread_create( synthesizeFromList, &arg1 );
@@ -756,7 +752,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
             }
         }
         // BRE の値によりノイズを励起信号に加算する．
-        appendNoise(starSpec, min(p->fftLength, T * fs), (*(p->controlCurves))[BRETHINESS][breIndex].value / 128.0, &noiseCount);
+        appendNoise( starSpec, (int)min( p->fftLength, T * fs ), (*(p->controlCurves))[BRETHINESS][breIndex].value / 128.0, &noiseCount );
 
         // starSpec -> residual DFT を実行する．
         fftw_execute(forward_r2c);
@@ -788,14 +784,14 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 
         // 実波形に直す．
         fftw_execute(inverse_c2r);
-        currentPosition = currentTime * fs;
+        currentPosition = (int)(currentTime * fs);
         for( int k = 0; k < p->fftLength / 2 && currentPosition < p->waveLength; k++, currentPosition++ )
         {
             p->wave[currentPosition] += impulse[k] / p->fftLength * p->dynamics[currentFrame];
         }
 
         currentTime += T;
-        currentFrame = currentTime * 1000.0 / framePeriod;
+        currentFrame = (int)(currentTime * 1000.0 / framePeriod);
     }
 
     //================================================================================================= ↓後処理

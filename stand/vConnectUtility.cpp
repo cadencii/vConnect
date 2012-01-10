@@ -84,7 +84,7 @@ void vConnectUtility::linearStretch(double *dst, const double *src, double ratio
     for(int i = 0; i < length; i++)
     {
         double dIndex = (double)i * ratio;
-        int iIndex = dIndex;
+        int iIndex = (int)dIndex;
         double r = dIndex - (double)iIndex;
         if(iIndex < 0 || iIndex >= length - 1) {
             dst[i] = 0.0;
@@ -149,7 +149,7 @@ void vConnectUtility::newOggVorbis(char **dst, int *size, const double *wave, in
     }
 
     vorbis_comment_init(&comment);
-    vorbis_comment_add_tag(&comment, "ENCODER", ENCODER_TAG);
+    vorbis_comment_add_tag(&comment, "ENCODER", (char *)ENCODER_TAG);
 
     vorbis_analysis_init(&dspState, &info);
     vorbis_block_init(&dspState, &block);

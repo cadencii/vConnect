@@ -220,7 +220,7 @@ bool worldParameters::readParameters(const char *path)
 
 bool worldParameters::getParameters(float *f0, float *t, int *pulseLocations, int fs, double beginTime, int timeLength, double framePeriod)
 {
-    int beginIndex = beginTime / framePeriod * 1000.0;
+    int beginIndex = (int)(beginTime / framePeriod * 1000.0);
     int endIndex = beginIndex + timeLength;
     int index, i, tmp;
 
@@ -235,14 +235,14 @@ bool worldParameters::getParameters(float *f0, float *t, int *pulseLocations, in
     // データをコピー．
     for(; index < endIndex; i++, index++)
     {
-        int tmpIndex = (double)index * framePeriod / this->framePeriod;
+        int tmpIndex = (int)((double)index * framePeriod / this->framePeriod);
         if(tmpIndex >= tLen)
         {
             break;
         }
         f0[i] = this->f0[tmpIndex];
         t[i] = this->t[tmpIndex] - this->t[tmp];
-        pulseLocations[i] = this->pulseLocations[tmpIndex] - beginTime * fs;
+        pulseLocations[i] = this->pulseLocations[tmpIndex] - (int)(beginTime * fs);
     }
 
     // 指定された長さほどにデータが無い場合．

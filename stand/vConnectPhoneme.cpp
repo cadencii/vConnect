@@ -380,7 +380,7 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
         }
         return;
     }
-    int index = t / this->framePeriod * 1000.0;
+    int index = (int)(t / this->framePeriod * 1000.0);
     if(index < 0)
     {
         index = 0;
@@ -498,7 +498,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauPara
 
         // 読み込みその他終了したので，波形とパラメタを取り出す．
         waveOffset = 0;
-        timeLength = (endTime - beginTime) / framePeriod * 1000.0 + 0.5;
+        timeLength = (int)((endTime - beginTime) / framePeriod * 1000.0 + 0.5);
         f0 = new float[timeLength];
         t  = new float[timeLength];
         pulseLocations = new int[timeLength];
@@ -506,17 +506,17 @@ bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauPara
         worldParams.getParameters(f0, t, pulseLocations, waveFile.getSamplingFrequency(), beginTime, timeLength, framePeriod);
         for(int i = 0; i < timeLength; i++)
         {
-            int tmp = waveFile.getSamplingFrequency() * 1.0 / ((f0[i] == 0.0)?DEFAULT_F0:f0[i]) +0.5;
+            int tmp = (int)(waveFile.getSamplingFrequency() * 1.0 / ((f0[i] == 0.0) ? DEFAULT_F0 : f0[i]) + 0.5);
             waveOffset = min(waveOffset, pulseLocations[i] - tmp);
         }
 
-        int sampleLength =(endTime - beginTime) * waveFile.getSamplingFrequency() + 0.5 - waveOffset;
+        int sampleLength = (int)((endTime - beginTime) * waveFile.getSamplingFrequency() + 0.5 - waveOffset);
         wave = new double[sampleLength];
 
         int i, j;
 
         // 波形の値を取り出す．
-        for(i = 0, j = beginTime * waveFile.getSamplingFrequency() + waveOffset; j < 0; i++, j++)
+        for(i = 0, j = (int)(beginTime * waveFile.getSamplingFrequency() + waveOffset); j < 0; i++, j++)
         {
             wave[i] = 0.0;
         }
@@ -544,7 +544,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauPara
             sum1 += wave[i] * wave[i];
         }
         float wavePos = utauParams->msLeftBlank + utauParams->msFixedLength;
-        for(i = 0, j = wavePos / 1000.0 * waveFile.getSamplingFrequency(); i < 2048 && j < waveLength - waveOffset; i++, j++)
+        for(i = 0, j = (int)(wavePos / 1000.0 * waveFile.getSamplingFrequency()); i < 2048 && j < waveLength - waveOffset; i++, j++)
         {
             sum2 += waveBuffer[j] * waveBuffer[j];
         }

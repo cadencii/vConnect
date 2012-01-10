@@ -14,6 +14,7 @@
 #ifndef __EncodingConverter_h__
 #define __EncodingConverter_h__
 
+#include <errno.h>
 #include <iconv.h>
 #include <string>
 
@@ -83,11 +84,12 @@ namespace vconnect
             while( remainingInputBytes > 0 ){
                 char *originalInput = input;
                 size_t n = iconv( this->converter, &input, &remainingInputBytes, &output, &remainingOutputBytes );
-                if( (n != (size_t) - 1 && remainingInputBytes == 0) || (errno == EINVAL) ){
+                int error = errno;
+                if( (n != (size_t) - 1 && remainingInputBytes == 0) || (error == EINVAL) ){
                     remainingInputBytes = 0;
                     result.append( buffer, 0, outputBytes - remainingOutputBytes );
                 }else{
-                    switch( errno ){
+                    switch( error ){
                         case E2BIG:{
                             result.append( buffer, 0, outputBytes - remainingOutputBytes );
                             output = buffer;
@@ -131,6 +133,7 @@ namespace vconnect
             if( NULL != localeNameRaw ){
                 // localeName = "ja_JP.UTF-8" (MacOSX Lion)
                 // localeName = "ja_JP.UTF-8" (openSUSE, g++)
+                // localeName = "ja_JP.UTF-8" (CentOS, g++)
                 // localeName = "Japanese_Japan.932" (Windows XP, g++)
                 // localeName = "Japanese_Japan.932" (Windows XP, VC++2008)
                 string localeName = localeNameRaw;
