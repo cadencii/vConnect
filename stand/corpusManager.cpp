@@ -1,7 +1,7 @@
 /*
  * corpusManager.cpp
  * Copyright (C) 2010- HAL,
- * Copyright (C) 2011 kbinani.
+ * Copyright (C) 2011-2012 kbinani.
  *
  *  This files is a part of v.Connect.
  * corpusManager is a class that controls corpus based on UTAU.
@@ -14,7 +14,8 @@
 #include "corpusManager.h"
 #include "utauVoiceDB/UtauDB.h"
 #include "vConnectPhoneme.h"
-#include "vsqMetaText/vsqFileEx.h"
+#include "vsqMetaText/Sequence.h"
+#include "Configuration.h"
 
 corpusManager::corpusManager()
 {
@@ -128,6 +129,7 @@ corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
             string path = mDBPath + parameters.fileName;
             bool bResult = false;
             if( parameters.isWave ){
+                double framePeriod = Configuration::getMilliSecondsPerFrame();
                 bResult = target->p->readRawWave( mDBPath, &parameters, framePeriod );
             }else{
                 bResult = target->p->readPhoneme( path.c_str() );

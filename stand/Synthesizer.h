@@ -18,7 +18,7 @@
 #define __Synthesizer_h__
 
 #include "corpusManager.h"
-#include "vsqMetaText/vsqFileEx.h"
+#include "vsqMetaText/Sequence.h"
 #include "Task.h"
 #include "RuntimeOption.h"
 #include "FrameBP.h"
@@ -70,7 +70,7 @@ namespace vconnect
         static void emptyPath( double secOffset, string output );
 
     private: // private field
-        vsqFileEx mVsq;
+        Sequence mVsq;
         corpusManager mManager;
         vector<corpusManager *> mManagerList;
         long mEndFrame;

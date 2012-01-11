@@ -59,30 +59,4 @@ const string OBJ_NAME_OTOINI = "[oto.ini]";
 const string OBJ_NAME_EVENT_LIST = "[EventList]";
 const string OBJ_NAME_TEMPO = "[Tempo]";
 
-/*class vsqBase
-{
-public:
-
-    virtual ~vsqBase()
-    {
-    }
-
-    virtual void setParameter( string_t left, string_t right )
-    {
-    }
-
-    static void outputError( const char* p )
-    {
-        cout << p << endl;
-    }
-
-
-    //    static    double                tempo;
-//    static    long                endTick;
-    //static    vector<utauVoiceDataBase*> voiceDBs;
-//    static    map_t<string_t, vsqBase*> objectMap;
-//    static    map_t<string_t, int> singerMap;
-
-};*/
-
 #endif

@@ -16,7 +16,7 @@
 
 #include "vsqBase.h"
 
-class vsqTempo// : public vsqBase
+class vsqTempo
 {
 
 public:

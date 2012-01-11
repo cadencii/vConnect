@@ -1,5 +1,5 @@
 /**
- * vsqVibratoBP.h
+ * VibratoBP.h
  * Copyright (C) 2010 HAL, kbinani
  *
  * This file is part of v.Connect.
@@ -11,12 +11,15 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#ifndef __vsqVibratoBP_h__
-#define __vsqVibratoBP_h__
+#ifndef __VibratoBP_h__
+#define __VibratoBP_h__
 
-struct vsqVibratoBP{
-    float    position;
-    short    value;
-};
-
-#endif // __vsqVibratoBP_h__
+namespace vconnect
+{
+    struct VibratoBP
+    {
+        float    position;
+        short    value;
+    };
+}
+#endif

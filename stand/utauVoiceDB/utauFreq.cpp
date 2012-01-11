@@ -14,8 +14,11 @@
  *
  */
 #include "utauFreq.h"
+#include "../Configuration.h"
 
 #define BUFLEN 80
+
+using namespace vconnect;
 
 bool utauFreq::readFrqFile( string input )
 {
@@ -53,9 +56,10 @@ bool utauFreq::readFrqFile( string input )
 
 void utauFreq::getF0Contour( double* f0, double msLeftBlank, double msRightBlank, int length )
 {
-    double x;
+
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     double step = (double)fs * framePeriod / 1000.0 / (double)sampleInterval;
-    x = msLeftBlank / 1000.0 * (double)fs / (double)sampleInterval;
+    double x = msLeftBlank / 1000.0 * (double)fs / (double)sampleInterval;
 
     for( long i = 0; i < length; i++ ){
         if( 0 <= x && x < this->f0.size() )
@@ -68,9 +72,9 @@ void utauFreq::getF0Contour( double* f0, double msLeftBlank, double msRightBlank
 
 void utauFreq::getDynamics( double* dynamics, double msLeftBlank, double msRightBlank, int length )
 {
-    double x;
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     double step = (double)fs * framePeriod / 1000.0 / (double)sampleInterval;
-    x = msLeftBlank / 1000.0 * (double)fs / (double)sampleInterval;
+    double x = msLeftBlank / 1000.0 * (double)fs / (double)sampleInterval;
 
     for( long i = 0; i < length; i++ ){
         if( 0 <= x && x < volume.size() )

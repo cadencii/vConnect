@@ -302,6 +302,5 @@ extern mutex_t hFFTWMutex;
 #define SAFE_DELETE(x) if(x){ delete(x); x = NULL; }
 
 const int    fs = 44100;
-const double framePeriod = 2.0;
 
 #endif

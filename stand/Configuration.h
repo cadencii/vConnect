@@ -45,6 +45,16 @@ namespace vconnect
             return result;
         }
 
+        /**
+         * STAND で使用するフレーム単位時間が表す時間を取得する
+         * @return 1 フレーム時間あたりのミリ秒単位の時間
+         * @todo review; この doc コメントであってるか？
+         */
+        static double getMilliSecondsPerFrame()
+        {
+            return 2.0;
+        }
+
     private:
         Configuration()
         {

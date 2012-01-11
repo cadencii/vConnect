@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "BPList.h"
-#include "../stand.h"
+#include "../Configuration.h"
 
 namespace vconnect
 {
@@ -38,6 +38,7 @@ namespace vconnect
         vector<BP>::size_type size = this->data.size();
         dst.clear();
         dst.resize( size );
+        double framePeriod = Configuration::getMilliSecondsPerFrame();
         for( vector<BP>::size_type i = 0; i < size; i++ ){
             dst[i].value = this->data[i].value;
             dst[i].frameTime = INT_MAX;                // the value will continue till this time.

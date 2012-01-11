@@ -17,6 +17,7 @@
 #include "utauVoiceDB/UtauDB.h"
 #include "vConnectPhoneme.h"
 #include "vConnectUtility.h"
+#include "Configuration.h"
 
 
 // 転写システム
@@ -134,6 +135,7 @@ void Transcriber::_transcribe_compressed(vConnectPhoneme *src, vConnectPhoneme *
     vConnectUtility::calculateMatching(dst_to_src_stretched, src_to_dst, src_env, dst_to_src_stretched, src_len);
 
     cout << "  stretch src->dst." << endl;
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     for( int i = 0; i < dst_len - 1; i++ ){
         double tmp = (double)i / (double)dst_len * (double)src_len;
         if( tmp >= src_len - 1 ){

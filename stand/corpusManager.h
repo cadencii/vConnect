@@ -15,12 +15,12 @@
 #ifndef __corpusManager_h__
 #define __corpusManager_h__
 
+#include <list>
 #include "vConnectSetting.h"
 #include "RuntimeOption.h"
-#include <list>
+#include "vsqMetaText/Sequence.h"
 
 class vConnectPhoneme;
-class vsqEventEx;
 
 class corpusManager
 {
@@ -62,7 +62,7 @@ public:
     };
 
     struct itemForAnalyze {
-        list<vsqEventEx*> itemList;
+        list<Event*> itemList;
     };
 
     void setUtauDB( UtauDB *p, RuntimeOption &option );

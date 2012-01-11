@@ -11,13 +11,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include "Synthesizer.h"
 #include <time.h>
-
 #include <vorbis/vorbisfile.h>
-
+#include "Configuration.h"
+#include "Synthesizer.h"
 #include "vConnectPhoneme.h"
 #include "vConnectUtility.h"
+#include "vsqMetaText/EventList.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];
@@ -27,6 +27,8 @@ double temporary3[TRANS_MAX];
 double Synthesizer::noiseWave[NOISE_LEN];
 double Synthesizer::mNoteFrequency[NOTE_NUM];
 double Synthesizer::mVibrato[VIB_NUM];
+
+using namespace vconnect;
 
 __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg );
 
@@ -51,7 +53,7 @@ struct vConnectArg {
     int fftLength;
     vConnectFrame *frames;
     vector<vConnectPhoneme *> *phonemes;
-    vsqEventList *eventList;
+    EventList *eventList;
     vector<vector<FrameBP> > *controlCurves;
 };
 
@@ -124,10 +126,10 @@ void Synthesizer::emptyPath( double secOffset, string output )
     return;
 }
 
-void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhoneme *> &phonemes, vsqFileEx &vsq, vector<corpusManager *> &managers, vector<FrameBP> &briCurve, int beginFrame)
+void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhoneme *> &phonemes, Sequence &vsq, vector<corpusManager *> &managers, vector<FrameBP> &briCurve, int beginFrame)
 {
     vector<int> briArray;
-    vsqEventEx *itemPrev = NULL;
+    Event *itemPrev = NULL;
 
     // brightness を展開．
     int briIndex = 0;
@@ -141,10 +143,11 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
         briArray[i] = briCurve[briIndex].value;
     }
 
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     // 音符ごとに対応する音素を計算して合成リストへ追加していく．
     for(int i = 0; i < vsq.events.eventList.size(); i++) {
-        vsqEventEx *itemThis = vsq.events.eventList[i];
-        vsqEventEx *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
+        Event *itemThis = vsq.events.eventList[i];
+        Event *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
         string lyric = itemThis->lyricHandle.getLyric();
         list<corpusManager::phoneme *> phonemeList;
         corpusManager::phoneme *p;
@@ -339,6 +342,7 @@ void Synthesizer::run()
     // 準備２．合成に必要なローカル変数の初期化
     beginFrame = mVsq.events.eventList[0]->beginFrame;
     frameLength = mEndFrame - beginFrame;
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     waveLength = (long int)(frameLength * framePeriod * fs / 1000);
 
     wave = new double[waveLength];
@@ -485,11 +489,11 @@ corpusManager::phoneme* Synthesizer::getPhoneme(string lyric, int singerIndex, v
 }
 
 int getFirstItem(
-    vsqEventEx **p1,
-    vsqEventEx **p2,
+    Event **p1,
+    Event **p2,
     corpusManager::phoneme **ph1,
     corpusManager::phoneme **ph2,
-    vsqFileEx *vsq,
+    Sequence *vsq,
     vector<corpusManager *> &managers,
     int beginFrame )
 {
@@ -608,6 +612,7 @@ void calculateRawWave(double *starSpec,
     list<vConnectData *>::iterator i;
     double *tmpStar = new double[fftLength];
     fftw_complex *tmpRes = new fftw_complex[fftLength];
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     for(i = frames.begin(); i != frames.end(); i++)
     {
         if((*i)->phoneme->getMode() != VCNT_RAW)
@@ -699,6 +704,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
     int noiseCount = 0;
 
     // 合成処理
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     while( currentFrame < p->endFrame )
     {
         double currentF0;
@@ -840,7 +846,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 void Synthesizer::calculateVsqInfo( void )
 {
     // 書きづらいので
-    vector<vsqEventEx *> *events = &(mVsq.events.eventList);
+    vector<Event *> *events = &(mVsq.events.eventList);
     string temp;
     //vector<UtauDB*> *pDBs = this->vsq.getVoiceDBs();
     UtauDB* voiceDB;
@@ -852,9 +858,10 @@ void Synthesizer::calculateVsqInfo( void )
 
     /////////
     // 前から後ろをチェック
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
     for( unsigned int i = 0; i < events->size(); i++ )
     {
-        vsqEventEx *itemi = mVsq.events.eventList[i];
+        Event *itemi = mVsq.events.eventList[i];
 
         // タイプ判定
         while( itemi->type == "Singer" )
@@ -863,7 +870,7 @@ void Synthesizer::calculateVsqInfo( void )
             singerIndex = mVsq.getSingerIndex( itemi->iconHandle.getIDS() );
 
             // 自分を消して
-            vector<vsqEventEx*>::iterator it = events->begin();
+            vector<Event*>::iterator it = events->begin();
             int j = 0;
             while( it != events->end() )
             {
@@ -989,10 +996,11 @@ void Synthesizer::calculateF0( double *f0, double *dynamics )
     long portamentoBegin, portamentoLength;
     long previousEndFrame = LONG_MIN, vibratoBeginFrame = 0, noteBeginFrame;
     int  pitIndex = 0, pbsIndex = 0, dynIndex = 0; // ControlCurve Index
+    double framePeriod = Configuration::getMilliSecondsPerFrame();
 
     for( unsigned int i = 0; i < mVsq.events.eventList.size(); i++ )
     {
-        vsqEventEx *itemi = mVsq.events.eventList[i];
+        Event *itemi = mVsq.events.eventList[i];
 
         // デフォルト値で埋める
         for( ; index < itemi->beginFrame - beginFrame && index < frameLength; index++ )
@@ -1080,7 +1088,7 @@ void Synthesizer::calculateF0( double *f0, double *dynamics )
     // ポルタメントを描きます．（ビブラートとは実は順番依存）
     for( unsigned int i = 0; i < mVsq.events.eventList.size(); i++ )
     {
-        vsqEventEx *itemi = mVsq.events.eventList[i];
+        Event *itemi = mVsq.events.eventList[i];
 
         if( !itemi->isContinuousBack )
         {
