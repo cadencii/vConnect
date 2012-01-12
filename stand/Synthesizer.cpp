@@ -18,6 +18,7 @@
 #include "vConnectPhoneme.h"
 #include "vConnectUtility.h"
 #include "vsqMetaText/EventList.h"
+#include "Thread.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];
@@ -30,7 +31,7 @@ double Synthesizer::mVibrato[VIB_NUM];
 
 using namespace vconnect;
 
-__stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg );
+ThreadCallbackReturn ThreadCallbackDeclspec synthesizeFromList( void *arg );
 
 struct vConnectData {
     vConnectPhoneme *phoneme;
@@ -378,7 +379,7 @@ void Synthesizer::run()
     clock_t cl = clock();
 #ifdef STND_MULTI_THREAD
 
-    thread_t hThread[2];
+    Thread *hThread[2];
 
 #ifdef _DEBUG
     cout << "vConnect::synthesize; STND_MULTI_THREAD" << endl;
@@ -434,14 +435,14 @@ void Synthesizer::run()
     arg2.waveLength -= (int)(currentTime * fs);
 
 
-    hThread[0] = stnd_thread_create( synthesizeFromList, &arg1 );
-    hThread[1] = stnd_thread_create( synthesizeFromList, &arg2 );
+    hThread[0] = new Thread( synthesizeFromList, &arg1 );
+    hThread[1] = new Thread( synthesizeFromList, &arg2 );
 
-    stnd_thread_join( hThread[0] );
-    stnd_thread_join( hThread[1] );
+    hThread[0]->join();
+    hThread[1]->join();
 
-    stnd_thread_destroy( hThread[0] );
-    stnd_thread_destroy( hThread[1] );
+    delete hThread[0];
+    delete hThread[1];
     delete hMutex;
     delete hFFTWMutex;
     hMutex = NULL;
@@ -645,7 +646,7 @@ void appendNoise(double *wave, int length, double ratio, int *c)
     }
 }
 
-__stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
+ThreadCallbackReturn ThreadCallbackDeclspec synthesizeFromList( void *arg )
 {
     vConnectArg *p = (vConnectArg *)arg;
 
