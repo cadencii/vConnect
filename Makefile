@@ -11,23 +11,11 @@ HEADER=stand/*.h \
     stand/world/*.h
 
 OS=${shell uname}
-ifeq ($(OS),"Darwin")
-    ARCH= -arch i386 -arch x86_64 
+ifeq ($(OS),Darwin)
+    ARCH= -arch i386 -arch x86_64
 else
     ARCH=
 endif
-
-#install path of FFTW (Windows)
-PATHFFTW=
-IPATHFFTW=-I$(PATHFFTW)
-LPATHFFTW=-L$(PATHFFTW)
-ifeq ($(PATHFFTW),)
-  IPATHFFTW=
-  LPATHFFTW=
-endif
-
-#lib name of FFTW; Windows -> fftw3-3, Mac&Linux -> fftw3
-LIBFFT=fftw3
 
 #Preparing FFTW libs for windows:
 #    cd $(PATHFFTW)
@@ -41,21 +29,26 @@ LIBFFT=fftw3
 all: vConnect-STAND.exe
 
 vConnect-STAND.exe: $(SRC) $(HEADER) libiconv-1.13/lib/*.o
-	g++ $(ARCH)-finput-charset=UTF-8 -DSTND_MULTI_THREAD -g -s -O2 $(IPATHFFTW) $(SRC) libiconv-1.13/lib/*.o $(LPATHFFTW) -lpthread -l$(LIBFFT) -logg -lvorbis -lvorbisfile -lvorbisenc -o vConnect-STAND.exe
-
-libiconv-1.13/lib/*.o: libiconv-1.13.tar.gz
+	g++ $(ARCH) -finput-charset=UTF-8 -DSTND_MULTI_THREAD -O2 $(SRC) libiconv-1.13/lib/*.o -lpthread -lfftw3 -logg -lvorbis -lvorbisfile -lvorbisenc -o vConnect-STAND.exe
 
 libiconv-1.13.tar.gz:
-	rm -f libiconv-1.13.tar.gz
-	rm -rf libiconv-1.13
-	rm -f libiconv-1.13-ja-1.patch.gz
-	rm -f libiconv-1.13-ja-1.patch
 	wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.13.tar.gz
-	tar zxvf libiconv-1.13.tar.gz
+
+libiconv-1.13-ja-1.patch.gz:
 	wget http://www2d.biglobe.ne.jp/~msyk/software/libiconv/libiconv-1.13-ja-1.patch.gz
-	gunzip libiconv-1.13-ja-1.patch.gz
+
+libiconv-1.13/lib/*.o: libiconv-1.13.tar.gz libiconv-1.13-ja-1.patch.gz
+	rm -rf libiconv-1.13
+	rm -f libiconv-1.13-ja-1.patch
+	tar zxvf libiconv-1.13.tar.gz
+	gunzip -c libiconv-1.13-ja-1.patch.gz > libiconv-1.13-ja-1.patch
 	cd libiconv-1.13 && patch -p1 -N < ../libiconv-1.13-ja-1.patch
-	cd libiconv-1.13 && ./configure --enable-static --disable-shared CFLAGS=" -O $(ARCH) " && make
+	cd libiconv-1.13 && ./configure --enable-static --disable-shared
+	export O_CFLAGS=`cat libiconv-1.13/lib/Makefile | grep "^CFLAGS" | sed -e 's/^CFLAGS[ ]*=[ ]*\(.*\)$/\1/g'`
+	rm -rf libiconv-1.13
+	tar zxvf libiconv-1.13.tar.gz
+	cd libiconv-1.13 && patch -p1 -N < ../libiconv-1.13-ja-1.patch
+	cd libiconv-1.13 && ./configure --enable-static --disable-shared CFLAGS=" ${O_CFLAGS} $(ARCH) " && make
 
 clean:
 	rm -f vConnect-STAND.exe
