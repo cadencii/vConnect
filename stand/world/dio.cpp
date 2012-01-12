@@ -21,12 +21,12 @@
 #include "world.h"
 
 // 内部関数(ユーザは触らないほうが良い)
-void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLength, int fftl, double shiftTime, double f0Floor, double f0Ceil, double *timeAxis, int tLen, 
+void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLength, int fftl, double shiftTime, double f0Floor, double f0Ceil, double *timeAxis, int tLen,
                    double *f0Deviations, double *interpolatedF0);
 void zeroCrossingEngine(double *x, int xLen, double fs,
                         double *eLocations, double *iLocations, double *intervals, int *iLen);
 void nuttallWindow(int yLen, double *y);
-void postprocessing(double framePeriod, double f0Floor, int candidates, int xLen, int fs, 
+void postprocessing(double framePeriod, double f0Floor, int candidates, int xLen, int fs,
                     double **f0Map, double *bestF0, double *f0);
 
 // Calculation of the number of F0 contour
@@ -40,7 +40,7 @@ int getSamplesForDIO(int fs, int xLen, double framePeriod)
 // x    : Input signal whose length is xLen [sample]
 // xLen : Length of the input signal.
 // f0    : Estimated F0 contour
-void dio(double *x, int xLen, int fs, double framePeriod, 
+void dio(double *x, int xLen, int fs, double framePeriod,
          double *timeAxis, double *f0)
 {
     int i,j;
@@ -63,10 +63,10 @@ void dio(double *x, int xLen, int fs, double framePeriod,
 
     // fft Lengthの計算
     int yLen = (1 + (int)(xLen/decimationRatio));
-    int fftl = (int)pow(2.0, 1.0 + (int)(log((double)yLen + 
+    int fftl = (int)pow(2.0, 1.0 + (int)(log((double)yLen +
         (double)(4*(int)(1.0 + (double)fs/boundaryF0List[0]/2.0)) ) / log(2.0)));
     double *y = (double *)malloc(sizeof(double) * fftl);
-    
+
     // ダウンサンプリング
     decimateForF0(x, xLen, y, decimationRatio);
 
@@ -97,13 +97,13 @@ void dio(double *x, int xLen, int fs, double framePeriod,
 
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     forwardFFT = fftw_plan_dft_r2c_1d(fftl, y, ySpec, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
 
@@ -121,7 +121,7 @@ void dio(double *x, int xLen, int fs, double framePeriod,
     // イベントの計算 (4つのゼロ交差．詳しくは論文にて)
     for(i = 0;i <= nBands;i++)
     {
-        rawEventByDio(boundaryF0List[i], fss, ySpec, yLen, fftl, framePeriod/1000.0, f0Floor, f0Ceil, timeAxis, tLen, 
+        rawEventByDio(boundaryF0List[i], fss, ySpec, yLen, fftl, framePeriod/1000.0, f0Floor, f0Ceil, timeAxis, tLen,
             f0Deviations, interpolatedF0);
         for(j = 0;j < tLen;j++)
         {
@@ -158,13 +158,13 @@ void dio(double *x, int xLen, int fs, double framePeriod,
     free(f0Deviations);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     fftw_destroy_plan(forwardFFT);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
     free(ySpec);
@@ -333,7 +333,7 @@ void postprocessing(double framePeriod, double f0Floor, int candidates, int xLen
             if(f0Step4[i+k] == 0)
                 break;
         }
-        f0[i] = j != voiceRangeMinimum2 && k != voiceRangeMinimum2 ? 
+        f0[i] = j != voiceRangeMinimum2 && k != voiceRangeMinimum2 ?
             0 : f0Step4[i];
     }
 */
@@ -344,7 +344,7 @@ void postprocessing(double framePeriod, double f0Floor, int candidates, int xLen
 }
 
 // イベントを計算する内部関数 (内部変数なので引数・戻り値に手加減なし)
-void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLength, int fftl, double framePeriod, double f0Floor, double f0Ceil, double *timeAxis, int tLen, 
+void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLength, int fftl, double framePeriod, double f0Floor, double f0Ceil, double *timeAxis, int tLen,
                    double *f0Deviations, double *interpolatedF0)
 {
     int i;
@@ -360,13 +360,13 @@ void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLengt
     eSpec = (fftw_complex *)malloc(sizeof(fftw_complex) * fftl);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     forwardFFT = fftw_plan_dft_r2c_1d(fftl, equivalentFIR, eSpec, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
     fftw_execute(forwardFFT); // FFTの実行
@@ -384,13 +384,13 @@ void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLengt
     fftw_plan     inverseFFT;
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     inverseFFT = fftw_plan_dft_c2r_1d(fftl, eSpec, equivalentFIR, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
     fftw_execute(inverseFFT);
@@ -415,28 +415,28 @@ void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLengt
     dnIntervals = (double *)malloc(sizeof(double) * xLength);
     dpIntervals = (double *)malloc(sizeof(double) * xLength);
 
-    zeroCrossingEngine(equivalentFIR, xLength, fs, 
+    zeroCrossingEngine(equivalentFIR, xLength, fs,
         nELocations, nILocations, nIntervals, &nLen);
 
     for(i = 0;i < xLength;i++) equivalentFIR[i] = -equivalentFIR[i];
-    zeroCrossingEngine(equivalentFIR, xLength, fs, 
+    zeroCrossingEngine(equivalentFIR, xLength, fs,
         pELocations, pILocations, pIntervals, &pLen);
 
     for(i = 0;i < xLength-1;i++) equivalentFIR[i] = equivalentFIR[i]-equivalentFIR[i+1];
-    zeroCrossingEngine(equivalentFIR, xLength-1, fs, 
+    zeroCrossingEngine(equivalentFIR, xLength-1, fs,
         dnELocations, dnILocations, dnIntervals, &dnLen);
 
     for(i = 0;i < xLength-1;i++) equivalentFIR[i] = -equivalentFIR[i];
-    zeroCrossingEngine(equivalentFIR, xLength-1, fs, 
+    zeroCrossingEngine(equivalentFIR, xLength-1, fs,
         dpELocations, dpILocations, dpIntervals, &dpLen);
 
 
     int usableChannel;
-    usableChannel = checkEvent(nLen-2) * checkEvent(pLen-2) * 
+    usableChannel = checkEvent(nLen-2) * checkEvent(pLen-2) *
         checkEvent(dnLen-2) * checkEvent(dpLen-2);
 
     double *interpolatedF0Set[4];
-    if(usableChannel <= 0) 
+    if(usableChannel <= 0)
     { // ノー候補でフィニッシュです
         for(i = 0;i < tLen;i++)
         {
@@ -456,7 +456,7 @@ void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLengt
 
         for(i = 0;i < tLen;i++)
         {
-            interpolatedF0[i] = (interpolatedF0Set[0][i] + interpolatedF0Set[1][i] + 
+            interpolatedF0[i] = (interpolatedF0Set[0][i] + interpolatedF0Set[1][i] +
                 interpolatedF0Set[2][i] + interpolatedF0Set[3][i]) / 4.0;
 
             f0Deviations[i]   = sqrt( ((interpolatedF0Set[0][i]-interpolatedF0[i])*(interpolatedF0Set[0][i]-interpolatedF0[i])
@@ -464,7 +464,7 @@ void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLengt
                 + (interpolatedF0Set[2][i]-interpolatedF0[i])*(interpolatedF0Set[2][i]-interpolatedF0[i])
                 + (interpolatedF0Set[3][i]-interpolatedF0[i])*(interpolatedF0Set[3][i]-interpolatedF0[i])) / 3.0);
 
-            if(interpolatedF0[i] > boundaryF0 || interpolatedF0[i] < boundaryF0/2.0 
+            if(interpolatedF0[i] > boundaryF0 || interpolatedF0[i] < boundaryF0/2.0
                 || interpolatedF0[i] > f0Ceil || interpolatedF0[i] < FLOOR) // 70 Hz以下はF0としない．
             {
                 interpolatedF0[i] = 0.0;
@@ -491,14 +491,14 @@ void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLengt
     free(dpIntervals);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
-    fftw_destroy_plan(inverseFFT);    
+    fftw_destroy_plan(inverseFFT);
     fftw_destroy_plan(forwardFFT);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
     free(eSpec);

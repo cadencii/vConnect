@@ -31,7 +31,7 @@
 
 // 特定時刻の応答を取得する．
 void getOneFrameSegment_v4(double *f0, int tLen, double **specgram, double **residualSpecgram, int fftl, double framePeriod, double currentTime, int fs, double defaultF0,
-                        fftw_complex *spectrum, fftw_complex *cepstrum, 
+                        fftw_complex *spectrum, fftw_complex *cepstrum,
                         double *response, int xLen, fftw_plan *inverseFFT_RP, fftw_plan minForward, fftw_plan minInverse)
 {
     int i;
@@ -39,14 +39,14 @@ void getOneFrameSegment_v4(double *f0, int tLen, double **specgram, double **res
 
     int currentFrame, currentPosition;
 
-    currentFrame = (int)(currentTime/(framePeriod/1000.0) + 0.5);    
+    currentFrame = (int)(currentTime/(framePeriod/1000.0) + 0.5);
     currentPosition = (int)(currentTime*(double)fs);
 
     tmp = currentTime + 1.0/(f0[currentFrame] == 0.0 ? defaultF0 : f0[currentFrame]);
-    
+
     // 値を取り出す
     getMinimumPhaseSpectrum(specgram[currentFrame], spectrum, cepstrum, fftl, minForward, minInverse);
-    
+
     spectrum[0][0] *= residualSpecgram[currentFrame][0];
     for(i = 1;i < fftl/2;i++)
     {
@@ -61,7 +61,7 @@ void getOneFrameSegment_v4(double *f0, int tLen, double **specgram, double **res
 }
 
 
-void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpecgram, int fftl, double framePeriod, int fs, 
+void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpecgram, int fftl, double framePeriod, int fs,
                double *synthesisOut, int xLen)
 {
     int i,j;
@@ -73,7 +73,7 @@ void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpec
     fftw_plan    inverseFFT_RP, minForward, minInverse;                // FFTセット
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     inverseFFT_RP = fftw_plan_dft_c2r_1d(fftl, spectrum, impulseResponse ,  FFTW_ESTIMATE);
@@ -81,7 +81,7 @@ void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpec
     minInverse = fftw_plan_dft_1d(fftl, cepstrum, spectrum, FFTW_BACKWARD, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
 
@@ -120,7 +120,7 @@ void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpec
 
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     fftw_destroy_plan(inverseFFT_RP);
@@ -128,7 +128,7 @@ void synthesis_v4(double *f0, int tLen, double **specgram, double **residualSpec
     fftw_destroy_plan(minInverse);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
     free(cepstrum); free(spectrum);

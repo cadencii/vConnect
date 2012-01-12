@@ -29,16 +29,16 @@
 
 // spectrum, cepstrumは毎回malloc, freeするのが面倒だから．
 void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperiodicity, int fftl, double framePeriod, double currentTime, int fs, double defaultF0,
-                        fftw_complex *spectrum, fftw_complex *cepstrum, 
+                        fftw_complex *spectrum, fftw_complex *cepstrum,
                         double *response, int xLen);
 
 // xorshift法と中心極限定理との組み合わせ
-/*double randn(void) 
+/*double randn(void)
 {
     static unsigned int x = 123456789;
     static unsigned int y = 362436069;
     static unsigned int z = 521288629;
-    static unsigned int w = 88675123; 
+    static unsigned int w = 88675123;
     unsigned int t;
      t = x ^ (x << 11);
     x = y; y = z; z = w;
@@ -66,7 +66,7 @@ void getMinimumPhaseSpectrum(double *inputSpec, fftw_complex *spectrum, fftw_com
     double real, imag;
 
     // 値を取り出す
-    for(i = 0;i <= fftl/2;i++)    
+    for(i = 0;i <= fftl/2;i++)
     {
         // 加算は暫定処置
         spectrum[i][0] = log(inputSpec[i] + 1.0e-17)/2.0;
@@ -100,7 +100,7 @@ void getMinimumPhaseSpectrum(double *inputSpec, fftw_complex *spectrum, fftw_com
 
 // 特定時刻の応答を取得する．
 void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperiodicity, int fftl, double framePeriod, double currentTime, int fs, double defaultF0,
-                        fftw_complex *spectrum, fftw_complex *cepstrum, 
+                        fftw_complex *spectrum, fftw_complex *cepstrum,
                         double *response, int xLen)
 {
     int i, offset, noiseSize;
@@ -126,7 +126,7 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
 
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
 
@@ -138,11 +138,11 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
 
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
 
-    currentFrame = (int)(currentTime/(framePeriod/1000.0) + 0.5);    
+    currentFrame = (int)(currentTime/(framePeriod/1000.0) + 0.5);
     currentPosition = (int)(currentTime*(double)fs);
 
     tmp = currentTime + 1.0/(f0[currentFrame] == 0.0 ? defaultF0 : f0[currentFrame]);
@@ -159,7 +159,7 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
         for(i = 0;i < (int)((double)fs/defaultF0);i++)
         {
             if(i+currentPosition >= xLen || i+offset > fftl/2) break;
-            response[i] = specgram[currentFrame][i+offset]; 
+            response[i] = specgram[currentFrame][i+offset];
         }
     }
     else
@@ -218,7 +218,7 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
 
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
 
@@ -231,7 +231,7 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
 
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
     free(periodicSpec);
@@ -244,7 +244,7 @@ void getOneFrameSegment(double *f0, int tLen, double **specgram, double **aperio
 
 
 
-void synthesis(double *f0, int tLen, double **specgram, double **aperiodicity, int fftl, double framePeriod, int fs, 
+void synthesis(double *f0, int tLen, double **specgram, double **aperiodicity, int fftl, double framePeriod, int fs,
                double *synthesisOut, int xLen)
 {
     int i,j;

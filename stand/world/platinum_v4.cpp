@@ -62,7 +62,7 @@ void getOneFrameResidualSpec(double *x, int xLen, int fs, int positionIndex, dou
     for(i = 0;i < wLen;i++)
     {
         tmpIndex = i+index - (int)(0.5+T0);
-        tmpWave[i] = x[max(0, tmpIndex)] * 
+        tmpWave[i] = x[max(0, tmpIndex)] *
         (0.5 - 0.5*cos(2.0*PI*(double)(i+1)/((double)(wLen+1))));
     }
     for(;i < fftl;i++)
@@ -104,7 +104,7 @@ int getPulseLocations(double *x, int xLen, double *totalPhase, int vuvNum, int *
         for(j = stIndex;j < edIndex-1;j++) basePhase[j] = fmod(totalPhase[j+1]-tmp, 2*PI) - fmod(totalPhase[j]-tmp, 2*PI);
 
         basePhase[0] = 0; numberOfLocation = 0;
-        for(j = stIndex;j < edIndex;j++) 
+        for(j = stIndex;j < edIndex;j++)
         {
             if(fabs(basePhase[j]) > PI/2.0)
             {
@@ -159,7 +159,7 @@ void getWedgeList(double *x, int xLen, int vuvNum, int *stList, int *edList, int
 // PLATINUM Version 0.0.4. 恐らくこの仕様で確定です．
 // Aperiodicity estimation based on PLATINUM
 
-void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, double **specgram, 
+void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, double **specgram,
          double **residualSpecgram)
 {
     int i, j, index;
@@ -205,12 +205,12 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     edList[vuvNum-1] = tLen-1;
     for(i = index;i < tLen;i++)
     {
-        if(f0[i]!=0.0 && f0[i-1]==0.0) 
+        if(f0[i]!=0.0 && f0[i-1]==0.0)
         {
             edList[edCount++] = i-1;
             stList[stCount++] = i;
         }
-        if(f0[i]==0.0 && f0[i-1]!=0.0) 
+        if(f0[i]==0.0 && f0[i-1]!=0.0)
         {
             edList[edCount++] = i-1;
             stList[stCount++] = i;
@@ -241,7 +241,7 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     // Mutex 操作はひとつにまとめる．
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
        forwardFFT = fftw_plan_dft_r2c_1d(fftl, tmpWave, tmpSpec, FFTW_ESTIMATE);
@@ -249,7 +249,7 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
        minInverse = fftw_plan_dft_1d(fftl, ceps, starSpec, FFTW_BACKWARD, FFTW_ESTIMATE);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
 
@@ -280,7 +280,7 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     free(edList); free(stList);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     fftw_destroy_plan(forwardFFT);
@@ -288,7 +288,7 @@ void platinum_v4(double *x, int xLen, int fs, double *timeAxis, double *f0, doub
     fftw_destroy_plan(minInverse);
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex ){
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
     free(tmpSpec); free(ceps); free(starSpec);

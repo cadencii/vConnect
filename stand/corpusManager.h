@@ -19,6 +19,9 @@
 #include "vConnectSetting.h"
 #include "RuntimeOption.h"
 #include "vsqMetaText/Sequence.h"
+#include "Mutex.h"
+
+using namespace vconnect;
 
 class vConnectPhoneme;
 
@@ -57,7 +60,7 @@ public:
         bool enableFrequency;
         phoneme *children;
 #if defined( STND_MULTI_THREAD )
-        mutex_t waitHandle;
+        Mutex *waitHandle;
 #endif
     };
 

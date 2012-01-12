@@ -326,6 +326,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Mutex.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Mutex.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Path.h"
 				>
 			</File>
@@ -438,7 +446,39 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vsqMetaText\vsqBase.cpp"
+				RelativePath=".\vsqMetaText\Event.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\EventList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\EventList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\Handle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\Handle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\Lyric.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\Sequence.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\Sequence.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vsqMetaText\VibratoBP.h"
 				>
 			</File>
 			<File
@@ -447,42 +487,6 @@
 			</File>
 			<File
 				RelativePath=".\vsqControl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqEventEx.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqEventEx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqEventList.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqEventList.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqFileEx.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqFileEx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqHandle.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqHandle.h"
-				>
-			</File>
-			<File
-				RelativePath=".\vsqMetaText\vsqLyric.h"
 				>
 			</File>
 			<File

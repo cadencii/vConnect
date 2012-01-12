@@ -32,6 +32,7 @@
 
 #include "world/world.h"
 #include "waveFileEx/waveFileEx.h"
+#include "Mutex.h"
 
 using namespace std;
 
@@ -243,57 +244,11 @@ inline void stnd_thread_destroy( thread_t tid ){
 #endif
 };
 
-/**
- * 新しいmutexオブジェクトを作成します
- */
-inline mutex_t stnd_mutex_create(){
-#ifdef USE_PTHREADS
-    pthread_mutex_t *ret = (pthread_mutex_t *)malloc( sizeof( pthread_mutex_t ) );
-    pthread_mutex_init( ret, NULL );
-    return ret;
-#else
-    return CreateMutex( NULL, FALSE, NULL );
-#endif
-};
-
-/**
- * stnd_mutex_createで作成したmutexオブジェクトを破棄します
- */
-inline void stnd_mutex_destroy( mutex_t mutex ){
-#ifdef USE_PTHREADS
-    pthread_mutex_destroy( mutex );
-    free( mutex );
-#else
-    CloseHandle( mutex );
-#endif
-};
-
-/**
- * mutexオブジェクトによりロックを取得します
- */
-inline void stnd_mutex_lock( mutex_t mutex ){
-#ifdef USE_PTHREADS
-    pthread_mutex_lock( mutex );
-#else
-    WaitForSingleObject( mutex, INFINITE );
-#endif
-};
-
-/**
- * stnd_mutex_lockで取得したロックを解除します
- */
-inline void stnd_mutex_unlock( mutex_t mutex ){
-#ifdef USE_PTHREADS
-    pthread_mutex_unlock( mutex );
-#else
-    ReleaseMutex( mutex );
-#endif
-};
 #endif // STND_MULTI_THREAD
 
 #ifdef STND_MULTI_THREAD
-extern mutex_t hMutex;
-extern mutex_t hFFTWMutex;
+extern vconnect::Mutex *hMutex;
+extern vconnect::Mutex *hFFTWMutex;
 #endif
 
 //#define DEBUG

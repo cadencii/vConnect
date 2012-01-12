@@ -44,19 +44,16 @@ void corpusManager::analyze( vector<string> &phonemes )
 corpusManager::~corpusManager()
 {
     map_t<string, phoneme *>::iterator i;
-    for( i = objectMap.begin(); i != objectMap.end(); i++ )
-    {
+    for( i = objectMap.begin(); i != objectMap.end(); i++ ){
         SAFE_DELETE( i->second->p );
         SAFE_DELETE( i->second );
     }
-    for( int j = 0; j < mAppendCorpus.size(); j++)
-    {
+    for( int j = 0; j < mAppendCorpus.size(); j++){
         delete mAppendCorpus[j];
     }
 
     // うーん…
-    if(mIsAppend)
-    {
+    if(mIsAppend){
         delete mUtauDB;
     }
 }
@@ -68,63 +65,52 @@ corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
     string alphabet, vtd_path;
 
 #ifdef STND_MULTI_THREAD
-    if( hMutex )
-    {
-        stnd_mutex_lock( hMutex );
+    if( hMutex ){
+        hMutex->lock();
     }
 #endif
 
     // まず vConnectPhoneme の有無をチェック．
     i = objectMap.find( lyric );
 
-    if( i != objectMap.end() )         // 希望のデータが存在するのでそれを返す．
-    {
+    if( i != objectMap.end() ){         // 希望のデータが存在するのでそれを返す．
 #ifdef STND_MULTI_THREAD
-        if( hMutex )
-        {
-            stnd_mutex_unlock( hMutex );
+        if( hMutex ){
+            hMutex->unlock();
         }
-        if( i->second->isProcessing )        // あるにはあるけど分析中なので待機．
-        {
-            if( i->second->waitHandle )
-            {
-                stnd_mutex_lock( i->second->waitHandle );
+        if( i->second->isProcessing ){        // あるにはあるけど分析中なので待機．
+            if( i->second->waitHandle ){
+                i->second->waitHandle->lock();
                 // ロックが取得できたってことは分析終了なので即解放
-                stnd_mutex_unlock( i->second->waitHandle );
-                stnd_mutex_destroy( i->second->waitHandle );
+                i->second->waitHandle->unlock();
+                delete i->second->waitHandle;
             }
             i->second->waitHandle = NULL;
         }
 #endif
 
-        if( i->second->isValid )
-        {             // 有効性を見る．
+        if( i->second->isValid ){
+            // 有効性を見る．
             ret = i->second;
-        }
-        else
-        {
+        }else{
             ret = NULL;
         }
-    }
-    else
-    {                              // 希望するデータが存在しないので作成する．
+    }else{                              // 希望するデータが存在しないので作成する．
         UtauParameter parameters;
         phoneme *target = new phoneme;  // ハッシュには先に突っ込んでしまう．
         objectMap.insert( make_pair( lyric, target ) );
 
 #ifdef STND_MULTI_THREAD
         target->isProcessing = true;
-        target->waitHandle = stnd_mutex_create();// CreateEvent(NULL,TRUE,FALSE,NULL);
-        stnd_mutex_lock( target->waitHandle );
-        if( hMutex )
-        {
-            stnd_mutex_unlock( hMutex );
+        target->waitHandle = new Mutex();// CreateEvent(NULL,TRUE,FALSE,NULL);
+        target->waitHandle->lock();
+        if( hMutex ){
+            hMutex->unlock();
         }
 #endif
 
         // UTAU の原音設定が無ければ読み込みを行わない．
-        if( mUtauDB->getParams( parameters, lyric ) )
-        {
+        if( mUtauDB->getParams( parameters, lyric ) ){
             target->p = new vConnectPhoneme;
             string path = mDBPath + parameters.fileName;
             bool bResult = false;
@@ -147,9 +133,8 @@ corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
         target->isProcessing = false;
 
 #ifdef STND_MULTI_THREAD
-        if( target->waitHandle )
-        {
-            stnd_mutex_unlock( target->waitHandle );
+        if( target->waitHandle ){
+            target->waitHandle->unlock();
         }
 #endif
     }
@@ -162,18 +147,15 @@ corpusManager::phoneme *corpusManager::getPhoneme(string lyric, list<phoneme*> &
     phoneme *p = NULL;
 
     // 有効な音素なら追加する．
-    if((p = getPhoneme(lyric)) && p->isValid && p->p)
-    {
+    if((p = getPhoneme(lyric)) && p->isValid && p->p){
         p->enableBrightness = mEnableBrightness;
         p->enableFrequency = mEnableFrequency;
         phonemeList.push_back(p);
     }
 
     // アペンドがあるならそれを追加．
-    for(int i = 0; i < mAppendCorpus.size(); i++)
-    {
-        if(mAppendCorpus[i] && p)
-        {
+    for(int i = 0; i < mAppendCorpus.size(); i++){
+        if(mAppendCorpus[i] && p){
             p->children = mAppendCorpus[i]->getPhoneme(lyric, phonemeList);
         }
     }
@@ -184,19 +166,16 @@ void corpusManager::setUtauDB( UtauDB *p, RuntimeOption &options )
 {
     string tmp;
     mUtauDB = p;
-    if( p )
-    {
+    if( p ){
         p->getDBPath( mDBPath );
     }
     tmp = "vConnect.ini";
     mEnableExtention =  setting.readSetting( mDBPath, tmp, options.getEncodingOtoIni().c_str()); // 文字コード指定は暫定処置
 
-    if(mEnableExtention)
-    {
+    if(mEnableExtention){
         setCorpusSetting(setting.getLibrarySetting(SETTING_BASE));
         librarySetting *brightnessSetting = setting.getLibrarySetting(SETTING_BRIGHTNESS);
-        if(mEnableBrightness && brightnessSetting)
-        {
+        if(mEnableBrightness && brightnessSetting){
             UtauDB *db = new UtauDB();
             mAppendCorpus.resize(1, NULL);
             mAppendCorpus[0] = new corpusManager();
@@ -218,8 +197,7 @@ bool corpusManager::checkEnableExtention()
 
 void corpusManager::setCorpusSetting(librarySetting *setting)
 {
-    if(!setting)
-    {
+    if(!setting){
         mEnableBrightness = mEnableFrequency = false;
         return;
     }

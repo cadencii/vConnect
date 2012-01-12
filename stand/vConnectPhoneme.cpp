@@ -470,7 +470,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauPara
 #ifdef STND_MULTI_THREAD
                 if(hMutex)
                 {
-                    stnd_mutex_lock(hMutex);
+                    hMutex->lock();
                 }
 #endif
                 */
@@ -479,7 +479,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauPara
 #ifdef STND_MULTI_THREAD
                 if(hMutex)
                 {
-                    stnd_mutex_unlock(hMutex);
+                    hMutex->unlock();
                 }
 #endif
                 */

@@ -384,8 +384,8 @@ void Synthesizer::run()
     cout << "vConnect::synthesize; STND_MULTI_THREAD" << endl;
 #endif
 
-    hMutex = stnd_mutex_create();
-    hFFTWMutex = stnd_mutex_create();
+    hMutex = new Mutex();
+    hFFTWMutex = new Mutex();
 
 #ifdef _DEBUG
     cout << "vConnect::synthesize; mutex created: hFFTWMutex" << endl;
@@ -442,8 +442,8 @@ void Synthesizer::run()
 
     stnd_thread_destroy( hThread[0] );
     stnd_thread_destroy( hThread[1] );
-    stnd_mutex_destroy( hMutex );
-    stnd_mutex_destroy( hFFTWMutex );
+    delete hMutex;
+    delete hFFTWMutex;
     hMutex = NULL;
     hFFTWMutex = NULL;
 
@@ -663,7 +663,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex )
     {
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     fftw_plan forward = fftw_plan_dft_1d(p->fftLength, spectrum, cepstrum, FFTW_FORWARD,  FFTW_ESTIMATE);
@@ -674,7 +674,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex )
     {
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
 
@@ -818,7 +818,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex )
     {
-        stnd_mutex_lock( hFFTWMutex );
+        hFFTWMutex->lock();
     }
 #endif
     fftw_destroy_plan( forward );
@@ -829,7 +829,7 @@ __stnd_thread_start_retval __stnd_declspec synthesizeFromList( void *arg )
 #ifdef STND_MULTI_THREAD
     if( hFFTWMutex )
     {
-        stnd_mutex_unlock( hFFTWMutex );
+        hFFTWMutex->unlock();
     }
 #endif
 

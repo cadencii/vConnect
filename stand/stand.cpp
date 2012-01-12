@@ -15,6 +15,6 @@
 
 #ifdef STND_MULTI_THREAD
 // あんまり使いたくないグローバル変数．
-mutex_t hMutex = NULL;
-mutex_t hFFTWMutex = NULL;
+vconnect::Mutex *hMutex = NULL;
+vconnect::Mutex *hFFTWMutex = NULL;
 #endif
