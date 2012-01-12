@@ -834,14 +834,8 @@ ThreadCallbackReturn ThreadCallbackDeclspec synthesizeFromList( void *arg )
     }
 #endif
 
-#ifdef STND_MULTI_THREAD
-#ifndef USE_PTHREADS
-    _endthreadex( 0 );
-#endif
-    return NULL;
-#else
+    Thread::tellThreadEnd();
     return 0;
-#endif
 }
 
 void Synthesizer::calculateVsqInfo( void )

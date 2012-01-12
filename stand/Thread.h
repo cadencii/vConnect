@@ -32,12 +32,25 @@ namespace vconnect
     public:
         /**
          * スレッドの作成と開始を行います
+         * @param start スレッドで実行するワーカーメソッド
+         * @param argument ワーカーメソッドに渡す引数
          */
         Thread( ThreadCallback start, void* argument );
 
+        /**
+         * スレッドが停止するのを待つ
+         */
         void join();
 
+        /**
+         * デストラクタ
+         */
         ~Thread();
+
+        /**
+         * スレッドのワーカーメソッド内で、ワーカーが終了するときに呼ばなくてはならない
+         */
+        static void tellThreadEnd();
 
     private:
         Thread()

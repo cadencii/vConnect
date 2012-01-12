@@ -19,6 +19,11 @@ namespace vconnect
     {
         CloseHandle( this->thread );
     }
+
+    void Thread::tellThreadEnd()
+    {
+        _endthreadex( 0 );
+    }
 #else
     Thread::Thread( ThreadCallback start, void *argument )
     {
@@ -34,6 +39,10 @@ namespace vconnect
     Thread::~Thread()
     {
         free( this->thread );
+    }
+
+    void Thread::tellThreadEnd()
+    {
     }
 #endif
 }
