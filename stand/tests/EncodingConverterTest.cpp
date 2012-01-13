@@ -1,6 +1,4 @@
-﻿#ifndef TEST_EncodingConverterTest
-#define TEST_EncodingConverterTest
-#include "AllTests.h"
+﻿#include "AllTests.h"
 #include "../EncodingConverter.h"
 
 using namespace vconnect;
@@ -62,4 +60,3 @@ public:
 };
 
 REGISTER_TEST_SUITE( EncodingConverterTest );
-#endif

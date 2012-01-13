@@ -1,6 +1,4 @@
-﻿#ifndef TEST_UtauParameterTest
-#define TEST_UtauParameterTest
-#include "AllTests.h"
+﻿#include "AllTests.h"
 #include "../utauVoiceDB/UtauParameter.h"
 
 using namespace vconnect;
@@ -34,4 +32,3 @@ public:
 };
 
 REGISTER_TEST_SUITE( UtauParameterTest );
-#endif

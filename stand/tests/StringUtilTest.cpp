@@ -1,6 +1,4 @@
-﻿#ifndef TEST_StringUtilTest
-#define TEST_StringUtilTest
-#include "AllTests.h"
+﻿#include "AllTests.h"
 #include "../StringUtil.h"
 
 using namespace std;
@@ -82,4 +80,3 @@ public:
 };
 
 REGISTER_TEST_SUITE( StringUtilTest );
-#endif

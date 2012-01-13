@@ -1,6 +1,4 @@
-﻿#ifndef TEST_TextOutputStreamTest
-#define TEST_TextOutputStreamTest
-#include "AllTests.h"
+﻿#include "AllTests.h"
 #include "../TextOutputStream.h"
 
 using namespace vconnect;
@@ -45,4 +43,3 @@ public:
 };
 
 REGISTER_TEST_SUITE( TextOutputStreamTest );
-#endif

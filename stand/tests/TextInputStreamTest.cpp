@@ -1,6 +1,4 @@
-﻿#ifndef TEST_TextInputStreamTest
-#define TEST_TextInputStreamTest
-#include "AllTests.h"
+﻿#include "AllTests.h"
 #include "../TextInputStream.h"
 
 using namespace vconnect;
@@ -61,4 +59,3 @@ public:
 };
 
 REGISTER_TEST_SUITE( TextInputStreamTest );
-#endif

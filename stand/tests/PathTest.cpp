@@ -1,6 +1,4 @@
-﻿#ifndef TEST_PathTest
-#define TEST_PathTest
-#include "AllTests.h"
+﻿#include "AllTests.h"
 #include "../Path.h"
 
 using namespace std;
@@ -64,4 +62,3 @@ public:
 };
 
 REGISTER_TEST_SUITE( PathTest );
-#endif
