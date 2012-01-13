@@ -112,7 +112,7 @@ namespace vconnect
         static bool exists( string path )
         {
             #ifdef _WIN32
-                return PathFileExists( path.c_str() ) ? true : false;
+                return PathFileExistsA( path.c_str() ) ? true : false;
             #else
                 struct stat statResult;
                 return (stat( path.c_str(), & statResult ) == 0) ? true : false;

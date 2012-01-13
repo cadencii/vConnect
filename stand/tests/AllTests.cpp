@@ -6,9 +6,6 @@
 #include "StringUtilTest.h"
 #include "PathTest.h"
 #include "UtauParameterTest.h"
-#include "ThreadTest.h"
-
-string ThreadTest::result = "";
 
 int main( int argc, char* argv[] )
 {

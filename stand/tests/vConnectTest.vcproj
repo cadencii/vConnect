@@ -25,6 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)fixture\*.* $(TargetDir)fixture\&#x0D;&#x0A;xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -86,7 +87,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /S /E /F /G /H /R /K /Y /EXCLUDE:.svn $(ProjectDir)fixture\*.* $(TargetDir)fixture\"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -99,6 +100,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)fixture\*.* $(TargetDir)fixture\&#x0D;&#x0A;xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -162,7 +164,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /S /E /F /G /H /R /K /Y /EXCLUDE:.svn $(ProjectDir)fixture\*.* $(TargetDir)fixture\"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
@@ -217,6 +219,10 @@
 			Name="stand"
 			>
 			<File
+				RelativePath="..\Mutex.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Thread.cpp"
 				>
 			</File>
@@ -258,7 +264,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\ThreadTest.h"
+			RelativePath=".\ThreadTest.cpp"
 			>
 		</File>
 		<File

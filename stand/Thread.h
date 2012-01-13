@@ -1,3 +1,16 @@
+/*
+ * Thread.h
+ * Copyright © 2012 kbinani
+ *
+ * This file is part of vConnect-STAND.
+ *
+ * vConnect-STAND is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
+ *
+ * vConnect-STAND is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #ifndef __Thread_h__
 #define __Thread_h__
 
@@ -6,19 +19,20 @@
     #include <process.h>
 #else
     #include <pthread.h>
+    #include <unistd.h>
 #endif
 
 namespace vconnect
 {
 
 #ifdef _WIN32
-    #define ThreadCallbackDeclspec __stdcall
-    typedef unsigned int ThreadCallbackReturn;
+    #define ThreadWorkerDeclspec __stdcall
+    typedef unsigned int ThreadWorkerReturnType;
 #else
-    #define ThreadCallbackDeclspec
-    typedef void* ThreadCallbackReturn;
+    #define ThreadWorkerDeclspec
+    typedef void* ThreadWorkerReturnType;
 #endif
-    typedef ThreadCallbackReturn (ThreadCallbackDeclspec *ThreadCallback)( void *argument );
+    typedef ThreadWorkerReturnType (ThreadWorkerDeclspec *ThreadWorker)( void *argument );
 
     class Thread
     {
@@ -35,7 +49,7 @@ namespace vconnect
          * @param start スレッドで実行するワーカーメソッド
          * @param argument ワーカーメソッドに渡す引数
          */
-        Thread( ThreadCallback start, void* argument );
+        Thread( ThreadWorker start, void* argument );
 
         /**
          * スレッドが停止するのを待つ
@@ -51,6 +65,12 @@ namespace vconnect
          * スレッドのワーカーメソッド内で、ワーカーが終了するときに呼ばなくてはならない
          */
         static void tellThreadEnd();
+
+        /**
+         * 指定されたミリ秒数だけスレッドを休止する
+         * @param milliseconds 休止するミリ秒数
+         */
+        static void sleep( unsigned int milliseconds );
 
     private:
         Thread()

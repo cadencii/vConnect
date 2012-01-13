@@ -31,7 +31,7 @@ double Synthesizer::mVibrato[VIB_NUM];
 
 using namespace vconnect;
 
-ThreadCallbackReturn ThreadCallbackDeclspec synthesizeFromList( void *arg );
+ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg );
 
 struct vConnectData {
     vConnectPhoneme *phoneme;
@@ -646,7 +646,7 @@ void appendNoise(double *wave, int length, double ratio, int *c)
     }
 }
 
-ThreadCallbackReturn ThreadCallbackDeclspec synthesizeFromList( void *arg )
+ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
 {
     vConnectArg *p = (vConnectArg *)arg;
 
