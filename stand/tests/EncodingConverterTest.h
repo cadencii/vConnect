@@ -1,4 +1,4 @@
-#ifndef TEST_EncodingConverterTest
+﻿#ifndef TEST_EncodingConverterTest
 #define TEST_EncodingConverterTest
 #include "AllTests.h"
 #include "../EncodingConverter.h"

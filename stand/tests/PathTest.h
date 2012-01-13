@@ -1,4 +1,4 @@
-#ifndef TEST_PathTest
+﻿#ifndef TEST_PathTest
 #define TEST_PathTest
 #include "AllTests.h"
 #include "../Path.h"

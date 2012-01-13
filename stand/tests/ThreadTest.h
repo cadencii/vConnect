@@ -1,4 +1,4 @@
-#ifndef TEST_ThreadTest
+﻿#ifndef TEST_ThreadTest
 #define TEST_ThreadTest
 #include "AllTests.h"
 #include "../Thread.h"

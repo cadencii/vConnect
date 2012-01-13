@@ -1,4 +1,4 @@
-#include "AllTests.h"
+﻿#include "AllTests.h"
 
 #include "EncodingConverterTest.h"
 #include "TextInputStreamTest.h"

@@ -1,4 +1,4 @@
-#ifndef TEST_TextInputStreamTest
+﻿#ifndef TEST_TextInputStreamTest
 #define TEST_TextInputStreamTest
 #include "AllTests.h"
 #include "../TextInputStream.h"
