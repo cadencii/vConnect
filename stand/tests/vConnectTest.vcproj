@@ -17,80 +17,6 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)fixture\*.* $(TargetDir)fixture\&#x0D;&#x0A;xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="cppunit.lib shlwapi.lib"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine=""
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -236,7 +162,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\EncodingConverterTest.h"
+			RelativePath=".\EncodingConverterTest.cpp"
 			>
 		</File>
 		<File
@@ -248,19 +174,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\PathTest.h"
+			RelativePath=".\PathTest.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\StringUtilTest.h"
+			RelativePath=".\StringUtilTest.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\TextInputStreamTest.h"
+			RelativePath=".\TextInputStreamTest.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\TextOutputStreamTest.h"
+			RelativePath=".\TextOutputStreamTest.cpp"
 			>
 		</File>
 		<File
@@ -268,7 +194,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\UtauParameterTest.h"
+			RelativePath=".\UtauParameterTest.cpp"
 			>
 		</File>
 	</Files>
