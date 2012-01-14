@@ -1,14 +1,14 @@
-SRC=stand/*.cpp \
-    stand/utauVoiceDB/*.cpp \
-    stand/vsqMetaText/*.cpp \
-    stand/waveFileEx/*.cpp \
-    stand/world/*.cpp
+SRC=*.cpp \
+    utauVoiceDB/*.cpp \
+    vsqMetaText/*.cpp \
+    waveFileEx/*.cpp \
+    world/*.cpp
 
-HEADER=stand/*.h \
-    stand/utauVoiceDB/*.h \
-    stand/vsqMetaText/*.h \
-    stand/waveFileEx/*.h \
-    stand/world/*.h
+HEADER=*.h \
+    utauVoiceDB/*.h \
+    vsqMetaText/*.h \
+    waveFileEx/*.h \
+    world/*.h
 
 OS=${shell uname}
 ifeq ($(OS),Darwin)
@@ -20,11 +20,7 @@ endif
 #Preparing FFTW libs for windows:
 #    cd $(PATHFFTW)
 #    lib /def:libfftw3-3.def
-#    lib /def:libfftw3f-3.def
-#    lib /def:libfftw3l-3.def
 #    dlltool --add-stdcall-underscore -d libfftw3-3.def -l libfftw3-3.a
-#    dlltool --add-stdcall-underscore -d libfftw3f-3.def -l libfftw3f-3.a
-#    dlltool --add-stdcall-underscore -d libfftw3l-3.def -l libfftw3l-3.a
 
 all: vConnect-STAND.exe
 
