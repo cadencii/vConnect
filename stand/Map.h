@@ -22,18 +22,12 @@
 
 namespace vconnect
 {
-#ifdef __GNUC__
-    using namespace std;
-#else
-    using namespace stdext;
-#endif
-
     template<typename K, typename V>
     class Map
 #ifdef __GNUC__
-        : public map<K, V>
+        : public std::map<K, V>
 #else
-        : public hash_map<K, V>
+        : public stdext::hash_map<K, V>
 #endif
     {
     };
