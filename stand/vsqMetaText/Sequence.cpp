@@ -4,6 +4,7 @@
  * Copyright (C) 2011-2012 kbinani.
  */
 #include "Sequence.h"
+#include "../utauVoiceDB/UtauDBManager.h"
 
 namespace vconnect
 {
@@ -15,7 +16,7 @@ namespace vconnect
         UtauDB *p = new UtauDB;
         p->read( otoIniPath, target->_codepage_otoini.c_str() );
         // リストに追加
-        UtauDB::dbRegist( p );
+        UtauDBManager::regist( p );
         target->singerIndex++;
     }
 
@@ -181,7 +182,7 @@ namespace vconnect
         }
 
         // utau音源が無ければ合成しようがないので false.
-        int size = UtauDB::dbSize();
+        int size = UtauDBManager::size();
 
     #if defined( _DEBUG )
         dumpEvents();

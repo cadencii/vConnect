@@ -17,6 +17,8 @@
 #include "vsqMetaText/Sequence.h"
 #include "Configuration.h"
 
+using namespace vconnect;
+
 corpusManager::corpusManager()
 {
     mUtauDB = NULL;

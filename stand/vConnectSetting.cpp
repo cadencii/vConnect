@@ -12,8 +12,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "vConnectSetting.h"
+#include "TextInputStream.h"
 
 #define SETTING_BUF_LEN 4096
+
+using namespace vconnect;
 
 const string settingName[] = {
     "[BaseLibrary]",

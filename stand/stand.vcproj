@@ -246,6 +246,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\utauVoiceDB\UtauDBManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utauVoiceDB\UtauDBManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utauVoiceDB\utauFreq.cpp"
 				>
 			</File>

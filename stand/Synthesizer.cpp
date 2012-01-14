@@ -19,6 +19,7 @@
 #include "vConnectUtility.h"
 #include "vsqMetaText/EventList.h"
 #include "Thread.h"
+#include "utauVoiceDB/UtauDBManager.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];
@@ -304,7 +305,7 @@ void Synthesizer::run()
 #endif
 
     // 空のときは空の wave を出力して終了
-    if( mVsq.events.eventList.empty() && UtauDB::dbSize() == 0 ){
+    if( mVsq.events.eventList.empty() && UtauDBManager::size() == 0 ){
         emptyPath( mVsq.getEndSec(), output );
         return;
     }
@@ -316,10 +317,10 @@ void Synthesizer::run()
     double *wave;
 
     vector<string> analyze_list;
-    for( int i = 0; i < UtauDB::dbSize(); i++ )
+    for( int i = 0; i < UtauDBManager::size(); i++ )
     {
         corpusManager *p = new corpusManager;
-        p->setUtauDB( UtauDB::dbGet( i ), this->option );
+        p->setUtauDB( UtauDBManager::get( i ), this->option );
         analyze_list.clear();
         for( int j = 0; j < mVsq.events.eventList.size(); j++) {
             if( mVsq.events.eventList[j]->singerIndex == i ) {
@@ -887,11 +888,11 @@ void Synthesizer::calculateVsqInfo( void )
             // 次の音符へ
             itemi = mVsq.events.eventList[i];
         }
-        if( singerIndex < 0 || singerIndex >= UtauDB::dbSize() )
+        if( singerIndex < 0 || singerIndex >= UtauDBManager::size() )
         {
             continue;
         }
-        voiceDB = UtauDB::dbGet( singerIndex );
+        voiceDB = UtauDBManager::get( singerIndex );
         // 原音設定の反映
         temp = itemi->lyricHandle.getLyric();
         msPreUtterance = itemi->utauSetting.msPreUtterance;
