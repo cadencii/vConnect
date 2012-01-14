@@ -1,5 +1,5 @@
 ﻿#include "AllTests.h"
-#include "../utauVoiceDB/UtauParameter.h"
+#include "../utau/UtauParameter.h"
 
 using namespace vconnect;
 using namespace std;

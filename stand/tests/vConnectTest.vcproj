@@ -26,7 +26,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)fixture\*.* $(TargetDir)fixture\&#x0D;&#x0A;xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\"
+				CommandLine="xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)fixture\*.* $(TargetDir)fixture\&#x0D;&#x0A;xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -128,6 +128,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="utau"
+				>
+				<Filter
+					Name="UtauDB"
+					>
+					<File
+						RelativePath=".\fixture\utau\UtauDB\oto.ini"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="expected"
@@ -154,6 +166,22 @@
 			</File>
 			<File
 				RelativePath="..\Thread.cpp"
+				>
+			</File>
+			<Filter
+				Name="utau"
+				>
+				<File
+					RelativePath="..\utau\UtauDB.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="utau"
+			>
+			<File
+				RelativePath=".\utau\UtauDBTest.cpp"
 				>
 			</File>
 		</Filter>

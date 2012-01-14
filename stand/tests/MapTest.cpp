@@ -3,6 +3,7 @@
 #include "AllTests.h"
 #include "../Map.h"
 
+using namespace std;
 using namespace vconnect;
 
 class MapTest : public CppUnit::TestFixture {

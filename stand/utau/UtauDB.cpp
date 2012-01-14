@@ -51,10 +51,13 @@ namespace vconnect
             return;
         }
 
-        mDBPath = path_oto_ini.substr( 0, path_oto_ini.rfind( Path::getDirectorySeparator() ) + 1 );
+        mDBPath = Path::combine( Path::getDirectoryName( path_oto_ini ), "" );
 
         while( stream.ready() ){
             string line = stream.readLine();
+            if( line.length() == 0 ){
+                continue;
+            }
             UtauParameter *current = new UtauParameter( line );
             mSettingMap.insert( make_pair( current->lyric, current ) );
             if( current->lyric.compare( current->fileName ) != 0 ){
