@@ -14,13 +14,13 @@
 #ifndef __Converter_h__
 #define __Converter_h__
 
-#include <math.h>
 #include <time.h>
 #include "TextInputStream.h"
 #include "TextOutputStream.h"
 #include "vConnectPhoneme.h"
 #include "StringUtil.h"
 #include "Task.h"
+#include "waveFileEx/waveFileEx.h"
 
 namespace vconnect
 {

@@ -4,7 +4,6 @@
 #include <vorbis/vorbisfile.h>
 #include <fftw3.h>
 #include <string>
-#include "vsqMetaText/vsqBase.h"
 #include "utau/UtauParameter.h"
 
 using namespace std;

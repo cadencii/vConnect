@@ -14,7 +14,6 @@
 #include "stand.h"
 
 #ifdef STND_MULTI_THREAD
-// あんまり使いたくないグローバル変数．
 vconnect::Mutex *hMutex = NULL;
 vconnect::Mutex *hFFTWMutex = NULL;
 #endif

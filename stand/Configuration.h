@@ -55,6 +55,15 @@ namespace vconnect
             return 2.0;
         }
 
+        /**
+         * 音声のデフォルトのサンプリング周波数を取得する
+         * @return サンプリング周波数(Hz)
+         */
+        static int getDefaultSampleRate()
+        {
+            return 44100;
+        }
+
     private:
         Configuration()
         {

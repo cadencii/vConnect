@@ -5,6 +5,7 @@
 #include "world/world.h"
 #include "waveFileEx/waveFileEx.h"
 #include "worldParameters.h"
+#include "Configuration.h"
 
 vConnectPhoneme::vConnectPhoneme()
 {
@@ -398,11 +399,12 @@ void vConnectPhoneme::getOneFrameWorld(double *starSpec,
     // STAR スペクトルを計算する．
     //  残差分を作業用バッファとして使いまわし．
     double currentF0 = (f0[index] == 0.0)? DEFAULT_F0 : f0[index];
+    int sampleRate = Configuration::getDefaultSampleRate();
     // starGeneralBody(x, xLen, fs, currentF0, timeAxis[i], fftl, specgram[i], waveform, powerSpec, ySpec,&forwardFFT);
-    starGeneralBody(wave, waveLength, fs, currentF0, this->t[index], fftLength, starSpec, waveform, waveform, cepstrum, &forward_r2c);
+    starGeneralBody(wave, waveLength, sampleRate, currentF0, this->t[index], fftLength, starSpec, waveform, waveform, cepstrum, &forward_r2c);
 
     // PLATINUM 残差スペクトルを計算する．
-    double T0 = (double)fs / currentF0;
+    double T0 = (double)sampleRate / currentF0;
     int wLen = (int)(0.5 + T0*2.0);
     int pulseIndex = pulseLocations[index];
 
@@ -463,7 +465,8 @@ bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauPara
         // 事前分析データが無いのであれば事前分析を行いファイルとして保存する．
         if(worldParams.readParameters((fileName + ".wpd").c_str()) == false)
         {
-            if(worldParams.computeWave(waveBuffer, waveLength, fs, framePeriod))
+            int sampleRate = Configuration::getDefaultSampleRate();
+            if(worldParams.computeWave(waveBuffer, waveLength, sampleRate, framePeriod))
             {
                 /* 要らない…？
                 // 同名ファイルの書き込み中に読み込まれるといけない．

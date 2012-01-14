@@ -16,6 +16,8 @@
 #define __corpusManager_h__
 
 #include <list>
+#include "stand.h"
+#include "utau/UtauDB.h"
 #include "vConnectSetting.h"
 #include "RuntimeOption.h"
 #include "vsqMetaText/Sequence.h"

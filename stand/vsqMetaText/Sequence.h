@@ -1,12 +1,21 @@
-/**
+/*
  * Sequence.h
- * Copyright (C) 2009-2011 HAL,
- * Copyright (C) 2011-2012 kbinani.
+ * Copyright © 2009-2011 HAL,
+ * Copyright © 2011-2012 kbinani.
+ *
+ * This file is part of vConnect-STAND.
+ *
+ * vConnect-STAND is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
+ *
+ * vConnect-STAND is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #ifndef __vsqFileEx_h__
 #define __vsqFileEx_h__
 
-#include "vsqBase.h"
+#include <string>
 #include "Event.h"
 #include "EventList.h"
 #include "BPList.h"
@@ -17,9 +26,12 @@
 #include "../Path.h"
 #include "../InputStream.h"
 #include "../TextInputStream.h"
+#include "../Map.h"
 
 namespace vconnect
 {
+    using namespace std;
+
     /// <summary>
     /// VSQメタテキストが表現するシーケンスを取り扱うクラスです．
     /// </summary>
@@ -70,6 +82,33 @@ namespace vconnect
         /// </summary>
         /// <returns>シーケンスの長さ（tick単位）</returns>
         long getEndTick();
+
+        /**
+         * 四分音符一拍あたりの Tick 単位の時間を取得する
+         * @return Tick 単位の時間
+         */
+        static int getTickPerBeat()
+        {
+            return 480;
+        }
+
+        /**
+         * A4 の音の周波数(Hz)を取得する
+         * @return 周波数(Hz)
+         */
+        static double getA4Frequency()
+        {
+            return 440.0;
+        }
+
+        /**
+         * A4 の音のノート番号を取得する
+         * @return ノート番号
+         */
+        static int getA4NoteNumber()
+        {
+            return 69;
+        }
 
     public:
 
@@ -131,6 +170,21 @@ namespace vconnect
          * @param encoding oto.ini のテキストエンコーディング
          */
         void setParamOtoIni( string singerName, string otoIniPath, string encoding );
+
+        /**
+         * [oto.ini] セクションの名前
+         */
+        static const string OBJ_NAME_OTOINI;
+
+        /**
+         * [EventList] セクションの名前
+         */
+        static const string OBJ_NAME_EVENT_LIST;
+
+        /**
+         * [Tempo] セクションの名前
+         */
+        static const string OBJ_NAME_TEMPO;
 
     private:
 

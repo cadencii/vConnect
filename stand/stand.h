@@ -48,97 +48,6 @@ using namespace std;
 #  define STND_OS_OTHER
 #endif
 
-#if defined( _UNICODE ) || defined( UNICODE )
-#define USE_WSTRING
-#endif
-
-//Compile-time parameters summary
-//  OS: Windows, MacOSX, openSUSE   -> STND_OS_WIN, STND_OS_MAC, STND_OTHER
-//  iconv: used or not used         -> MB_USE_ICONV (in mb_text.h)
-//  wcstombs: used or not used      -> MB_USE_STDLIB (in mb_text.cpp)
-//  UNICODE: defined or not defined -> USE_WSTRING (just below in this file)
-//Run-time parameters
-//  Text-encoding: Shift_JIS, UTF-8, UTF-16LE, UTF-16BE, UTF-32LE, UTF-32BE
-
-//Our code condition in these compile-time parameters
-// ( These tables were tested with UTF-8. )
-// ( We should make MORE and MORE tables for Run-time parameters, ooops!! )
-//(1) In case STND_OS_WIN (VC++)
-//    (1-1) In case MB_USE_ICONV defined
-//
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    O.K.                 |    O.K. (*1)
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    O.K. (*1)            |    O.K. (*1)
-//
-//
-//    (1-2) In case MB_USE_ICONV not defined
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    O.K.                 |    N.G.
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    N.G.                 |    N.G.
-//
-//
-//(2) In case STND_OS_WIN && __GNUC__
-//    (2-1) In case MB_USE_ICONV defined
-//
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    O.K.                 |    O.K.
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    O.K.                 |    O.K.
-//
-//
-//    (2-2) In case MB_USE_ICONV not defined
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    N.G.                 |    N.G.
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    N.G.                 |    N.G.
-//
-//
-//(3) In case STND_OS_MAC
-//    (3-1) In case MB_USE_ICONV defined
-//
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    O.K.                 |    O.K.
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    O.K.                 |    O.K.
-//
-//
-//    (3-2) In case MB_USE_ICONV not defined
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    N.G. (*2)            |    N.G. (*2)
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    N.G. (*2)            |    N.G. (*2)
-//
-//
-//(4) In case STND_OS_OTHER
-//    (4-1) In case MB_USE_ICONV defined
-//
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    O.K.                 |    O.K.
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    O.K.                 |    O.K.
-//
-//
-//    (4-2) In case MB_USE_ICONV not defined
-//                               |  MB_USE_STDLIB defined  |  MB_USE_STDLIB not defined
-//        -------------------------------------------------------------------------------
-//          UNICODE defined      |    N.G. (*2)            |    N.G. (*2)
-//        -------------------------------------------------------------------------------
-//          UNICODE not defined  |    N.G. (*2)            |    N.G. (*2)
-//
-// *1 patched version only.
-//    http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.9.1.bin.woe32.zip would not work
-// *2 libiconv is required in MacOSX and Linux to convert character set.
-//
-
 #define LINEBUFF_LEN 4096
 
 #ifdef STND_MULTI_THREAD
@@ -150,7 +59,5 @@ extern vconnect::Mutex *hFFTWMutex;
 #define ST_PI (3.141592653589793238462643383279)
 #define SAFE_DELETE_ARRAY(x) if(x){ delete[] (x); x = NULL; }
 #define SAFE_DELETE(x) if(x){ delete(x); x = NULL; }
-
-const int    fs = 44100;
 
 #endif

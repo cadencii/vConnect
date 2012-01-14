@@ -15,8 +15,8 @@
 #ifndef __Event_h__
 #define __Event_h__
 
-#include "vsqBase.h"
 #include "Handle.h"
+#include "../utau/UtauParameter.h"
 
 namespace vconnect
 {

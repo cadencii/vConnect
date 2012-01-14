@@ -1,13 +1,26 @@
 /*
  * Sequence.cpp
- * Copyright (C) 2009-2011 HAL,
- * Copyright (C) 2011-2012 kbinani.
+ * Copyright © 2009-2011 HAL,
+ * Copyright © 2011-2012 kbinani.
+ *
+ * This file is part of vConnect-STAND.
+ *
+ * vConnect-STAND is free software; you can redistribute it and/or
+ * modify it under the terms of the GPL License.
+ *
+ * vConnect-STAND is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "Sequence.h"
 #include "../utau/UtauDBManager.h"
 
 namespace vconnect
 {
+    const string Sequence::OBJ_NAME_OTOINI     = "[oto.ini]";
+    const string Sequence::OBJ_NAME_EVENT_LIST = "[EventList]";
+    const string Sequence::OBJ_NAME_TEMPO      = "[Tempo]";
+
     void Sequence::setParamOtoIni( string singerName, string otoIniPath, string encoding )
     {
         // 名前登録して

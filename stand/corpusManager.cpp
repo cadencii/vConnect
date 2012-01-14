@@ -11,11 +11,11 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include "corpusManager.h"
-#include "utau/UtauDB.h"
-#include "vConnectPhoneme.h"
-#include "vsqMetaText/Sequence.h"
 #include "Configuration.h"
+#include "corpusManager.h"
+#include "vConnectPhoneme.h"
+#include "utau/UtauDB.h"
+#include "vsqMetaText/Sequence.h"
 
 using namespace vconnect;
 
@@ -47,8 +47,14 @@ corpusManager::~corpusManager()
 {
     Map<string, phoneme *>::iterator i;
     for( i = objectMap.begin(); i != objectMap.end(); i++ ){
-        SAFE_DELETE( i->second->p );
-        SAFE_DELETE( i->second );
+        if( i->second ){
+            if( i->second->p ){
+                delete i->second->p;
+                i->second->p = NULL;
+            }
+            delete i->second;
+            i->second = NULL;
+        }
     }
     for( int j = 0; j < mAppendCorpus.size(); j++){
         delete mAppendCorpus[j];

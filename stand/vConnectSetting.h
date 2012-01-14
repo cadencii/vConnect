@@ -14,9 +14,11 @@
 #ifndef __vConnectSetting_h__
 #define __vConnectSetting_h__
 
-#include "vsqMetaText/vsqBase.h"
+#include <vector>
+#include <string>
 #include "Map.h"
 
+using namespace std;
 using namespace vconnect;
 
 enum vConnectSettingList{

@@ -13,8 +13,9 @@
  */
 #include <time.h>
 
-#include "Transcriber.h"
 #include "utau/UtauDB.h"
+#include "world/world.h"
+#include "Transcriber.h"
 #include "vConnectPhoneme.h"
 #include "vConnectUtility.h"
 #include "Configuration.h"
@@ -177,6 +178,7 @@ void Transcriber::_calculate_compressed_env( double *dst, vConnectPhoneme *src, 
     src->vorbisOpen( &ovf );
     float **pcm_channels;
 
+    int sampleRate = Configuration::getDefaultSampleRate();
     for( int i = 0; i < length; i++ ){
         int mel_len;
         int c;
@@ -185,7 +187,7 @@ void Transcriber::_calculate_compressed_env( double *dst, vConnectPhoneme *src, 
 
         // ケプストラムからパワースペクトルを計算．
         mel_cep = src->getMelCepstrum( i, &mel_len );
-        vConnectUtility::extractMelCepstrum( pow_spec, fftl, mel_cep, mel_len, spectrum, out, inverse_c2r, fs );
+        vConnectUtility::extractMelCepstrum( pow_spec, fftl, mel_cep, mel_len, spectrum, out, inverse_c2r, sampleRate );
         getMinimumPhaseSpectrum( pow_spec, spectrum, cepstrum, fftl, forward, inverse );
 
         // Ogg ストリームから残差波形をデコード．

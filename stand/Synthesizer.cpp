@@ -12,7 +12,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include <time.h>
+#include <math.h>
 #include <vorbis/vorbisfile.h>
+#include "stand.h"
 #include "Configuration.h"
 #include "Synthesizer.h"
 #include "vConnectPhoneme.h"
@@ -21,6 +23,8 @@
 #include "Thread.h"
 #include "utau/UtauDBManager.h"
 #include "vsqMetaText/CurveTypeEnum.h"
+#include "world/world.h"
+#include "waveFileEx/waveFileEx.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];
@@ -84,19 +88,18 @@ public:
 Synthesizer::Synthesizer( RuntimeOption option )
     : Task( option )
 {
-    for( int i = 0; i < NOTE_NUM; i++ )
-    {
-        mNoteFrequency[i] = A4_PITCH * pow( 2.0, (double)(i - A4_NOTE) / 12.0 );
+    double a4frequency = Sequence::getA4Frequency();
+    int a4note = Sequence::getA4NoteNumber();
+    for( int i = 0; i < NOTE_NUM; i++ ){
+        mNoteFrequency[i] = a4frequency * pow( 2.0, (double)(i - a4note) / 12.0 );
     }
     mVibrato[0] = 0.0;
-    for( int i = 1; i < VIB_NUM; i++ )
-    {
+    for( int i = 1; i < VIB_NUM; i++ ){
         double period = exp( 5.24 - 1.07e-2 * i ) * 2.0 / 1000.0;
         mVibrato[i] = 2.0 * ST_PI / period;
     }
 
-    for(int i = 0; i < NOISE_LEN; i++)
-    {
+    for(int i = 0; i < NOISE_LEN; i++){
         noiseWave[i] = randn();
     }
 
@@ -196,7 +199,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
             int briVal = briArray[index];                       // 現在の bri 値．
             int minBri = -1, maxBri = 129;
 
-            frameIndex = (int)max( 2, min( frameIndex, itemThis->utauSetting.msFixedLength / framePeriod ) );
+            frameIndex = (int)max( 2.0, min( (double)frameIndex, itemThis->utauSetting.msFixedLength / framePeriod ) );
 
             // 同じフレームを使いまわしたくない場合はここを使うとよい．
 
@@ -259,7 +262,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
                 data->phoneme = phoneme;
 
                 double baseBriRatio = 1.0 - (double)abs(briVal - p->brightness) / (double)(maxBri - minBri);
-                baseBriRatio = max(0, min(1.0, baseBriRatio));
+                baseBriRatio = max(0.0, min(1.0, baseBriRatio));
                 if(baseBriRatio == 0.0)
                 {
                     delete data;
@@ -340,13 +343,14 @@ void Synthesizer::run()
     cout << "vConnect::synthesize; calling mVsq.dumpMapIDs...done" << endl;
 #endif
 
-    aperiodicityLength = fftLength = getFFTLengthForStar(fs);
+    int sampleRate = Configuration::getDefaultSampleRate();
+    aperiodicityLength = fftLength = getFFTLengthForStar( sampleRate );
 
     // 準備２．合成に必要なローカル変数の初期化
     beginFrame = mVsq.events.eventList[0]->beginFrame;
     frameLength = mEndFrame - beginFrame;
     double framePeriod = Configuration::getMilliSecondsPerFrame();
-    waveLength = (long int)(frameLength * framePeriod * fs / 1000);
+    waveLength = (long int)(frameLength * framePeriod * sampleRate / 1000);
 
     wave = new double[waveLength];
     memset(wave, 0, sizeof(double) * waveLength);
@@ -434,8 +438,8 @@ void Synthesizer::run()
     arg2.dynamics += i;
     arg2.f0 += i;
     arg2.frames += i;
-    arg2.wave += (int)(currentTime * fs);
-    arg2.waveLength -= (int)(currentTime * fs);
+    arg2.wave += (int)(currentTime * sampleRate);
+    arg2.waveLength -= (int)(currentTime * sampleRate);
 
 
     hThread[0] = new Thread( synthesizeFromList, &arg1 );
@@ -712,6 +716,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
 
     // 合成処理
     double framePeriod = Configuration::getMilliSecondsPerFrame();
+    int sampleRate = Configuration::getDefaultSampleRate();
     while( currentFrame < p->endFrame )
     {
         double currentF0;
@@ -756,7 +761,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
                 spectrum,
                 impulse,
                 inverse_c2r,
-                fs );
+                sampleRate );
         } else {
             for(int k = 0; k <= p->fftLength / 2; k++)
             {
@@ -764,7 +769,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
             }
         }
         // BRE の値によりノイズを励起信号に加算する．
-        appendNoise( starSpec, (int)min( p->fftLength, T * fs ), (*(p->controlCurves))[CurveTypeEnum::BRETHINESS][breIndex].value / 128.0, &noiseCount );
+        appendNoise( starSpec, (int)min( p->fftLength, T * sampleRate ), (*(p->controlCurves))[CurveTypeEnum::BRETHINESS][breIndex].value / 128.0, &noiseCount );
 
         // starSpec -> residual DFT を実行する．
         fftw_execute(forward_r2c);
@@ -796,7 +801,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
 
         // 実波形に直す．
         fftw_execute(inverse_c2r);
-        currentPosition = (int)(currentTime * fs);
+        currentPosition = (int)(currentTime * sampleRate);
         for( int k = 0; k < p->fftLength / 2 && currentPosition < p->waveLength; k++, currentPosition++ )
         {
             p->wave[currentPosition] += impulse[k] / p->fftLength * p->dynamics[currentFrame];

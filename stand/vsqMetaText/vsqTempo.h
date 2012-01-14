@@ -14,7 +14,9 @@
 #ifndef __vsqTempo_h__
 #define __vsqTempo_h__
 
-#include "vsqBase.h"
+#include <string>
+
+using namespace std;
 
 class vsqTempo
 {

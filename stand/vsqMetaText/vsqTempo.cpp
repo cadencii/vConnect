@@ -12,6 +12,9 @@
  *
  */
 #include "vsqTempo.h"
+#include "Sequence.h"
+
+using namespace vconnect;
 
 const double vsqTempo::DEFAULT_TEMPO = 120.0;
 
@@ -22,15 +25,11 @@ void vsqTempo::setParameter( string left, string right )
 
 long vsqTempo::secondToTick( double second )
 {
-  /* In This Code, only static tempo is available */
-  long result = (long)( second / 60.0 * tempo * TICK_PER_BEAT );
-
-  return result;
+    /* In This Code, only static tempo is available */
+    return (long)(second / 60.0 * tempo * Sequence::getTickPerBeat());
 }
 
 double vsqTempo::tickToSecond( long tick )
 {
-  double result = 60.0/tempo*(double)tick/TICK_PER_BEAT;
-
-  return result;
+    return 60.0 / tempo * (double)tick / Sequence::getTickPerBeat();
 }

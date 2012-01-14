@@ -6,7 +6,7 @@
 #ifndef __EventList_h__
 #define __EventList_h__
 
-#include "vsqBase.h"
+#include "../Map.h"
 #include "Event.h"
 
 namespace vconnect

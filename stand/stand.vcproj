@@ -478,10 +478,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vsqMetaText\vsqBase.h"
-				>
-			</File>
-			<File
 				RelativePath=".\vsqMetaText\vsqTempo.cpp"
 				>
 			</File>

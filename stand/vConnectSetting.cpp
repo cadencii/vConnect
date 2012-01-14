@@ -11,8 +11,10 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+#include <cmath>
 #include "vConnectSetting.h"
 #include "TextInputStream.h"
+#include "vsqMetaText/Sequence.h"
 
 #define SETTING_BUF_LEN 4096
 
@@ -34,7 +36,9 @@ bool librarySetting::readSetting(string left, string right)
         brightness = atoi( right.c_str() );
     }else if( left.compare( "NoteNumber" ) == 0 ){
         noteNumber = atoi( right.c_str() );
-        frequency = A4_PITCH * pow( 2.0, (double)(noteNumber - A4_NOTE) / 12.0 );
+        double a4frequency = Sequence::getA4Frequency();
+        int a4note = Sequence::getA4NoteNumber();
+        frequency = a4frequency * pow( 2.0, (double)(noteNumber - a4note) / 12.0 );
     }else if( left.compare( "Directory" ) == 0 ){
         path += right;
     }else{
@@ -50,8 +54,8 @@ vConnectSetting::vConnectSetting()
         libraryArray[i] = new librarySetting;
         libraryArray[i]->brightness = 64;
         libraryArray[i]->enabled = false;
-        libraryArray[i]->frequency = A4_PITCH;
-        libraryArray[i]->noteNumber = A4_NOTE;
+        libraryArray[i]->frequency = Sequence::getA4Frequency();
+        libraryArray[i]->noteNumber = Sequence::getA4NoteNumber();
         libraryArray[i]->path = "";
         libraryMap.insert(make_pair(settingName[i], libraryArray[i]));
     }
