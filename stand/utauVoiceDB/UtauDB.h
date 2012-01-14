@@ -25,15 +25,25 @@ namespace vconnect
     /// </summary>
     class UtauDB
     {
-    public:
-        virtual ~UtauDB();
+    protected:
+        /// <summary>
+        /// oto.iniファイルのパス．
+        /// </summary>
+        string mDBPath;
 
+        Map<string, UtauParameter *> mSettingMap;
+
+        list<UtauParameter *> mSettingList;
+
+    public:
         /**
          * oto.iniのファイル名とそのテキスト・エンコーディングを指定して，oto.iniを読み込みます．
          * @param fileName oto.iniファイルのパス．
          * @param codepage oto.iniファイルのテキスト・エンコーディング．
          */
-        int read( string fileName, const char *codepage );
+        UtauDB( string fileName, string codepage );
+
+        virtual ~UtauDB();
 
         /// <summary>
         /// 指定した音素の原音のパラメータを取得します
@@ -63,15 +73,10 @@ namespace vconnect
 
         Map<string, UtauParameter *>::iterator end();
 
-    protected:
-        /// <summary>
-        /// oto.iniファイルのパス．
-        /// </summary>
-        string mDBPath;
-
-        Map<string, UtauParameter *> mSettingMap;
-
-        list<UtauParameter *> mSettingList;
+    private:
+        UtauDB()
+        {
+        }
     };
 }
 #endif

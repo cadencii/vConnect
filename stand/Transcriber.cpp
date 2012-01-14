@@ -26,10 +26,9 @@ void Transcriber::run()
     string src_path = this->option.getInputPath();
     string dst_path = this->option.getOutputPath();
     string codepage = this->option.getEncodingOtoIni();
-    UtauDB src, dst;
 
-    src.read( src_path, codepage.c_str() );
-    dst.read( dst_path, codepage.c_str() );
+    UtauDB src( src_path, codepage.c_str() );
+    UtauDB dst( dst_path, codepage.c_str() );
     Map<string, int> analyzedItems;
 
     for( int i = 0; i < src.size(); i++ ){

@@ -99,23 +99,13 @@ namespace vconnect
         /// </summary>
         Map<string, Handle *> mMapHandles;
 
-        /// <summary>
-        /// メタテキストのセクション名（[]で囲われた部分）と，
-        /// その内部の値を保持したオブジェクトとの紐付けを保持する．
-        /// </summary>
-        //Map<string, vsqBase *> objectMap;
-
-        /// <summary>
-        /// 歌手の名称（だったけ？IDSのぶぶんだったかIconIDの部分だったか忘れた）と，
-        /// 歌手のインデックスとの紐付けを保持する．
-        /// </summary>
+        /**
+         * 歌手の名称（だったけ？IDSのぶぶんだったかIconIDの部分だったか忘れた）と，
+         * 歌手のインデックスとの紐付けを保持する．
+         */
         Map<string, int> singerMap;
 
-
-    protected:
-
     private:
-
         /**
          * VSQのメタテキストを読み込みます．
          * @param stream 読み込むストリーム．

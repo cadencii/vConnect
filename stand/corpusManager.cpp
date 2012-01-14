@@ -178,15 +178,14 @@ void corpusManager::setUtauDB( UtauDB *p, RuntimeOption &options )
         setCorpusSetting(setting.getLibrarySetting(SETTING_BASE));
         librarySetting *brightnessSetting = setting.getLibrarySetting(SETTING_BRIGHTNESS);
         if(mEnableBrightness && brightnessSetting){
-            UtauDB *db = new UtauDB();
+            UtauDB *db = new UtauDB(
+                Path::combine( brightnessSetting->path, "oto.ini" ),
+                options.getEncodingOtoIni()
+            );
             mAppendCorpus.resize(1, NULL);
             mAppendCorpus[0] = new corpusManager();
-            db->read(
-                Path::combine( brightnessSetting->path, "oto.ini" ),
-                options.getEncodingOtoIni().c_str()
-            );
-            mAppendCorpus[0]->setBrightness(brightnessSetting->brightness);
-            mAppendCorpus[0]->setUtauDB(db, options);
+            mAppendCorpus[0]->setBrightness( brightnessSetting->brightness );
+            mAppendCorpus[0]->setUtauDB( db, options );
             mAppendCorpus[0]->setIsAppend(true);
         }
     }

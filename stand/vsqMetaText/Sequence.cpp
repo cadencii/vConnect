@@ -14,8 +14,7 @@ namespace vconnect
         int index = UtauDBManager::find( otoIniPath );
         if( index < 0 ){
             // 中身読んで
-            UtauDB *p = new UtauDB;
-            p->read( otoIniPath, encoding.c_str() );
+            UtauDB *p = new UtauDB( otoIniPath, encoding );
             // リストに追加
             UtauDBManager::regist( p );
             index = UtauDBManager::find( otoIniPath );

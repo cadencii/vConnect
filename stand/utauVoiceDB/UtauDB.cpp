@@ -38,7 +38,7 @@ namespace vconnect
         }
     }
 
-    int UtauDB::read( string path_oto_ini, const char *codepage )
+    UtauDB::UtauDB( string path_oto_ini, string codepage )
     {
         int result = 2;
 
@@ -48,7 +48,7 @@ namespace vconnect
         TextInputStream stream( path_oto_ini, codepage );
 
         if( false == stream.ready() ){
-            return result;
+            return;
         }
 
         mDBPath = path_oto_ini.substr( 0, path_oto_ini.rfind( Path::getDirectorySeparator() ) + 1 );
@@ -67,7 +67,7 @@ namespace vconnect
         }
         stream.close();
 
-        return result;
+        return;
     }
 
     int UtauDB::getParams( UtauParameter &parameters, string search )
