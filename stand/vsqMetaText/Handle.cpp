@@ -17,24 +17,6 @@ using namespace std;
 
 namespace vconnect
 {
-    void Lyric::setLyric( string right )
-    {
-        lyric = right.substr( 0, right.find( "," ) );
-        lyric = lyric.substr( lyric.find( "\"" ) + 1, lyric.rfind( "\"" ) - 1 );
-        right = right.substr( right.find( "," ) + 1 );
-        pronounce = right.substr( 0, right.find( "," ) );
-        pronounce = pronounce.substr( pronounce.find( "\"" ) + 1, pronounce.rfind( "\"" ) - 1 );
-
-        right = right.substr( right.find( "," ) + 1 );
-        lyricDelta = atoi( right.substr( 0, right.find( "," ) ).c_str() );
-
-        right = right.substr( right.find( "," ) + 1 );
-        consonantAdjustment = atoi( right.substr( 0, right.find( "," ) ).c_str() );
-
-        right = right.substr( right.find( "," ) + 1 );
-        protectFlag = atoi( right.substr( 0, right.find( "," ) ).c_str() );
-    }
-
     void Handle::setParameter( string left, string right )
     {
         if( left.compare( "IconID" ) == 0 ){
@@ -82,7 +64,7 @@ namespace vconnect
         }else if( left.compare( "RateBPY" ) == 0 ){
             parseBP( vibratoRate, right, false );
         }else if( left.find( "L" ) != string::npos ){
-            lyric.setLyric( right );
+            lyric = Lyric( right );
         }else{
             string Message = "warning: unknown Property in VsqHandle : " + left;
             cout << Message << endl;

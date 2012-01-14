@@ -27,8 +27,7 @@ namespace vconnect
     public:
         void    setParameter( string left, string right );
 
-        string    getLyric( void ){ return lyric.lyric; }
-        string    getPronounce( void ){ return lyric.pronounce; }
+        string    getLyric( void ){ return lyric.getLyric(); }
         string    getIDS( void ){ return IDS; }
         /**
          * ビブラート深さの値を取得しする

@@ -22,21 +22,17 @@ namespace vconnect
 
     class Lyric
     {
-    public:
-        void setLyric( string right );
-
-        string toString()
-        {
-            string ret;
-            ret += "{lyric=" + this->lyric + ",pronounce=" + this->pronounce + "}";
-            return ret;
-        }
-
+    private:
         string lyric;
-        string pronounce;
-        int lyricDelta;
-        short consonantAdjustment;
-        char protectFlag;
+
+    public:
+        Lyric();
+
+        Lyric( string line );
+
+        string getLyric();
+
+        string toString();
     };
 }
 #endif

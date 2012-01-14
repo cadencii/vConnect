@@ -76,30 +76,20 @@ namespace vconnect
     {
         string temp;
 
-        controlCurves.resize( CONTROL_CURVE_NUM );
+        this->controlCurves.resize( CONTROL_CURVE_NUM );
 
-        for( unsigned int i = 0; i < controlCurves.size(); i++ )
-        {
-            //objectMap.insert( make_pair( controlCurveName[i], (vsqBase *)&(controlCurves[i]) ) );
-            /* The note on 0 tick can be allocated before 0 tick, because of its preutterance. */
-            controlCurves[i].setParameter( -10000, controlCurveDefaultValue[i] );
-            mMapCurves.insert( make_pair( controlCurveName[i], &controlCurves[i] ) );
+        for( vector<BPList>::size_type i = 0; i < this->controlCurves.size(); i++ ){
+            this->controlCurves[i].setParameter( -10000, controlCurveDefaultValue[i] );
+            this->mMapCurves.insert( make_pair( controlCurveName[i], &this->controlCurves[i] ) );
         }
-
-        //temp = "[EventList]";
-        //objectMap.insert( make_pair( temp, (vsqBase *)&events ) );
-        //temp = "[Tempo]";
-        //objectMap.insert( make_pair( temp, (vsqBase *)&vsqTempoBp ) );
-        //temp = "[oto.ini]";
-        //objectMap.insert( make_pair( temp, (vsqBase *)&voiceDataBase ) );
     }
 
     bool Sequence::read( string file_name, RuntimeOption option )
     {
         bool result = false;
-        voiceDataBase.setRuntimeOption( option );
+        this->voiceDataBase.setRuntimeOption( option );
         TextInputStream *stream = new TextInputStream( file_name, option.getEncodingVsqText() );
-        bool ret = readCore( stream, file_name );
+        bool ret = this->readCore( stream, file_name );
         delete stream;
         return ret;
     }

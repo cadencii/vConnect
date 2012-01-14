@@ -474,6 +474,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vsqMetaText\Lyric.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\vsqMetaText\Lyric.h"
 				>
 			</File>
