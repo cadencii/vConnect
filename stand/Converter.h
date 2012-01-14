@@ -85,19 +85,17 @@ namespace vconnect
          */
         string processRecord( std::string record, int count, string sourceDirectory, string destinationDirectory )
         {
-            list<string> splitted = StringUtil::explode( "=", record, 2 );
-            list<string>::iterator i = splitted.begin();
-            string fileName = *i++;
-            string parametersString = *i++;
+            vector<string> splitted = StringUtil::explode( "=", record, 2 );
+            string fileName = splitted[0];
+            string parametersString = splitted[1];
 
-            list<string> parameters = StringUtil::explode( ",", parametersString );
-            list<string>::iterator j = parameters.begin();
-            string alias = *j++;
-            float leftBlank = atof( (*j++).c_str() );
-            float fixedLength = atof( (*j++).c_str() );
-            float rightBlank = atof( (*j++).c_str() );
-            float preUtterance = atof( (*j++).c_str() );
-            float voiceOverlap = atof( (*j++).c_str() );
+            vector<string> parameters = StringUtil::explode( ",", parametersString );
+            string alias = parameters[0];
+            float leftBlank = atof( parameters[1].c_str() );
+            float fixedLength = atof( parameters[2].c_str() );
+            float rightBlank = atof( parameters[3].c_str() );
+            float preUtterance = atof( parameters[4].c_str() );
+            float voiceOverlap = atof( parameters[5].c_str() );
 
             char buf[16];
             sprintf( buf, "%d.vvd", count );

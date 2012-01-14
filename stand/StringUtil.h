@@ -14,7 +14,7 @@
 #ifndef __StringUtil_h__
 #define __StringUtil_h__
 
-#include <list>
+#include <vector>
 #include <string>
 
 using namespace std;
@@ -35,9 +35,9 @@ namespace vconnect
          * @param limit 区切る回数の最大値
          * @return 区切られた文字列のリスト
          */
-        static list<string> explode( string delimiter, string text, int limit = string::npos )
+        static vector<string> explode( string delimiter, string text, int limit = string::npos )
         {
-            list<string> result;
+            vector<string> result;
             string::size_type searchFrom = 0;
             string::size_type delimiterIndex = text.find( delimiter, searchFrom );
             while( delimiterIndex != string::npos ){

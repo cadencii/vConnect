@@ -9,55 +9,27 @@ class StringUtilTest : public CppUnit::TestFixture
 public:
     void explode()
     {
-        list<string> splitted = StringUtil::explode( ",", "aaa,bbb,ccc", 2 );
-        CPPUNIT_ASSERT_EQUAL( (string::size_type)2, splitted.size() );
-        list<string>::iterator i = splitted.begin();
-        string expected = "aaa";
-        string actual = *i;
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
-        i++;
-        expected = "bbb,ccc";
-        actual = *i;
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
+        vector<string> splitted = StringUtil::explode( ",", "aaa,bbb,ccc", 2 );
+        CPPUNIT_ASSERT_EQUAL( (vector<string>::size_type)2, splitted.size() );
+        CPPUNIT_ASSERT_EQUAL( string( "aaa" ), splitted[0] );
+        CPPUNIT_ASSERT_EQUAL( string( "bbb,ccc" ), splitted[1] );
     };
 
     void explodeNonLimit()
     {
-        list<string> splitted = StringUtil::explode( "_|_", "aaa_|__|_bb_|_" );
-        CPPUNIT_ASSERT_EQUAL( (string::size_type)4, splitted.size() );
-        list<string>::iterator i = splitted.begin();
-        string expected;
-        string actual;
-
-        expected = "aaa";
-        actual = *i;
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
-
-        i++;
-        expected = "";
-        actual = *i;
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
-
-        i++;
-        expected = "bb";
-        actual = *i;
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
-
-        i++;
-        expected = "";
-        actual = *i;
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
+        vector<string> splitted = StringUtil::explode( "_|_", "aaa_|__|_bb_|_" );
+        CPPUNIT_ASSERT_EQUAL( (vector<string>::size_type)4, splitted.size() );
+        CPPUNIT_ASSERT_EQUAL( string( "aaa" ), splitted[0] );
+        CPPUNIT_ASSERT_EQUAL( string( "" ), splitted[1] );
+        CPPUNIT_ASSERT_EQUAL( string( "bb" ), splitted[2] );
+        CPPUNIT_ASSERT_EQUAL( string( "" ), splitted[3] );
     }
 
     void explodeDelimiterNotFound()
     {
-        list<string> splitted = StringUtil::explode( "|", "aaa,bbb,ccc" );
+        vector<string> splitted = StringUtil::explode( "|", "aaa,bbb,ccc" );
         CPPUNIT_ASSERT_EQUAL( (string::size_type)1, splitted.size() );
-
-        list<string>::iterator i = splitted.begin();
-        string expected = "aaa,bbb,ccc";
-        string actual = *i;
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
+        CPPUNIT_ASSERT_EQUAL( string( "aaa,bbb,ccc" ), splitted[0] );
     }
 
     void testReplace()
