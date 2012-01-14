@@ -30,14 +30,14 @@ void Transcriber::run()
 
     src.read( src_path, codepage.c_str() );
     dst.read( dst_path, codepage.c_str() );
-    map_t<string, int> analyzedItems;
+    Map<string, int> analyzedItems;
 
     for( int i = 0; i < src.size(); i++ ){
         UtauParameter src_param, dst_param;
         src.getParams(src_param, i);
         cout << "Begin analysis : " << src_param.lyric << endl;
 
-        map_t<string, int>::iterator itr = analyzedItems.find(src_param.fileName);
+        Map<string, int>::iterator itr = analyzedItems.find(src_param.fileName);
         if( itr != analyzedItems.end() ){
             cout << " Already analyzed." << endl;
             continue;

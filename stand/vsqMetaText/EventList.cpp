@@ -18,7 +18,7 @@ namespace vconnect
         }
     }
 
-    void EventList::setParameter( string left, string right, map_t<string, Event *> &id_map )
+    void EventList::setParameter( string left, string right, Map<string, Event *> &id_map )
     {
         /* If Back is EOS, Front is End Tick */
         if( right.compare( "EOS" ) == 0 ){

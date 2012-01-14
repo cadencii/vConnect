@@ -545,14 +545,14 @@ int calculateMelCepstrum( float *dst, int fftLength, list<vConnectData *> &frame
     return ret;
 }
 
-void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames, map_t<vConnectPhoneme *, vorbisFile *> &vorbisMap)
+void calculateResidual(double *dst, int fftLength, list<vConnectData *> &frames, Map<vConnectPhoneme *, vorbisFile *> &vorbisMap)
 {
     memset(dst, 0, sizeof(double) * fftLength);
     float **pcm_channels;
     for(list<vConnectData *>::iterator i = frames.begin(); i != frames.end(); i++)
     {
         int count = 0;
-        map_t<vConnectPhoneme *, vorbisFile *>::iterator itr = vorbisMap.find((*i)->phoneme);
+        Map<vConnectPhoneme *, vorbisFile *>::iterator itr = vorbisMap.find((*i)->phoneme);
 
         if(itr == vorbisMap.end())
         {
@@ -681,7 +681,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
 #endif
 
     // 検索用ハッシュ
-    map_t<vConnectPhoneme *, vorbisFile *> vorbisMap;
+    Map<vConnectPhoneme *, vorbisFile *> vorbisMap;
     for( int i = 0; i < p->phonemes->size(); i++ )
     {
         if( !(*(p->phonemes))[i] )
@@ -802,7 +802,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
     }
 
     //================================================================================================= ↓後処理
-    map_t<vConnectPhoneme *, vorbisFile*>::iterator i;
+    Map<vConnectPhoneme *, vorbisFile*>::iterator i;
     for( i = vorbisMap.begin(); i != vorbisMap.end(); i++) {
         ov_clear( &(i->second->ovf) );
         delete i->second;

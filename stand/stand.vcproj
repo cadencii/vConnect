@@ -334,6 +334,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Map.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Mutex.cpp"
 				>
 			</File>

@@ -17,7 +17,7 @@ namespace vconnect
 
         ~EventList();
 
-        void setParameter( string left, string right, map_t<string, Event *> &id_map );
+        void setParameter( string left, string right, Map<string, Event *> &id_map );
 
 
     public:

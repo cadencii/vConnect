@@ -14,19 +14,27 @@
 #ifndef __Map_h__
 #define __Map_h__
 
-#include <map>
+#ifdef __GNUC__
+    #include <map>
+#else
+    #include <hash_map>
+#endif
 
 namespace vconnect
 {
+#ifdef __GNUC__
     using namespace std;
+#else
+    using namespace stdext;
+#endif
 
-    template<
-        typename _Key,
-        typename _Tp,
-        typename _Compare = std::less<_Key>,
-        typename _Alloc = std::allocator<std::pair<const _Key, _Tp> >
-    >
-    class Map : public map<_Key, _Tp, _Compare, _Alloc>
+    template<typename K, typename V>
+    class Map
+#ifdef __GNUC__
+        : public map<K, V>
+#else
+        : public hash_map<K, V>
+#endif
     {
     };
 }

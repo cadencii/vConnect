@@ -14,8 +14,10 @@
 #ifndef __vConnectSetting_h__
 #define __vConnectSetting_h__
 
-#include "stand.h"
 #include "vsqMetaText/vsqBase.h"
+#include "Map.h"
+
+using namespace vconnect;
 
 enum vConnectSettingList{
     SETTING_BASE = 0,
@@ -46,7 +48,7 @@ public:
     bool readSetting(string path, string fileName, const char *code);
     librarySetting *getLibrarySetting(vConnectSettingList settingKind){return libraryArray[settingKind];}
 private:
-    map_t<string, librarySetting*> libraryMap;
+    Map<string, librarySetting*> libraryMap;
     vector<librarySetting*>          libraryArray;
     string path;
 };

@@ -139,18 +139,6 @@ using namespace std;
 // *2 libiconv is required in MacOSX and Linux to convert character set.
 //
 
-// std::map、stdext::hash_mapのどちらを使うかを決める
-// g++では、hash_map<string_t ...>が出来ないのでこれを回避する
-#ifdef __GNUC__
-#include <map>
-using namespace std;
-#define map_t map
-#else
-#include <hash_map>
-using namespace stdext;
-#define map_t hash_map
-#endif
-
 #define LINEBUFF_LEN 4096
 
 #ifdef STND_MULTI_THREAD

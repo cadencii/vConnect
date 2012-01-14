@@ -101,7 +101,7 @@ public:
 
 private:
 
-    map_t<string, phoneme *> objectMap;
+    Map<string, phoneme *> objectMap;
     vector<corpusManager *> mAppendCorpus;
     UtauDB *mUtauDB;
     string mDBPath;

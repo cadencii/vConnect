@@ -78,7 +78,7 @@ namespace vconnect
         /// </summary>
         vector<BPList> controlCurves;
 
-        map_t<string, BPList *> mMapCurves;
+        Map<string, BPList *> mMapCurves;
 
         /// <summary>
         /// シーケンス内の音符と歌手変更イベントを格納したリスト．
@@ -93,24 +93,24 @@ namespace vconnect
         /// <summary>
         /// [ID#]の文字列と，その中身との紐付けを保持するマップ．
         /// </summary>
-        map_t<string, vconnect::Event *> mMapIDs;
+        Map<string, vconnect::Event *> mMapIDs;
 
         /// <summary>
         /// [h#]の文字列と，その中身との紐付けを保持するマップ．
         /// </summary>
-        map_t<string, Handle *> mMapHandles;
+        Map<string, Handle *> mMapHandles;
 
         /// <summary>
         /// メタテキストのセクション名（[]で囲われた部分）と，
         /// その内部の値を保持したオブジェクトとの紐付けを保持する．
         /// </summary>
-        //map_t<string, vsqBase *> objectMap;
+        //Map<string, vsqBase *> objectMap;
 
         /// <summary>
         /// 歌手の名称（だったけ？IDSのぶぶんだったかIconIDの部分だったか忘れた）と，
         /// 歌手のインデックスとの紐付けを保持する．
         /// </summary>
-        map_t<string, int> singerMap;
+        Map<string, int> singerMap;
 
 
     protected:
@@ -160,7 +160,7 @@ namespace vconnect
         void dumpMapIDs()
         {
             cout << "vsqFileEx::dumpMapIDs" << endl;
-            map_t<string, Event *>::iterator i;
+            Map<string, Event *>::iterator i;
             for( i = mMapIDs.begin(); i != mMapIDs.end(); i++ ){
                 Event *item = i->second;
                 cout << i->first << ":" << item->toString() << endl;
@@ -173,7 +173,7 @@ namespace vconnect
         void dumpMapHandles()
         {
             cout << "vsqFileEx::dumpMapHandles" << endl;
-            map_t<string, Handle *>::iterator i;
+            Map<string, Handle *>::iterator i;
             for( i = mMapHandles.begin(); i != mMapHandles.end(); i++ ){
                 cout << i->first << ":" << i->second->toString() << endl;
             }

@@ -45,7 +45,7 @@ void corpusManager::analyze( vector<string> &phonemes )
 
 corpusManager::~corpusManager()
 {
-    map_t<string, phoneme *>::iterator i;
+    Map<string, phoneme *>::iterator i;
     for( i = objectMap.begin(); i != objectMap.end(); i++ ){
         SAFE_DELETE( i->second->p );
         SAFE_DELETE( i->second );
@@ -63,7 +63,7 @@ corpusManager::~corpusManager()
 corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
 {
     phoneme *ret = NULL;
-    map_t<string, phoneme *>::iterator i;
+    Map<string, phoneme *>::iterator i;
     string alphabet, vtd_path;
 
 #ifdef STND_MULTI_THREAD

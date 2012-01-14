@@ -100,7 +100,7 @@ namespace vconnect
         if( !stream ) return false;
 
         string temp, search, left, right;
-        //map_t<string, vsqBase *>::iterator i;
+        //Map<string, vsqBase *>::iterator i;
 
         while( stream->ready() ){
             temp = stream->readLine();
@@ -154,21 +154,21 @@ namespace vconnect
                 this->vsqTempoBp.setParameter( left, right );
             }else if( search.find( "[ID#" ) == 0 ){
                 // ID
-                map_t<string, Event *>::iterator i;
+                Map<string, Event *>::iterator i;
                 i = mMapIDs.find( search );
                 if( i != mMapIDs.end() && i->second ){
                     setParamEvent( i->second, left, right );
                 }
             }else if( search.find( "[h#" ) == 0 ){
                 // handle
-                map_t<string, Handle *>::iterator i;
+                Map<string, Handle *>::iterator i;
                 i = mMapHandles.find( search );
                 if( i != mMapHandles.end() && i->second ){
                     i->second->setParameter( left, right );
                 }
             }else{
                 // たぶんコントロールカーブ
-                map_t<string, BPList *>::iterator i;
+                Map<string, BPList *>::iterator i;
                 i = mMapCurves.find( search );
                 if( i != mMapCurves.end() && i->second ){
                     i->second->setParameter( left, right );
@@ -202,7 +202,7 @@ namespace vconnect
     int Sequence::getSingerIndex( string t_search )
     {
         int ret = 0;
-        map_t<string, int>::iterator i = singerMap.find( t_search );
+        Map<string, int>::iterator i = singerMap.find( t_search );
         if( i != singerMap.end() )
         {
             ret = i->second;

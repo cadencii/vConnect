@@ -59,7 +59,7 @@ vConnectSetting::vConnectSetting()
 
 vConnectSetting::~vConnectSetting()
 {
-    for(map_t<string, librarySetting*>::iterator i = libraryMap.begin(); i != libraryMap.end(); i++){
+    for(Map<string, librarySetting*>::iterator i = libraryMap.begin(); i != libraryMap.end(); i++){
         delete i->second;
     }
 }
@@ -78,7 +78,7 @@ bool vConnectSetting::readSetting( string path, string fileName, const char *cod
 
     string tmp;
     string left, right;
-    map_t<string, librarySetting*>::iterator currentParse = libraryMap.end();
+    Map<string, librarySetting*>::iterator currentParse = libraryMap.end();
     int index;
     for( int i = 0; i < SETTING_END; i++ ){
         libraryArray[i]->path = this->path;
