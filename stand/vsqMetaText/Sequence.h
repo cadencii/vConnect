@@ -11,6 +11,7 @@
 #include "EventList.h"
 #include "BPList.h"
 #include "vsqTempo.h"
+#include "CurveTypeEnum.h"
 #include "../RuntimeOption.h"
 #include "../Socket.h"
 #include "../Path.h"

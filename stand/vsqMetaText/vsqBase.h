@@ -27,34 +27,6 @@
 /* by the value in phoneme DataBase.                            */
 //#define __UTAU_OFFSET__
 
-const string controlCurveName[]={
-    "[PitchBendBPList]",
-    "[PitchBendSensBPList]",
-    "[DynamicsBPList]",
-    "[EpRResidualBPList]",            /* BRE Curve */
-    "[EpRESlopeBPList]",            /* BRI Curve */
-    "[EpRESlopeDepthBPList]",        /* CLE Curve */
-    "[GenderFactorBPList]"            /* GEN Curve */
-};
-const int controlCurveDefaultValue[] = {
-    0,
-    2,
-    64,
-    0,
-    64,
-    0,
-    64
-};
-enum{
-    PITCH_BEND=0,
-    PITCH_BEND_SENS,
-    DYNAMICS,
-    BRETHINESS,
-    BRIGHTNESS,
-    CLEARNESS,
-    GENDER
-};
-
 const string OBJ_NAME_OTOINI = "[oto.ini]";
 const string OBJ_NAME_EVENT_LIST = "[EventList]";
 const string OBJ_NAME_TEMPO = "[Tempo]";

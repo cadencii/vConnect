@@ -47,4 +47,9 @@ namespace vconnect
             }
         }
     }
+
+    BP BPList::get( int index )
+    {
+        return this->data[index];
+    }
 }

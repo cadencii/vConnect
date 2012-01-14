@@ -34,6 +34,13 @@ namespace vconnect
 
         void setParameter( string left, string right );
 
+        /**
+         * 指定したインデックスにおけるカーブの値を取得する
+         * @param index インデックス
+         * @return カーブの値
+         */
+        BP get( int index );
+
     private:
         vector<BP> data;
     };

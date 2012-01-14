@@ -434,6 +434,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\vsqMetaText\CurveTypeEnum.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vsqMetaText\Event.h"
 				>
 			</File>

@@ -20,6 +20,7 @@
 #include "vsqMetaText/EventList.h"
 #include "Thread.h"
 #include "utau/UtauDBManager.h"
+#include "vsqMetaText/CurveTypeEnum.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];
@@ -358,7 +359,8 @@ void Synthesizer::run()
     // 準備４．合成時刻に必要な情報を整理．
     vConnectFrame *frames = new vConnectFrame[frameLength];
     vector<vConnectPhoneme *> phonemes;
-    calculateFrameData(frames, frameLength, phonemes, mVsq, mManagerList, mControlCurves[BRIGHTNESS], beginFrame);
+    calculateFrameData(frames, frameLength, phonemes, mVsq, mManagerList, mControlCurves[CurveTypeEnum::BRIGHTNESS], beginFrame);
+
 
     // 実際の合成．
     vConnectArg arg1, arg2;
@@ -700,9 +702,12 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
     }
     //================================================================================================= ↑前処理
 
-    int currentPosition, currentFrame = p->beginFrame;
-    double currentTime = 0.0, T;
-    int genIndex = 0, breIndex = 0;
+    int currentPosition;
+    int currentFrame = p->beginFrame;
+    double currentTime = 0.0;
+    double T;
+    int genIndex = 0;
+    int breIndex = 0;
     int noiseCount = 0;
 
     // 合成処理
@@ -719,11 +724,11 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
         T = 1.0 / currentF0;
 
         // コントロールトラックのインデックスを該当箇所まで進める．
-        while( currentFrame + p->frameOffset > (*(p->controlCurves))[GENDER][genIndex].frameTime )
+        while( currentFrame + p->frameOffset > (*(p->controlCurves))[CurveTypeEnum::GENDER][genIndex].frameTime )
         {
             genIndex++;
         }
-        while( currentFrame + p->frameOffset > (*(p->controlCurves))[BRETHINESS][breIndex].frameTime )
+        while( currentFrame + p->frameOffset > (*(p->controlCurves))[CurveTypeEnum::BRETHINESS][breIndex].frameTime )
         {
             breIndex++;
         }
@@ -759,7 +764,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
             }
         }
         // BRE の値によりノイズを励起信号に加算する．
-        appendNoise( starSpec, (int)min( p->fftLength, T * fs ), (*(p->controlCurves))[BRETHINESS][breIndex].value / 128.0, &noiseCount );
+        appendNoise( starSpec, (int)min( p->fftLength, T * fs ), (*(p->controlCurves))[CurveTypeEnum::BRETHINESS][breIndex].value / 128.0, &noiseCount );
 
         // starSpec -> residual DFT を実行する．
         fftw_execute(forward_r2c);
@@ -768,7 +773,7 @@ ThreadWorkerReturnType ThreadWorkerDeclspec synthesizeFromList( void *arg )
         calculateRawWave(impulse, residual, p->fftLength, *frames, waveform, spectrum, cepstrum, forward_r2c_raw, forward, inverse);
 
         // Gender Factor を適用したスペクトルを starSpec に書き込む．
-        double stretchRatio = pow(2.0 , (double)((*(p->controlCurves))[GENDER][genIndex].value - 64) / 64.0);
+        double stretchRatio = pow(2.0 , (double)((*(p->controlCurves))[CurveTypeEnum::GENDER][genIndex].value - 64) / 64.0);
         vConnectUtility::linearStretch(starSpec, impulse, stretchRatio, p->fftLength / 2 + 1);
 
         // 合成パワースペクトルから最小位相応答を計算．
@@ -1038,21 +1043,21 @@ void Synthesizer::calculateF0( double *f0, double *dynamics )
         for( ; index < itemi->endFrame - beginFrame && index < frameLength; index++ )
         {
             // ピッチetcカーブに格納されている値の内どれを使うか？
-            while( index + beginFrame > mControlCurves[PITCH_BEND][pitIndex].frameTime )
+            while( index + beginFrame > mControlCurves[CurveTypeEnum::PITCH_BEND][pitIndex].frameTime )
             {
                 pitIndex++;
             }
-            while( index + beginFrame > mControlCurves[PITCH_BEND_SENS][pbsIndex].frameTime )
+            while( index + beginFrame > mControlCurves[CurveTypeEnum::PITCH_BEND_SENS][pbsIndex].frameTime )
             {
                 pbsIndex++;
             }
-            while( index + beginFrame > mControlCurves[DYNAMICS][dynIndex].frameTime )
+            while( index + beginFrame > mControlCurves[CurveTypeEnum::DYNAMICS][dynIndex].frameTime )
             {
                 dynIndex++;
             }
-            pitch_change = pow( 2, (double)mControlCurves[PITCH_BEND][pitIndex].value / 8192.0 * (double)mControlCurves[PITCH_BEND_SENS][pbsIndex].value / 12.0 );
+            pitch_change = pow( 2, (double)mControlCurves[CurveTypeEnum::PITCH_BEND][pitIndex].value / 8192.0 * (double)mControlCurves[CurveTypeEnum::PITCH_BEND_SENS][pbsIndex].value / 12.0 );
             f0[index] = mNoteFrequency[itemi->note] * pitch_change * getPitchFluctuation( (double)index * framePeriod / 1000.0 );
-            dynamics[index] = (double)mControlCurves[DYNAMICS][dynIndex].value / 64.0;
+            dynamics[index] = (double)mControlCurves[CurveTypeEnum::DYNAMICS][dynIndex].value / 64.0;
             if( index > portamentoBegin )
             {
                 dynamics[index] *= 1.0 - (double)( index - portamentoBegin ) / 50.0;

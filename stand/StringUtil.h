@@ -35,7 +35,7 @@ namespace vconnect
          * @param limit 区切る回数の最大値
          * @return 区切られた文字列のリスト
          */
-        static vector<string> explode( string delimiter, string text, int limit = string::npos )
+        static vector<string> explode( string delimiter, string text, string::size_type limit = string::npos )
         {
             vector<string> result;
             string::size_type searchFrom = 0;
@@ -66,9 +66,10 @@ namespace vconnect
                 return text;
             }
             string result = text;
-            int index = result.find( search, 0 );
+            string::size_type index = result.find( search, 0 );
             int searchLength = search.length();
             int replaceLength = replace.length();
+
             while( string::npos != index ){
                 result.replace( index, searchLength, replace );
                 index = result.find( search, index - searchLength + replaceLength + 1 );

@@ -77,13 +77,14 @@ namespace vconnect
 
     Sequence::Sequence()
     {
-        string temp;
-
-        this->controlCurves.resize( CONTROL_CURVE_NUM );
-
-        for( vector<BPList>::size_type i = 0; i < this->controlCurves.size(); i++ ){
-            this->controlCurves[i].setParameter( -10000, controlCurveDefaultValue[i] );
-            this->mMapCurves.insert( make_pair( controlCurveName[i], &this->controlCurves[i] ) );
+        vector<CurveTypeEnum::CurveType> values = CurveTypeEnum::values();
+        int size = values.size();
+        this->controlCurves.resize( size );
+        for( int i = 0; i < size; i++ ){
+            int defaultValue = CurveTypeEnum::getDefault( values[i] );
+            string name = CurveTypeEnum::getName( values[i] );
+            this->controlCurves[i].setParameter( -10000, defaultValue );
+            this->mMapCurves.insert( make_pair( name, &this->controlCurves[i] ) );
         }
     }
 
