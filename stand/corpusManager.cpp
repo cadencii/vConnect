@@ -169,7 +169,7 @@ void corpusManager::setUtauDB( UtauDB *p, RuntimeOption &options )
     string tmp;
     mUtauDB = p;
     if( p ){
-        p->getDBPath( mDBPath );
+        this->mDBPath = p->getOtoIniPath();
     }
     tmp = "vConnect.ini";
     mEnableExtention =  setting.readSetting( mDBPath, tmp, options.getEncodingOtoIni().c_str()); // 文字コード指定は暫定処置

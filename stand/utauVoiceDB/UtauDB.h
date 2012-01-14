@@ -45,12 +45,11 @@ namespace vconnect
 
         int getParams( UtauParameter &parameters, int index );
 
-        /// <summary>
-        /// oto.iniファイルのパスを取得します．
-        /// </summary>
-        /// <param name="dst">ファイルパスの格納先．</param>
-        /// <returns>1を返します．</returns>
-        int getDBPath( string &dst );
+        /**
+         * oto.iniファイルのパスを取得します．
+         * @return oto.ini のパス
+         */
+        string getOtoIniPath();
 
         /// <summary>
         /// 音素の数が0かどうかを取得します．

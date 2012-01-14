@@ -92,10 +92,9 @@ namespace vconnect
         return result;
     }
 
-    int UtauDB::getDBPath( string &dst )
+    string UtauDB::getOtoIniPath()
     {
-        dst = mDBPath;
-        return 1;
+        return this->mDBPath;
     }
 
     bool UtauDB::empty()

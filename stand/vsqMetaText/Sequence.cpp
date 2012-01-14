@@ -8,16 +8,19 @@
 
 namespace vconnect
 {
-    void Sequence::setParamOtoIni( vsqPhonemeDB *target, string singerName, string otoIniPath )
+    void Sequence::setParamOtoIni( string singerName, string otoIniPath, string encoding )
     {
         // 名前登録して
-        singerMap.insert( make_pair( singerName, target->singerIndex ) );
-        // 中身読んで
-        UtauDB *p = new UtauDB;
-        p->read( otoIniPath, target->_codepage_otoini.c_str() );
-        // リストに追加
-        UtauDBManager::regist( p );
-        target->singerIndex++;
+        int index = UtauDBManager::find( otoIniPath );
+        if( index < 0 ){
+            // 中身読んで
+            UtauDB *p = new UtauDB;
+            p->read( otoIniPath, encoding.c_str() );
+            // リストに追加
+            UtauDBManager::regist( p );
+            index = UtauDBManager::find( otoIniPath );
+        }
+        singerMap.insert( std::make_pair( singerName, index ) );
     }
 
     void Sequence::setParamEvent( Event *target, string left, string right )
@@ -88,14 +91,13 @@ namespace vconnect
     bool Sequence::read( string file_name, RuntimeOption option )
     {
         bool result = false;
-        this->voiceDataBase.setRuntimeOption( option );
         TextInputStream *stream = new TextInputStream( file_name, option.getEncodingVsqText() );
-        bool ret = this->readCore( stream, file_name );
+        bool ret = this->readCore( stream, file_name, option.getEncodingOtoIni() );
         delete stream;
         return ret;
     }
 
-    bool Sequence::readCore( InputStream *stream, string vsqFilePath )
+    bool Sequence::readCore( InputStream *stream, string vsqFilePath, string encodingOtoIni )
     {
         if( !stream ) return false;
 
@@ -148,7 +150,7 @@ namespace vconnect
                     string directory = Path::getDirectoryName( vsqFilePath );
                     otoIniPath = Path::combine( directory, otoIniPath );
                 }
-                this->setParamOtoIni( &this->voiceDataBase, singerName, otoIniPath );
+                this->setParamOtoIni( singerName, otoIniPath, encodingOtoIni );
             }else if( search.compare( OBJ_NAME_TEMPO ) == 0 ){
                 // [Tempo]
                 this->vsqTempoBp.setParameter( left, right );

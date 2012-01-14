@@ -58,16 +58,13 @@ void Transcriber::run()
             // 圧縮形式のマッチング．
             vConnectPhoneme src_phoneme, dst_phoneme;
 
-            string tmp_path;
-            src.getDBPath(tmp_path);
-            tmp_path += src_param.fileName;
+            string tmp_path = src.getOtoIniPath() + src_param.fileName;
             if( !src_phoneme.readPhoneme( tmp_path.c_str() ) ){
                 cout << " error; can't read file : " << tmp_path << endl;
                 continue;
             }
 
-            dst.getDBPath(tmp_path);
-            tmp_path += dst_param.fileName;
+            tmp_path = dst.getOtoIniPath() + dst_param.fileName;
             if( !dst_phoneme.readPhoneme( tmp_path.c_str() ) ){
                 cout << " error; can't read file : " << tmp_path << endl;
                 continue;
@@ -80,8 +77,7 @@ void Transcriber::run()
             mb_conv(tmp_path, s);
             src_phoneme.writePhoneme(s.c_str());
 */
-            dst.getDBPath(tmp_path);
-            tmp_path += dst_param.fileName;
+            tmp_path = dst.getOtoIniPath() + dst_param.fileName;
             dst_phoneme.writePhoneme( tmp_path.c_str() );
         }else{
             vConnectPhoneme src_phoneme, dst_phoneme;

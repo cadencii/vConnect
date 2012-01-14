@@ -55,6 +55,13 @@ namespace vconnect
          */
         static UtauDB *get( int index );
 
+        /**
+         * 指定した oto.ini の音源のインデックスを取得する
+         * @param otoIniPath oto.ini のパス
+         * @return 音源のインデックス
+         */
+        static int find( string otoIniPath );
+
     private:
         UtauDBManager()
         {

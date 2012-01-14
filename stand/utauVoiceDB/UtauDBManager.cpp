@@ -42,4 +42,18 @@ namespace vconnect
         }
         UtauDBManager::mDBs.clear();
     }
+
+    int UtauDBManager::find( string otoIniPath )
+    {
+        if( otoIniPath.length() == 0 ){
+            return -1;
+        }
+        int size = UtauDBManager::size();
+        for( int i = 0; i < size; i++ ){
+            if( UtauDBManager::get( i )->getOtoIniPath() == otoIniPath ){
+                return i;
+            }
+        }
+        return -1;
+    }
 }

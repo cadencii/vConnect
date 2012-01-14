@@ -11,7 +11,6 @@
 #include "EventList.h"
 #include "BPList.h"
 #include "vsqTempo.h"
-#include "vsqPhonemeDB.h"
 #include "../RuntimeOption.h"
 #include "../Socket.h"
 #include "../Path.h"
@@ -117,13 +116,14 @@ namespace vconnect
 
     private:
 
-        /// <summary>
-        /// VSQのメタテキストを読み込みます．
-        /// </summary>
-        /// <param name="stream">読み込むストリーム．</param>
-        /// <param name="vsqFilePath">読み込むファイルのパス</param>
-        /// <returns>読み込みに成功した場合true，それ以外はfalseを返します．</returns>
-        bool readCore( InputStream *stream, string vsqFilePath );
+        /**
+         * VSQのメタテキストを読み込みます．
+         * @param stream 読み込むストリーム．
+         * @param vsqFilePath 読み込むファイルのパス
+         * @param encodingOtoIni oto.ini ファイルのテキストエンコーディング
+         * @return 読み込みに成功した場合true，それ以外はfalseを返します．
+         */
+        bool readCore( InputStream *stream, string vsqFilePath, string encodingOtoIni );
 
         /// <summary>
         /// 指定したイベントの内容を，メタテキストの行データを元に設定します．
@@ -133,7 +133,13 @@ namespace vconnect
         /// <param name="right">メタテキストの"="の右側部分</param>
         void setParamEvent( vconnect::Event *target, string left, string right );
 
-        void setParamOtoIni( vsqPhonemeDB *target, string singerName, string otoIniPath );
+        /**
+         * 歌手名と oto.ini のパスの紐付けを登録する
+         * @param singerName 歌手名
+         * @param otoIniPath oto.ini のパス
+         * @param encoding oto.ini のテキストエンコーディング
+         */
+        void setParamOtoIni( string singerName, string otoIniPath, string encoding );
 
     private:
 
@@ -178,10 +184,6 @@ namespace vconnect
                 cout << i->first << ":" << i->second->toString() << endl;
             }
         }
-
-    private:
-        vsqPhonemeDB voiceDataBase;
-
     };
 }
 #endif
