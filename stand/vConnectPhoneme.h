@@ -5,7 +5,7 @@
 #include <fftw3.h>
 #include <string>
 #include "vsqMetaText/vsqBase.h"
-#include "utauVoiceDB/UtauParameter.h"
+#include "utau/UtauParameter.h"
 
 using namespace std;
 using namespace vconnect;

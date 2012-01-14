@@ -235,30 +235,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="utauVoiceDB"
-			>
-			<File
-				RelativePath=".\utauVoiceDB\UtauDB.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utauVoiceDB\UtauDB.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utauVoiceDB\UtauDBManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utauVoiceDB\UtauDBManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utauVoiceDB\UtauParameter.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="world"
 			>
 			<File
@@ -507,6 +483,30 @@
 			</File>
 			<File
 				RelativePath=".\vsqMetaText\vsqTempo.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="utau"
+			>
+			<File
+				RelativePath=".\utau\UtauDB.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utau\UtauDB.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utau\UtauDBManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utau\UtauDBManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utau\UtauParameter.h"
 				>
 			</File>
 		</Filter>

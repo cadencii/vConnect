@@ -15,7 +15,7 @@
 #define __vsqBase_h__
 
 #include "../stand.h"
-#include "../utauVoiceDB/UtauDB.h"
+#include "../utau/UtauDB.h"
 
 #define TICK_PER_BEAT 480
 #define CONTROL_CURVE_NUM 7

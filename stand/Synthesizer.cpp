@@ -19,7 +19,7 @@
 #include "vConnectUtility.h"
 #include "vsqMetaText/EventList.h"
 #include "Thread.h"
-#include "utauVoiceDB/UtauDBManager.h"
+#include "utau/UtauDBManager.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];

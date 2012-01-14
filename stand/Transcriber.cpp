@@ -14,7 +14,7 @@
 #include <time.h>
 
 #include "Transcriber.h"
-#include "utauVoiceDB/UtauDB.h"
+#include "utau/UtauDB.h"
 #include "vConnectPhoneme.h"
 #include "vConnectUtility.h"
 #include "Configuration.h"

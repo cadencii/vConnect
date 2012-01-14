@@ -1,11 +1,11 @@
 SRC=*.cpp \
-    utauVoiceDB/*.cpp \
+    utau/*.cpp \
     vsqMetaText/*.cpp \
     waveFileEx/*.cpp \
     world/*.cpp
 
 HEADER=*.h \
-    utauVoiceDB/*.h \
+    utau/*.h \
     vsqMetaText/*.h \
     waveFileEx/*.h \
     world/*.h

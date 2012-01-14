@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 #include "corpusManager.h"
-#include "utauVoiceDB/UtauDB.h"
+#include "utau/UtauDB.h"
 #include "vConnectPhoneme.h"
 #include "vsqMetaText/Sequence.h"
 #include "Configuration.h"

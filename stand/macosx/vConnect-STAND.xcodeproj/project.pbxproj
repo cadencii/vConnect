@@ -14,7 +14,6 @@
 		942D1ECB14C1A8AF0070B3C0 /* Synthesizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1D5B14C1A8AE0070B3C0 /* Synthesizer.cpp */; };
 		942D1ED614C1A8AF0070B3C0 /* Thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1D9714C1A8AE0070B3C0 /* Thread.cpp */; };
 		942D1ED714C1A8AF0070B3C0 /* Transcriber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1D9914C1A8AE0070B3C0 /* Transcriber.cpp */; };
-		942D1ED814C1A8AF0070B3C0 /* UtauDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1D9C14C1A8AE0070B3C0 /* UtauDB.cpp */; };
 		942D1EDA14C1A8AF0070B3C0 /* vConnectPhoneme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DA214C1A8AE0070B3C0 /* vConnectPhoneme.cpp */; };
 		942D1EDB14C1A8AF0070B3C0 /* vConnectSetting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DA414C1A8AE0070B3C0 /* vConnectSetting.cpp */; };
 		942D1EDC14C1A8AF0070B3C0 /* vConnectUtility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DA614C1A8AE0070B3C0 /* vConnectUtility.cpp */; };
@@ -33,7 +32,8 @@
 		942D1EE914C1A8AF0070B3C0 /* synthesis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DC314C1A8AE0070B3C0 /* synthesis.cpp */; };
 		942D1EEA14C1A8AF0070B3C0 /* synthesis_v4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DC414C1A8AE0070B3C0 /* synthesis_v4.cpp */; };
 		942D1EEB14C1A8AF0070B3C0 /* worldParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DC614C1A8AE0070B3C0 /* worldParameters.cpp */; };
-		942D1EF314C1F2990070B3C0 /* UtauDBManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1EF114C1F2990070B3C0 /* UtauDBManager.cpp */; };
+		942D1F0314C1F91B0070B3C0 /* UtauDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1EFE14C1F91B0070B3C0 /* UtauDB.cpp */; };
+		942D1F0414C1F91B0070B3C0 /* UtauDBManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F0014C1F91B0070B3C0 /* UtauDBManager.cpp */; };
 		9479B90E14B988BA00A3CFD4 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B90D14B988BA00A3CFD4 /* libogg.a */; };
 		9479B91214B988D600A3CFD4 /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B90F14B988D600A3CFD4 /* libvorbis.a */; };
 		9479B91314B988D600A3CFD4 /* libvorbisenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B91014B988D600A3CFD4 /* libvorbisenc.a */; };
@@ -79,9 +79,6 @@
 		942D1D9814C1A8AE0070B3C0 /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thread.h; sourceTree = "<group>"; };
 		942D1D9914C1A8AE0070B3C0 /* Transcriber.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Transcriber.cpp; sourceTree = "<group>"; };
 		942D1D9A14C1A8AE0070B3C0 /* Transcriber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Transcriber.h; sourceTree = "<group>"; };
-		942D1D9C14C1A8AE0070B3C0 /* UtauDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtauDB.cpp; sourceTree = "<group>"; };
-		942D1D9D14C1A8AE0070B3C0 /* UtauDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauDB.h; sourceTree = "<group>"; };
-		942D1DA014C1A8AE0070B3C0 /* UtauParameter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauParameter.h; sourceTree = "<group>"; };
 		942D1DA214C1A8AE0070B3C0 /* vConnectPhoneme.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectPhoneme.cpp; sourceTree = "<group>"; };
 		942D1DA314C1A8AE0070B3C0 /* vConnectPhoneme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectPhoneme.h; sourceTree = "<group>"; };
 		942D1DA414C1A8AE0070B3C0 /* vConnectSetting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectSetting.cpp; sourceTree = "<group>"; };
@@ -116,8 +113,11 @@
 		942D1DC514C1A8AE0070B3C0 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
 		942D1DC614C1A8AE0070B3C0 /* worldParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = worldParameters.cpp; sourceTree = "<group>"; };
 		942D1DC714C1A8AE0070B3C0 /* worldParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = worldParameters.h; sourceTree = "<group>"; };
-		942D1EF114C1F2990070B3C0 /* UtauDBManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtauDBManager.cpp; sourceTree = "<group>"; };
-		942D1EF214C1F2990070B3C0 /* UtauDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauDBManager.h; sourceTree = "<group>"; };
+		942D1EFE14C1F91B0070B3C0 /* UtauDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtauDB.cpp; sourceTree = "<group>"; };
+		942D1EFF14C1F91B0070B3C0 /* UtauDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauDB.h; sourceTree = "<group>"; };
+		942D1F0014C1F91B0070B3C0 /* UtauDBManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtauDBManager.cpp; sourceTree = "<group>"; };
+		942D1F0114C1F91B0070B3C0 /* UtauDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauDBManager.h; sourceTree = "<group>"; };
+		942D1F0214C1F91B0070B3C0 /* UtauParameter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauParameter.h; sourceTree = "<group>"; };
 		9461B9F214B97F9800F5E0EC /* vConnect-STAND */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "vConnect-STAND"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9461BAD314B984DC00F5E0EC /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogg.framework; path = Library/Frameworks/Ogg.framework; sourceTree = SDKROOT; };
 		9461BAD914B9856200F5E0EC /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = Library/Frameworks/Vorbis.framework; sourceTree = SDKROOT; };
@@ -170,7 +170,7 @@
 				942D1D9814C1A8AE0070B3C0 /* Thread.h */,
 				942D1D9914C1A8AE0070B3C0 /* Transcriber.cpp */,
 				942D1D9A14C1A8AE0070B3C0 /* Transcriber.h */,
-				942D1D9B14C1A8AE0070B3C0 /* utauVoiceDB */,
+				942D1EFD14C1F91B0070B3C0 /* utau */,
 				942D1DA214C1A8AE0070B3C0 /* vConnectPhoneme.cpp */,
 				942D1DA314C1A8AE0070B3C0 /* vConnectPhoneme.h */,
 				942D1DA414C1A8AE0070B3C0 /* vConnectSetting.cpp */,
@@ -185,18 +185,6 @@
 			);
 			name = stand;
 			path = ..;
-			sourceTree = "<group>";
-		};
-		942D1D9B14C1A8AE0070B3C0 /* utauVoiceDB */ = {
-			isa = PBXGroup;
-			children = (
-				942D1EF114C1F2990070B3C0 /* UtauDBManager.cpp */,
-				942D1EF214C1F2990070B3C0 /* UtauDBManager.h */,
-				942D1D9C14C1A8AE0070B3C0 /* UtauDB.cpp */,
-				942D1D9D14C1A8AE0070B3C0 /* UtauDB.h */,
-				942D1DA014C1A8AE0070B3C0 /* UtauParameter.h */,
-			);
-			path = utauVoiceDB;
 			sourceTree = "<group>";
 		};
 		942D1DA814C1A8AE0070B3C0 /* vsqMetaText */ = {
@@ -244,6 +232,18 @@
 				942D1DC514C1A8AE0070B3C0 /* world.h */,
 			);
 			path = world;
+			sourceTree = "<group>";
+		};
+		942D1EFD14C1F91B0070B3C0 /* utau */ = {
+			isa = PBXGroup;
+			children = (
+				942D1EFE14C1F91B0070B3C0 /* UtauDB.cpp */,
+				942D1EFF14C1F91B0070B3C0 /* UtauDB.h */,
+				942D1F0014C1F91B0070B3C0 /* UtauDBManager.cpp */,
+				942D1F0114C1F91B0070B3C0 /* UtauDBManager.h */,
+				942D1F0214C1F91B0070B3C0 /* UtauParameter.h */,
+			);
+			path = utau;
 			sourceTree = "<group>";
 		};
 		9461B9E714B97F9800F5E0EC = {
@@ -333,7 +333,6 @@
 				942D1ECB14C1A8AF0070B3C0 /* Synthesizer.cpp in Sources */,
 				942D1ED614C1A8AF0070B3C0 /* Thread.cpp in Sources */,
 				942D1ED714C1A8AF0070B3C0 /* Transcriber.cpp in Sources */,
-				942D1ED814C1A8AF0070B3C0 /* UtauDB.cpp in Sources */,
 				942D1EDA14C1A8AF0070B3C0 /* vConnectPhoneme.cpp in Sources */,
 				942D1EDB14C1A8AF0070B3C0 /* vConnectSetting.cpp in Sources */,
 				942D1EDC14C1A8AF0070B3C0 /* vConnectUtility.cpp in Sources */,
@@ -352,7 +351,8 @@
 				942D1EE914C1A8AF0070B3C0 /* synthesis.cpp in Sources */,
 				942D1EEA14C1A8AF0070B3C0 /* synthesis_v4.cpp in Sources */,
 				942D1EEB14C1A8AF0070B3C0 /* worldParameters.cpp in Sources */,
-				942D1EF314C1F2990070B3C0 /* UtauDBManager.cpp in Sources */,
+				942D1F0314C1F91B0070B3C0 /* UtauDB.cpp in Sources */,
+				942D1F0414C1F91B0070B3C0 /* UtauDBManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

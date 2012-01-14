@@ -4,7 +4,7 @@
  * Copyright (C) 2011-2012 kbinani.
  */
 #include "Sequence.h"
-#include "../utauVoiceDB/UtauDBManager.h"
+#include "../utau/UtauDBManager.h"
 
 namespace vconnect
 {
