@@ -17,12 +17,6 @@
 		942D1EDA14C1A8AF0070B3C0 /* vConnectPhoneme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DA214C1A8AE0070B3C0 /* vConnectPhoneme.cpp */; };
 		942D1EDB14C1A8AF0070B3C0 /* vConnectSetting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DA414C1A8AE0070B3C0 /* vConnectSetting.cpp */; };
 		942D1EDC14C1A8AF0070B3C0 /* vConnectUtility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DA614C1A8AE0070B3C0 /* vConnectUtility.cpp */; };
-		942D1EDD14C1A8AF0070B3C0 /* BPList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DAA14C1A8AE0070B3C0 /* BPList.cpp */; };
-		942D1EDE14C1A8AF0070B3C0 /* EventList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DAD14C1A8AE0070B3C0 /* EventList.cpp */; };
-		942D1EDF14C1A8AF0070B3C0 /* Handle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DAF14C1A8AE0070B3C0 /* Handle.cpp */; };
-		942D1EE014C1A8AF0070B3C0 /* Lyric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DB114C1A8AE0070B3C0 /* Lyric.cpp */; };
-		942D1EE114C1A8AF0070B3C0 /* Sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DB314C1A8AE0070B3C0 /* Sequence.cpp */; };
-		942D1EE214C1A8AF0070B3C0 /* vsqTempo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DB814C1A8AE0070B3C0 /* vsqTempo.cpp */; };
 		942D1EE314C1A8AF0070B3C0 /* waveFileEx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DBB14C1A8AE0070B3C0 /* waveFileEx.cpp */; };
 		942D1EE414C1A8AF0070B3C0 /* dio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DBE14C1A8AE0070B3C0 /* dio.cpp */; };
 		942D1EE514C1A8AF0070B3C0 /* matlabfunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DBF14C1A8AE0070B3C0 /* matlabfunctions.cpp */; };
@@ -34,6 +28,12 @@
 		942D1EEB14C1A8AF0070B3C0 /* worldParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1DC614C1A8AE0070B3C0 /* worldParameters.cpp */; };
 		942D1F0314C1F91B0070B3C0 /* UtauDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1EFE14C1F91B0070B3C0 /* UtauDB.cpp */; };
 		942D1F0414C1F91B0070B3C0 /* UtauDBManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F0014C1F91B0070B3C0 /* UtauDBManager.cpp */; };
+		942D1F1B14C253840070B3C0 /* BPList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F0C14C253840070B3C0 /* BPList.cpp */; };
+		942D1F1C14C253840070B3C0 /* EventList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F1014C253840070B3C0 /* EventList.cpp */; };
+		942D1F1D14C253840070B3C0 /* Handle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F1214C253840070B3C0 /* Handle.cpp */; };
+		942D1F1E14C253840070B3C0 /* Lyric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F1414C253840070B3C0 /* Lyric.cpp */; };
+		942D1F1F14C253840070B3C0 /* Sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F1614C253840070B3C0 /* Sequence.cpp */; };
+		942D1F2014C253840070B3C0 /* TempoList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 942D1F1814C253840070B3C0 /* TempoList.cpp */; };
 		9479B90E14B988BA00A3CFD4 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B90D14B988BA00A3CFD4 /* libogg.a */; };
 		9479B91214B988D600A3CFD4 /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B90F14B988D600A3CFD4 /* libvorbis.a */; };
 		9479B91314B988D600A3CFD4 /* libvorbisenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9479B91014B988D600A3CFD4 /* libvorbisenc.a */; };
@@ -85,22 +85,6 @@
 		942D1DA514C1A8AE0070B3C0 /* vConnectSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectSetting.h; sourceTree = "<group>"; };
 		942D1DA614C1A8AE0070B3C0 /* vConnectUtility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vConnectUtility.cpp; sourceTree = "<group>"; };
 		942D1DA714C1A8AE0070B3C0 /* vConnectUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vConnectUtility.h; sourceTree = "<group>"; };
-		942D1DA914C1A8AE0070B3C0 /* BP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BP.h; sourceTree = "<group>"; };
-		942D1DAA14C1A8AE0070B3C0 /* BPList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BPList.cpp; sourceTree = "<group>"; };
-		942D1DAB14C1A8AE0070B3C0 /* BPList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BPList.h; sourceTree = "<group>"; };
-		942D1DAC14C1A8AE0070B3C0 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
-		942D1DAD14C1A8AE0070B3C0 /* EventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventList.cpp; sourceTree = "<group>"; };
-		942D1DAE14C1A8AE0070B3C0 /* EventList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventList.h; sourceTree = "<group>"; };
-		942D1DAF14C1A8AE0070B3C0 /* Handle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Handle.cpp; sourceTree = "<group>"; };
-		942D1DB014C1A8AE0070B3C0 /* Handle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Handle.h; sourceTree = "<group>"; };
-		942D1DB114C1A8AE0070B3C0 /* Lyric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lyric.cpp; sourceTree = "<group>"; };
-		942D1DB214C1A8AE0070B3C0 /* Lyric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lyric.h; sourceTree = "<group>"; };
-		942D1DB314C1A8AE0070B3C0 /* Sequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sequence.cpp; sourceTree = "<group>"; };
-		942D1DB414C1A8AE0070B3C0 /* Sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sequence.h; sourceTree = "<group>"; };
-		942D1DB514C1A8AE0070B3C0 /* VibratoBP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VibratoBP.h; sourceTree = "<group>"; };
-		942D1DB614C1A8AE0070B3C0 /* vsqBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vsqBase.h; sourceTree = "<group>"; };
-		942D1DB814C1A8AE0070B3C0 /* vsqTempo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vsqTempo.cpp; sourceTree = "<group>"; };
-		942D1DB914C1A8AE0070B3C0 /* vsqTempo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vsqTempo.h; sourceTree = "<group>"; };
 		942D1DBB14C1A8AE0070B3C0 /* waveFileEx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = waveFileEx.cpp; sourceTree = "<group>"; };
 		942D1DBC14C1A8AE0070B3C0 /* waveFileEx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = waveFileEx.h; sourceTree = "<group>"; };
 		942D1DBE14C1A8AE0070B3C0 /* dio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dio.cpp; sourceTree = "<group>"; };
@@ -118,6 +102,22 @@
 		942D1F0014C1F91B0070B3C0 /* UtauDBManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtauDBManager.cpp; sourceTree = "<group>"; };
 		942D1F0114C1F91B0070B3C0 /* UtauDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauDBManager.h; sourceTree = "<group>"; };
 		942D1F0214C1F91B0070B3C0 /* UtauParameter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtauParameter.h; sourceTree = "<group>"; };
+		942D1F0B14C253840070B3C0 /* BP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BP.h; sourceTree = "<group>"; };
+		942D1F0C14C253840070B3C0 /* BPList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BPList.cpp; sourceTree = "<group>"; };
+		942D1F0D14C253840070B3C0 /* BPList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BPList.h; sourceTree = "<group>"; };
+		942D1F0E14C253840070B3C0 /* CurveTypeEnum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurveTypeEnum.h; sourceTree = "<group>"; };
+		942D1F0F14C253840070B3C0 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
+		942D1F1014C253840070B3C0 /* EventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventList.cpp; sourceTree = "<group>"; };
+		942D1F1114C253840070B3C0 /* EventList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventList.h; sourceTree = "<group>"; };
+		942D1F1214C253840070B3C0 /* Handle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Handle.cpp; sourceTree = "<group>"; };
+		942D1F1314C253840070B3C0 /* Handle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Handle.h; sourceTree = "<group>"; };
+		942D1F1414C253840070B3C0 /* Lyric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lyric.cpp; sourceTree = "<group>"; };
+		942D1F1514C253840070B3C0 /* Lyric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lyric.h; sourceTree = "<group>"; };
+		942D1F1614C253840070B3C0 /* Sequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sequence.cpp; sourceTree = "<group>"; };
+		942D1F1714C253840070B3C0 /* Sequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sequence.h; sourceTree = "<group>"; };
+		942D1F1814C253840070B3C0 /* TempoList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TempoList.cpp; sourceTree = "<group>"; };
+		942D1F1914C253840070B3C0 /* TempoList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TempoList.h; sourceTree = "<group>"; };
+		942D1F1A14C253840070B3C0 /* VibratoBP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VibratoBP.h; sourceTree = "<group>"; };
 		9461B9F214B97F9800F5E0EC /* vConnect-STAND */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "vConnect-STAND"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9461BAD314B984DC00F5E0EC /* Ogg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogg.framework; path = Library/Frameworks/Ogg.framework; sourceTree = SDKROOT; };
 		9461BAD914B9856200F5E0EC /* Vorbis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vorbis.framework; path = Library/Frameworks/Vorbis.framework; sourceTree = SDKROOT; };
@@ -177,7 +177,7 @@
 				942D1DA514C1A8AE0070B3C0 /* vConnectSetting.h */,
 				942D1DA614C1A8AE0070B3C0 /* vConnectUtility.cpp */,
 				942D1DA714C1A8AE0070B3C0 /* vConnectUtility.h */,
-				942D1DA814C1A8AE0070B3C0 /* vsqMetaText */,
+				942D1F0A14C253840070B3C0 /* vsq */,
 				942D1DBA14C1A8AE0070B3C0 /* waveFileEx */,
 				942D1DBD14C1A8AE0070B3C0 /* world */,
 				942D1DC614C1A8AE0070B3C0 /* worldParameters.cpp */,
@@ -185,29 +185,6 @@
 			);
 			name = stand;
 			path = ..;
-			sourceTree = "<group>";
-		};
-		942D1DA814C1A8AE0070B3C0 /* vsqMetaText */ = {
-			isa = PBXGroup;
-			children = (
-				942D1DA914C1A8AE0070B3C0 /* BP.h */,
-				942D1DAA14C1A8AE0070B3C0 /* BPList.cpp */,
-				942D1DAB14C1A8AE0070B3C0 /* BPList.h */,
-				942D1DAC14C1A8AE0070B3C0 /* Event.h */,
-				942D1DAD14C1A8AE0070B3C0 /* EventList.cpp */,
-				942D1DAE14C1A8AE0070B3C0 /* EventList.h */,
-				942D1DAF14C1A8AE0070B3C0 /* Handle.cpp */,
-				942D1DB014C1A8AE0070B3C0 /* Handle.h */,
-				942D1DB114C1A8AE0070B3C0 /* Lyric.cpp */,
-				942D1DB214C1A8AE0070B3C0 /* Lyric.h */,
-				942D1DB314C1A8AE0070B3C0 /* Sequence.cpp */,
-				942D1DB414C1A8AE0070B3C0 /* Sequence.h */,
-				942D1DB514C1A8AE0070B3C0 /* VibratoBP.h */,
-				942D1DB614C1A8AE0070B3C0 /* vsqBase.h */,
-				942D1DB814C1A8AE0070B3C0 /* vsqTempo.cpp */,
-				942D1DB914C1A8AE0070B3C0 /* vsqTempo.h */,
-			);
-			path = vsqMetaText;
 			sourceTree = "<group>";
 		};
 		942D1DBA14C1A8AE0070B3C0 /* waveFileEx */ = {
@@ -244,6 +221,29 @@
 				942D1F0214C1F91B0070B3C0 /* UtauParameter.h */,
 			);
 			path = utau;
+			sourceTree = "<group>";
+		};
+		942D1F0A14C253840070B3C0 /* vsq */ = {
+			isa = PBXGroup;
+			children = (
+				942D1F0B14C253840070B3C0 /* BP.h */,
+				942D1F0C14C253840070B3C0 /* BPList.cpp */,
+				942D1F0D14C253840070B3C0 /* BPList.h */,
+				942D1F0E14C253840070B3C0 /* CurveTypeEnum.h */,
+				942D1F0F14C253840070B3C0 /* Event.h */,
+				942D1F1014C253840070B3C0 /* EventList.cpp */,
+				942D1F1114C253840070B3C0 /* EventList.h */,
+				942D1F1214C253840070B3C0 /* Handle.cpp */,
+				942D1F1314C253840070B3C0 /* Handle.h */,
+				942D1F1414C253840070B3C0 /* Lyric.cpp */,
+				942D1F1514C253840070B3C0 /* Lyric.h */,
+				942D1F1614C253840070B3C0 /* Sequence.cpp */,
+				942D1F1714C253840070B3C0 /* Sequence.h */,
+				942D1F1814C253840070B3C0 /* TempoList.cpp */,
+				942D1F1914C253840070B3C0 /* TempoList.h */,
+				942D1F1A14C253840070B3C0 /* VibratoBP.h */,
+			);
+			path = vsq;
 			sourceTree = "<group>";
 		};
 		9461B9E714B97F9800F5E0EC = {
@@ -336,12 +336,6 @@
 				942D1EDA14C1A8AF0070B3C0 /* vConnectPhoneme.cpp in Sources */,
 				942D1EDB14C1A8AF0070B3C0 /* vConnectSetting.cpp in Sources */,
 				942D1EDC14C1A8AF0070B3C0 /* vConnectUtility.cpp in Sources */,
-				942D1EDD14C1A8AF0070B3C0 /* BPList.cpp in Sources */,
-				942D1EDE14C1A8AF0070B3C0 /* EventList.cpp in Sources */,
-				942D1EDF14C1A8AF0070B3C0 /* Handle.cpp in Sources */,
-				942D1EE014C1A8AF0070B3C0 /* Lyric.cpp in Sources */,
-				942D1EE114C1A8AF0070B3C0 /* Sequence.cpp in Sources */,
-				942D1EE214C1A8AF0070B3C0 /* vsqTempo.cpp in Sources */,
 				942D1EE314C1A8AF0070B3C0 /* waveFileEx.cpp in Sources */,
 				942D1EE414C1A8AF0070B3C0 /* dio.cpp in Sources */,
 				942D1EE514C1A8AF0070B3C0 /* matlabfunctions.cpp in Sources */,
@@ -353,6 +347,12 @@
 				942D1EEB14C1A8AF0070B3C0 /* worldParameters.cpp in Sources */,
 				942D1F0314C1F91B0070B3C0 /* UtauDB.cpp in Sources */,
 				942D1F0414C1F91B0070B3C0 /* UtauDBManager.cpp in Sources */,
+				942D1F1B14C253840070B3C0 /* BPList.cpp in Sources */,
+				942D1F1C14C253840070B3C0 /* EventList.cpp in Sources */,
+				942D1F1D14C253840070B3C0 /* Handle.cpp in Sources */,
+				942D1F1E14C253840070B3C0 /* Lyric.cpp in Sources */,
+				942D1F1F14C253840070B3C0 /* Sequence.cpp in Sources */,
+				942D1F2014C253840070B3C0 /* TempoList.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,7 +14,7 @@
 #include <cmath>
 #include "vConnectSetting.h"
 #include "TextInputStream.h"
-#include "vsqMetaText/Sequence.h"
+#include "vsq/Sequence.h"
 
 #define SETTING_BUF_LEN 4096
 

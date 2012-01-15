@@ -19,10 +19,10 @@
 #include "Synthesizer.h"
 #include "vConnectPhoneme.h"
 #include "vConnectUtility.h"
-#include "vsqMetaText/EventList.h"
+#include "vsq/EventList.h"
 #include "Thread.h"
 #include "utau/UtauDBManager.h"
-#include "vsqMetaText/CurveTypeEnum.h"
+#include "vsq/CurveTypeEnum.h"
 #include "world/world.h"
 #include "waveFileEx/waveFileEx.h"
 

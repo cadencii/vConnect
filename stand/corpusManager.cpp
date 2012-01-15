@@ -15,7 +15,7 @@
 #include "corpusManager.h"
 #include "vConnectPhoneme.h"
 #include "utau/UtauDB.h"
-#include "vsqMetaText/Sequence.h"
+#include "vsq/Sequence.h"
 
 using namespace vconnect;
 

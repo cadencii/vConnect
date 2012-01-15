@@ -1,7 +1,7 @@
 ﻿#ifndef TEST_LyricTest
 #define TEST_LyricTest
 #include "AllTests.h"
-#include "../vsqMetaText/Lyric.h"
+#include "../vsq/Lyric.h"
 
 using namespace std;
 using namespace vconnect;

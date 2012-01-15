@@ -1,7 +1,7 @@
 #ifndef TEST_TempoListTest
 #define TEST_TempoListTest
 #include "../AllTests.h"
-#include "../../vsqMetaText/TempoList.h"
+#include "../../vsq/TempoList.h"
 
 using namespace std;
 using namespace vconnect;

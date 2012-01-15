@@ -18,7 +18,7 @@
 #define __Synthesizer_h__
 
 #include "corpusManager.h"
-#include "vsqMetaText/Sequence.h"
+#include "vsq/Sequence.h"
 #include "Task.h"
 #include "RuntimeOption.h"
 #include "FrameBP.h"

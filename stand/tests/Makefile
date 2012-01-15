@@ -1,5 +1,5 @@
 SOURCE=./*.cpp ./*/*.cpp \
-       ../Thread.cpp ../Mutex.cpp ../vsqMetaText/*.cpp \
+       ../Thread.cpp ../Mutex.cpp ../vsq/*.cpp \
        ../utau/*.cpp
 
 all: *.cpp *.h

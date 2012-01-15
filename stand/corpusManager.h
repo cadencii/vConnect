@@ -20,7 +20,7 @@
 #include "utau/UtauDB.h"
 #include "vConnectSetting.h"
 #include "RuntimeOption.h"
-#include "vsqMetaText/Sequence.h"
+#include "vsq/Sequence.h"
 #include "Mutex.h"
 
 using namespace vconnect;

@@ -1,7 +1,7 @@
 #ifndef TEST_SequenceTest
 #define TEST_SequenceTest
 #include "../AllTests.h"
-#include "../../vsqMetaText/Sequence.h"
+#include "../../vsq/Sequence.h"
 
 using namespace std;
 using namespace vconnect;

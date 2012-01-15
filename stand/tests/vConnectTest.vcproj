@@ -157,10 +157,6 @@
 			Name="stand"
 			>
 			<File
-				RelativePath="..\vsqMetaText\Lyric.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\Mutex.cpp"
 				>
 			</File>
@@ -173,6 +169,14 @@
 				>
 				<File
 					RelativePath="..\utau\UtauDB.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="vsq"
+				>
+				<File
+					RelativePath="..\vsq\Lyric.cpp"
 					>
 				</File>
 			</Filter>
