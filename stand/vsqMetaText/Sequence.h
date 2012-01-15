@@ -19,7 +19,7 @@
 #include "Event.h"
 #include "EventList.h"
 #include "BPList.h"
-#include "vsqTempo.h"
+#include "TempoList.h"
 #include "CurveTypeEnum.h"
 #include "../RuntimeOption.h"
 #include "../Socket.h"
@@ -127,7 +127,7 @@ namespace vconnect
         /// <summary>
         /// テンポの変更情報を格納したリスト．
         /// </summary>
-        vsqTempo vsqTempoBp;
+        TempoList vsqTempoBp;
 
         /// <summary>
         /// [ID#]の文字列と，その中身との紐付けを保持するマップ．
