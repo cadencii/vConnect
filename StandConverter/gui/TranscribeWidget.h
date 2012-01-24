@@ -17,7 +17,7 @@ class TranscribeWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TranscribeWidget(QWidget *parent = 0);
+    explicit TranscribeWidget(QWidget *parent = 0, int index = 0);
     ~TranscribeWidget();
 
     QString dir();

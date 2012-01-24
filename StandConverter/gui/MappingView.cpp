@@ -10,13 +10,16 @@ const int MappingView::_MAPPING_SIZE = 128;
 MappingView::MappingView(QWidget *parent) :
     QWidget(parent)
 {
-/*    _map = new *QColor[_MAPPING_SIZE];
-    _map[0] = new QColor[_MAPPING_SIZE * _MAPPING_SIZE];
+    _map = new _color*[_MAPPING_SIZE];
+    _map[0] = new _color[_MAPPING_SIZE * _MAPPING_SIZE];
     for(int i = 1; i < _MAPPING_SIZE; i++)
     {
-        _map[1] = _map[0] + i * _MAPPING_SIZE;
-    }*/
-    _map = NULL;
+        _map[i] = _map[0] + i * _MAPPING_SIZE;
+    }
+    for(int i = 0; i < _MAPPING_SIZE * _MAPPING_SIZE; i++)
+    {
+        _map[0][i].r = _map[0][i].b = _map[0][i].g = 0;
+    }
 }
 
 MappingView::~MappingView()
@@ -45,10 +48,23 @@ void MappingView::paintEvent(QPaintEvent *e)
             int y = j / (double)_MAPPING_SIZE * height();
             int h = (j + 1) / (double)_MAPPING_SIZE * height() - y;
 
-            p.fillRect(x, y, w, h, QColor(0, 0, 0));
+            p.fillRect(x, y, w, h, QColor(_map[i][j].r, _map[i][j].g, _map[i][j].b));
             p.setPen(QColor(192, 192, 192));
             p.drawLine(x, y, x, y + h);
             p.drawLine(x, y, x + w, y);
         }
+    }
+}
+
+void MappingView::setMapping(QVector<Map> &mapping)
+{
+    _data = mapping;
+    for(unsigned int i = 0; i < mapping.size(); i++)
+    {
+        int x = mapping.at(i).note;
+        int y = 127 - mapping.at(i).brightness;
+        _map[x][y].r = mapping.at(i).color.red();
+        _map[x][y].g = mapping.at(i).color.green();
+        _map[x][y].b = mapping.at(i).color.blue();
     }
 }

@@ -1,0 +1,21 @@
+StandConverter : v.Connect-STAND用音源変換ツール@Qt
+
+v.Connect-STAND用音源コネクトライブラリを作成するツールです．
+ConverterWindowから圧縮率などの指定をしたvvdファイルを作成し，
+TranscriberWindowから時間伸縮に必要なパラメタを計算したのち，
+vConnect.iniを作成します．
+
+Qt以外でコンパイルに必要なライブラリは以下の４つです．
+・libfftw3
+・libogg
+・libvorbis
+・libvorbisfile
+
+
+ToDo::TranscriberWindowの実装
+・GUI表示
+・マルチスレッド化
+・Transcriberの移植
+・出力への説明をどうするか検討
+
+Done::ConverterWindow周りの実装

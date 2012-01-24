@@ -21,6 +21,6 @@ int main(int argc, char *argv[])
 //    ConverterWindow w;
     TranscriberWindow w;
     w.show();
-    
+
     return a.exec();
 }

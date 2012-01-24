@@ -19,8 +19,8 @@ bool stand::utility::makeDirectory(QWidget *w, const QDir &dir, bool confirm)
     if(confirm)
     {
         int val = QMessageBox::warning(w,
-                                       "Confirm",
-                                       dir.path() + "\ndoes not exist. Do you want to create the directory",
+                                       QObject::tr("Confirm"),
+                                       dir.path() + QObject::tr("\ndoes not exist. Do you want to create the directory"),
                                        QMessageBox::Yes, QMessageBox::No);
         if(val == QMessageBox::No)
         {
@@ -30,7 +30,7 @@ bool stand::utility::makeDirectory(QWidget *w, const QDir &dir, bool confirm)
     // ディレクトリを作成．
     if(!dir.mkpath(dir.absolutePath()))
     {
-        QMessageBox::critical(w, "Error", dir.path() + "\nCould not mkdir.");
+        QMessageBox::critical(w, QObject::tr("Error"), dir.path() + QObject::tr("\nCould not mkdir."));
         return false;
     }
     return true;

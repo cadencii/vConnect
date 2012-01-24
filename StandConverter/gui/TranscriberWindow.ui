@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>454</width>
-    <height>440</height>
+    <height>492</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,17 +46,20 @@
      </layout>
     </item>
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="SettingTabs">
       <property name="tabPosition">
        <enum>QTabWidget::North</enum>
       </property>
       <property name="tabShape">
-       <enum>QTabWidget::Triangular</enum>
+       <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
       <property name="usesScrollButtons">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
        <bool>false</bool>
       </property>
       <widget class="stand::gui::TranscribeWidget" name="Base">
@@ -74,7 +77,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="AnalysisLabel">
         <property name="text">
          <string>Analysis Setting</string>
         </property>
@@ -94,14 +97,14 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="ThreadLabel">
         <property name="text">
          <string>Threads</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox"/>
+       <widget class="QSpinBox" name="NumThreads"/>
       </item>
      </layout>
     </item>
@@ -114,6 +117,20 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="AddButton">
+        <property name="text">
+         <string>Add Tab</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="RemoveButton">
+        <property name="text">
+         <string>Remove Tab</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -128,14 +145,14 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="AnalyzeButton">
         <property name="text">
          <string>Analyze</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="ExitButton">
         <property name="text">
          <string>Exit</string>
         </property>
@@ -144,20 +161,15 @@
      </layout>
     </item>
     <item>
-     <widget class="QProgressBar" name="progressBar">
+     <widget class="QProgressBar" name="ProgressBar">
       <property name="value">
        <number>24</number>
       </property>
      </widget>
     </item>
    </layout>
-   <zorder>tabWidget</zorder>
-   <zorder>progressBar</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
-   <zorder>label</zorder>
-   <zorder>label</zorder>
-   <zorder>horizontalLayoutWidget_2</zorder>
-   <zorder>verticalLayoutWidget</zorder>
+   <zorder>SettingTabs</zorder>
+   <zorder>ProgressBar</zorder>
    <zorder>line</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -193,5 +205,58 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>AddButton</sender>
+   <signal>clicked()</signal>
+   <receiver>TranscriberWindow</receiver>
+   <slot>addTab()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>53</x>
+     <y>423</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>422</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>RemoveButton</sender>
+   <signal>clicked()</signal>
+   <receiver>TranscriberWindow</receiver>
+   <slot>removeTab()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>124</x>
+     <y>418</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ExitButton</sender>
+   <signal>clicked()</signal>
+   <receiver>TranscriberWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>410</x>
+     <y>423</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>451</x>
+     <y>404</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>addTab()</slot>
+  <slot>removeTab()</slot>
+ </slots>
 </ui>

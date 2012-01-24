@@ -244,7 +244,7 @@ void ConverterWindow::converterFinished(bool f)
     // 変換が失敗したと聞いて．
     if(!f)
     {
-        _errorMessage("Error occured in converting.");
+        _errorMessage(QObject::tr("Error occured in converting."));
     }
     // 処理が終了したので変換器を殺しても大丈夫．
     delete currentConverter;
