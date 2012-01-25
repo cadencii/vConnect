@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TranscribeWidget</class>
- <widget class="QWidget" name="TranscribeWidget">
+ <class>TranscriberWidget</class>
+ <widget class="QWidget" name="TranscriberWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>109</height>
+    <height>138</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <number>2</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="CheckBoxSettings">
      <item>
       <widget class="QCheckBox" name="EnableCheck">
        <property name="text">
@@ -32,7 +32,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="DirectorySettings">
      <item>
       <widget class="QLabel" name="DirectoryLabel">
        <property name="text">
@@ -59,7 +59,50 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="EncodeLabel">
+       <property name="text">
+        <string>Encode</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="EncodeComboBox">
+       <item>
+        <property name="text">
+         <string>Shift-JIS</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>EUC-JP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>UTF-8</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="ParameterSettings">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -123,7 +166,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <layout class="QHBoxLayout" name="ColorSettings">
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -152,5 +195,25 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>DirectoryButton</sender>
+   <signal>clicked()</signal>
+   <receiver>TranscriberWidget</receiver>
+   <slot>openDirDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>397</x>
+     <y>23</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>openDirDialog()</slot>
+ </slots>
 </ui>

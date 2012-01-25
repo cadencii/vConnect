@@ -19,7 +19,7 @@ using namespace stand::gui;
 
 ConverterWindow::ConverterWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::ConverterWindow)
+    ui(new Ui::ConverterWindow())
 {
     ui->setupUi(this);
     isAnalyzing = false;
@@ -44,7 +44,7 @@ void ConverterWindow::closeEvent(QCloseEvent *e)
         val = (QMessageBox::StandardButton)(QMessageBox::warning(
                     this,
                     tr("Confirmation"),
-                    tr("Converter is analyzing. Do you want to exit anyway?"),
+                    tr("Converter is still running. Do you want to exit anyway?"),
                     QMessageBox::Yes,
                     QMessageBox::No));
     }
@@ -239,14 +239,16 @@ void ConverterWindow::_errorMessage(const QString &text)
 
 void ConverterWindow::converterFinished(bool f)
 {
-    isAnalyzing = false;
-    setEditorEnabled(true);
     // 変換が失敗したと聞いて．
     if(!f)
     {
         _errorMessage(QObject::tr("Error occured in converting."));
     }
+    currentConverter->disconnect();
+    currentConverter->wait();
     // 処理が終了したので変換器を殺しても大丈夫．
     delete currentConverter;
     currentConverter = NULL;
+    isAnalyzing = false;
+    setEditorEnabled(true);
 }

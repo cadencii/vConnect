@@ -62,7 +62,7 @@
       <property name="tabsClosable">
        <bool>false</bool>
       </property>
-      <widget class="stand::gui::TranscribeWidget" name="Base">
+      <widget class="stand::gui::TranscriberWidget" name="Base">
        <attribute name="title">
         <string>Base</string>
        </attribute>
@@ -192,9 +192,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stand::gui::TranscribeWidget</class>
+   <class>stand::gui::TranscriberWidget</class>
    <extends>QWidget</extends>
-   <header>TranscribeWidget.h</header>
+   <header>TranscriberWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -254,9 +254,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>AnalyzeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>TranscriberWindow</receiver>
+   <slot>pushAnalyze()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>317</x>
+     <y>421</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>247</x>
+     <y>417</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>addTab()</slot>
   <slot>removeTab()</slot>
+  <slot>pushAnalyze()</slot>
  </slots>
 </ui>

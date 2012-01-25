@@ -15,7 +15,7 @@ namespace stand
 namespace synthesis
 {
 
-class UtauPhonemeAnalyzer;
+class ConverterElement;
 
 class Converter : public QThread
 {
@@ -34,14 +34,14 @@ public:
     void run();
 
     void recieveRightBlank(int index, float rightBlank);
-    void analyzerFinished(stand::synthesis::UtauPhonemeAnalyzer *, bool);
+    void analyzerFinished(stand::synthesis::ConverterElement *, bool);
 
 private:
     void _initializeAnalyzers();
     void _writeOtoIni();
 
     float *rightBlanks;
-    UtauPhonemeAnalyzer **analyzers;
+    ConverterElement **analyzers;
     ConverterSetting setting;
     bool isCanceled;
     volatile unsigned int currentPosition;

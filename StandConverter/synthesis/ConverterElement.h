@@ -1,5 +1,5 @@
-#ifndef UTAUPHONEMEANALYZER_H
-#define UTAUPHONEMEANALYZER_H
+#ifndef CONVERTERELEMENT_H
+#define CONVERTERELEMENT_H
 
 #include <QThread>
 #include <QMutex>
@@ -19,7 +19,7 @@ namespace synthesis
 class ConverterSetting;
 class Converter;
 
-class UtauPhonemeAnalyzer : public QThread
+class ConverterElement : public QThread
 {
     Q_OBJECT
 signals:
@@ -27,7 +27,7 @@ signals:
 public slots:
 
 public:
-    explicit UtauPhonemeAnalyzer(unsigned int index, const ConverterSetting &s, Converter *c, QMutex *m = NULL);
+    explicit ConverterElement(unsigned int index, const ConverterSetting &s, Converter *c, QMutex *m = NULL);
 
     void run();
     void setIndex(unsigned int index);
@@ -51,4 +51,4 @@ private:
 }
 }
 
-#endif // UTAUPHONEMEANALYZER_H
+#endif // CONVERTERELEMENT_H

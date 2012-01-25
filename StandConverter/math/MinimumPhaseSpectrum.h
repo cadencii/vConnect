@@ -10,7 +10,7 @@ namespace math
 class FFTSet;
 namespace world
 {
-void minimumPhaseSpectrum(double *inputSpec, int fftl, FFTSet *forward, stand::math::FFTSet *inverse);
+fftw_complex *minimumPhaseSpectrum(double *inputSpec, int fftl, FFTSet *forward, stand::math::FFTSet *inverse);
 }
 }
 }

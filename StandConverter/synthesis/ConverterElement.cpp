@@ -1,4 +1,4 @@
-#include "UtauPhonemeAnalyzer.h"
+#include "ConverterElement.h"
 
 #include "../io/UtauLibrary.h"
 #include "../io/WaveFile.h"
@@ -24,7 +24,8 @@ using namespace stand::synthesis;
 #define max(a,b) (((a)<(b))?(b):(a))
 #endif
 
-UtauPhonemeAnalyzer::UtauPhonemeAnalyzer(unsigned int index, const ConverterSetting &s, Converter *c, QMutex *m)
+ConverterElement::ConverterElement(unsigned int index, const ConverterSetting &s, Converter *c, QMutex *m)
+    : QThread(c)
 {
     setting = s;
     _done = false;
@@ -34,12 +35,12 @@ UtauPhonemeAnalyzer::UtauPhonemeAnalyzer(unsigned int index, const ConverterSett
     converter = c;
 }
 
-void UtauPhonemeAnalyzer::converterFinished()
+void ConverterElement::converterFinished()
 {
     _done = true;
 }
 
-void UtauPhonemeAnalyzer::setIndex(unsigned int index)
+void ConverterElement::setIndex(unsigned int index)
 {
     const stand::io::UtauPhoneme *p = setting.library->at(index);
     if(p)
@@ -53,7 +54,7 @@ void UtauPhonemeAnalyzer::setIndex(unsigned int index)
     this->index = index;
 }
 
-void UtauPhonemeAnalyzer::run()
+void ConverterElement::run()
 {
     while(!_done)
     {
@@ -79,12 +80,12 @@ void UtauPhonemeAnalyzer::run()
             mutex->unlock();
         }
     }
-    qDebug(" Done :UtauPhonemeAnalyzer::run().");
+    qDebug(" Done :ConverterElement::run().");
 }
 
-void UtauPhonemeAnalyzer::_writeDebugString()
+void ConverterElement::_writeDebugString()
 {
-    qDebug("\nUtauPhonemeAnalyzer::run()\n"
+    qDebug("\nConverterElement::run()\n"
            " Analysis parameters\n"
            "  FileName: %s\n"
            "  Normalize option: %s\n"
@@ -93,7 +94,7 @@ void UtauPhonemeAnalyzer::_writeDebugString()
                          );
 }
 
-void UtauPhonemeAnalyzer::_analyze()
+void ConverterElement::_analyze()
 {
     // File duplication check
     QString outFileName;
@@ -166,6 +167,6 @@ void UtauPhonemeAnalyzer::_analyze()
 
     if(!stf.write(QDir::toNativeSeparators(outFileName).toLocal8Bit().data()))
     {
-        qDebug("UtauPhonemeAnalyzer::analyze(); // failed writing.");
+        qDebug("ConverterElement::analyze(); // failed writing.");
     }
 }

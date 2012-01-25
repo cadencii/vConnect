@@ -6,7 +6,7 @@
 using namespace stand::math;
 using namespace stand::math::world;
 
-void stand::math::world::minimumPhaseSpectrum(double *inputSpec, int fftl, FFTSet *forward, FFTSet *inverse)
+fftw_complex *stand::math::world::minimumPhaseSpectrum(double *inputSpec, int fftl, FFTSet *forward, FFTSet *inverse)
 {
     int i;
 
@@ -46,4 +46,5 @@ void stand::math::world::minimumPhaseSpectrum(double *inputSpec, int fftl, FFTSe
         dst[i][0] = exp(spectrum[i][0])*cos(spectrum[i][1]);
         dst[i][1] = exp(spectrum[i][0])*sin(spectrum[i][1]);
     }
+    return dst;
 }

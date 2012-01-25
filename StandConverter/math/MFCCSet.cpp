@@ -1,6 +1,6 @@
 #include "MFCCSet.h"
 
-#include <math.h>
+#include "MathSet.h"
 
 using namespace stand::math;
 
@@ -105,13 +105,6 @@ void MFCCSet::stretchFromMelScale(double *spectrum, const double *melSpectrum, i
         }
         spectrum[i] = val;
     }
-}
-
-double MFCCSet::interpolateArray( double x, const double *p )
-{
-    int t = (int)x;
-    double r = x - (double)t;
-    return ( p[t] * ( 1.0 - r ) + p[t+1] * r );
 }
 
 double  MFCCSet::getMelScale(double freq){

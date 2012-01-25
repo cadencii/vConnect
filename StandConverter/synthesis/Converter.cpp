@@ -5,7 +5,7 @@
 
 #include "../utility/Utility.h"
 #include "../io/UtauLibrary.h"
-#include "UtauPhonemeAnalyzer.h"
+#include "ConverterElement.h"
 
 using namespace stand::synthesis;
 
@@ -54,12 +54,12 @@ void Converter::_initializeAnalyzers()
 {
     mutex.lock();
     currentPosition = 0;
-    analyzers = new UtauPhonemeAnalyzer*[setting.numThreads];
+    analyzers = new ConverterElement*[setting.numThreads];
     for(unsigned int i = 0; i < setting.numThreads; i++)
     {
         if(i < setting.library->size())
         {
-            analyzers[i] = new UtauPhonemeAnalyzer(i, setting, this, &mutex);
+            analyzers[i] = new ConverterElement(i, setting, this, &mutex);
             currentPosition++;
             analyzers[i]->start();
         }
@@ -71,7 +71,7 @@ void Converter::_initializeAnalyzers()
     mutex.unlock();
 }
 
-void Converter::analyzerFinished(UtauPhonemeAnalyzer *p, bool f)
+void Converter::analyzerFinished(ConverterElement *p, bool f)
 {
     unsigned int i;
     currentFinished++;

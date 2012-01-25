@@ -10,6 +10,7 @@
 #include "Dio.h"
 #include "Star.h"
 #include "Platinum.h"
+#include "MinimumPhaseSpectrum.h"
 #include "WorldSynthesis.h"
 
 namespace stand

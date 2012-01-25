@@ -49,12 +49,6 @@ public:
     /// <param name="maxFrequency">最大周波数．</param>
     static void stretchFromMelScale(double *spectrum, const double *melSpectrum, int spectrumLength, int maxFrequency);
 
-    // このクラスか…？うーん．
-    /// <summary>配列の中間値を線形補間します．</summary>
-    /// <param name="x">配列のインデックス．</param>
-    /// <param name="p">配列</param>
-    /// <returns>配列の中間値を返します．</returns>
-    static double interpolateArray( double x, const double *p );
 private:
 
     FFTSet *_ffft, *_ifft;

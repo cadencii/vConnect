@@ -22,7 +22,6 @@ SOURCES += \
     synthesis/ConverterSetting.cpp \
     utility/Utility.cpp \
     synthesis/Converter.cpp \
-    synthesis/UtauPhonemeAnalyzer.cpp \
     io/WaveFile.cpp \
     math/FFTSet.cpp \
     math/Dio.cpp \
@@ -33,20 +32,25 @@ SOURCES += \
     math/MinimumPhaseSpectrum.cpp \
     math/MFCCSet.cpp \
     gui/WorldWidget.cpp \
-    gui/TranscribeWidget.cpp \
     io/VorbisFile.cpp \
     io/StandFile.cpp \
     math/WorldSynthesis.cpp \
     gui/TranscriberWindow.cpp \
     gui/HorizontalPianoView.cpp \
-    gui/MappingView.cpp
+    gui/MappingView.cpp \
+    math/SmootMatching.cpp \
+    math/MathSet.cpp \
+    synthesis/Transcriber.cpp \
+    synthesis/TranscriberSetting.cpp \
+    synthesis/ConverterElement.cpp \
+    gui/TranscriberWidget.cpp \
+    synthesis/TranscriberElement.cpp
 
 HEADERS  += gui/ConverterWindow.h \
     io/UtauLibrary.h \
     synthesis/ConverterSetting.h \
     utility/Utility.h \
     synthesis/Converter.h \
-    synthesis/UtauPhonemeAnalyzer.h \
     io/WaveFile.h \
     math/FFTSet.h \
     math/Dio.h \
@@ -57,15 +61,21 @@ HEADERS  += gui/ConverterWindow.h \
     math/MinimumPhaseSpectrum.h \
     math/MFCCSet.h \
     gui/WorldWidget.h \
-    gui/TranscribeWidget.h \
     io/VorbisFile.h \
     io/StandFile.h \
     math/WorldSynthesis.h \
     gui/TranscriberWindow.h \
     gui/HorizontalPianoView.h \
-    gui/MappingView.h
+    gui/MappingView.h \
+    math/SmootMatching.h \
+    math/MathSet.h \
+    synthesis/Transcriber.h \
+    synthesis/TranscriberSetting.h \
+    synthesis/ConverterElement.h \
+    gui/TranscriberWidget.h \
+    synthesis/TranscriberElement.h
 
 FORMS    += \
     gui/ConverterWindow.ui \
-    gui/TranscribeWidget.ui \
-    gui/TranscriberWindow.ui
+    gui/TranscriberWindow.ui \
+    gui/TranscriberWidget.ui

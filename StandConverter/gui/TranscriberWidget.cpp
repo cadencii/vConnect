@@ -1,13 +1,16 @@
-#include "TranscribeWidget.h"
-#include "ui_TranscribeWidget.h"
+#include "TranscriberWidget.h"
+#include "ui_TranscriberWidget.h"
 
 #include <QStringList>
+#include <QFileDialog>
+#include <QDir>
+#include <QTextCodec>
 
 using namespace stand::gui;
 
-TranscribeWidget::TranscribeWidget(QWidget *parent, int index) :
+TranscriberWidget::TranscriberWidget(QWidget *parent, int index) :
     QWidget(parent),
-    ui(new Ui::TranscribeWidget)
+    ui(new Ui::TranscriberWidget)
 {
     ui->setupUi(this);
 
@@ -30,22 +33,37 @@ TranscribeWidget::TranscribeWidget(QWidget *parent, int index) :
     ui->ColorSelector->setCurrentIndex(index % ui->ColorSelector->count());
 }
 
-TranscribeWidget::~TranscribeWidget()
+TranscriberWidget::~TranscriberWidget()
 {
     delete ui;
 }
 
-QString TranscribeWidget::dir()
+QString TranscriberWidget::dir()
 {
     return ui->DirectoryName->text();
 }
 
-int TranscribeWidget::bri()
+int TranscriberWidget::bri()
 {
     return ui->BirghtnessSpinBox->value();
 }
 
-int TranscribeWidget::note()
+int TranscriberWidget::note()
 {
     return ui->NoteSpinBox->value();
+}
+
+void TranscriberWidget::openDirDialog()
+{
+    QString dirName = QFileDialog::getExistingDirectory(
+                this,
+                tr("Select input directory."),
+                tr("")
+                );
+    ui->DirectoryName->setText(dirName);
+}
+
+QTextCodec *TranscriberWidget::codec()
+{
+    return QTextCodec::codecForName(ui->EncodeComboBox->currentText().toLocal8Bit().data());
 }

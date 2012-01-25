@@ -46,26 +46,77 @@ public:
                  int minBitrate,
                  int maxBitrate,
                  int averageBitrate);
+
+    static void matching(StandFile *src, StandFile *dst);
+
+    void setTimeAxis(double *t, int length);
+
+    void setBaseTimeAxis(double *base, int length);
+
+    qint32 tLen() const
+    {
+        return _tLen;
+    }
+
+    qint32 cLen() const
+    {
+        return _cLen;
+    }
+
+    qint32 fftl() const
+    {
+        return _fftl;
+    }
+
+    qint32 fs() const
+    {
+        return _fs;
+    }
+
+    float **MFCC()
+    {
+        return _MFCC;
+    }
+    float *f0()
+    {
+        return _f0;
+    }
+    qint32 baseTimeLength() const
+    {
+        return _baseTimeLength;
+    }
+    float *baseTimeAxis()
+    {
+        return _baseTimeAxis;
+    }
+
+    float framePeriod() const
+    {
+        return _framePeriod;
+    }
+
+
 private:
     void _create(int tLen, int cLen);
     void _destroy();
+    static void _calculateVolumeEnvelope(double *dst, StandFile *src, int length);
 
     // 32bit 実数型で定義したいが…
-    float **MFCC;
-    float *f0;
-    float *t;
-    float framePeriod;
+    float **_MFCC;
+    float *_f0;
+    float *_t;
+    float _framePeriod;
 
 
-    qint32 tLen; //! @brief 時間長
-    qint32 cLen; //! @brief ケプストラム長
+    qint32 _tLen; //! @brief 時間長
+    qint32 _cLen; //! @brief ケプストラム長
 
-    qint32 fftl; //! @brief FFT 長
-    qint32 fs;
+    qint32 _fftl; //! @brief FFT 長
+    qint32 _fs;
 
     // 時間伸縮用写像関数．
-    qint32 baseTimeLength;
-    float *baseTimeAxis;
+    qint32 _baseTimeLength;
+    float *_baseTimeAxis;
 };
 
 }
