@@ -2,6 +2,7 @@
 #define TRANSCRIBERSETTING_H
 
 #include <QVector>
+#include "Transcriber.h"
 
 namespace stand
 {
@@ -15,11 +16,8 @@ namespace synthesis
 class TranscriberSetting
 {
 public:
-    stand::io::UtauLibrary *base;
-    QVector<stand::io::UtauLibrary *> optionals;
-
-    int note;
-    int brightness;
+    Transcriber::TranscriberItem base;
+    QVector<Transcriber::TranscriberItem> optionals;
 
     unsigned int numThreads;
 };

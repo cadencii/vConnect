@@ -38,6 +38,11 @@ TranscriberWidget::~TranscriberWidget()
     delete ui;
 }
 
+void TranscriberWidget::settingChanged()
+{
+    emit changed(this);
+}
+
 QString TranscriberWidget::dir()
 {
     return ui->DirectoryName->text();
@@ -66,4 +71,9 @@ void TranscriberWidget::openDirDialog()
 QTextCodec *TranscriberWidget::codec()
 {
     return QTextCodec::codecForName(ui->EncodeComboBox->currentText().toLocal8Bit().data());
+}
+
+QString TranscriberWidget::colorName()
+{
+    return ui->ColorSelector->currentText();
 }

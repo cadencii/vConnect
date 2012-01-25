@@ -2,6 +2,9 @@
 #define TRANSCRIBERWINDOW_H
 
 #include <QMainWindow>
+#include <QVector>
+
+#include "MappingView.h"
 
 namespace Ui {
 class TranscriberWindow;
@@ -22,11 +25,13 @@ class TranscriberWindow : public QMainWindow
     Q_OBJECT
 signals:
     void sendCancelToTranscriber();
+    void mappingChanged(QVector<stand::gui::MappingView::Map> &mapping);
 public slots:
     void addTab();
     void removeTab();
 
     void pushAnalyze();
+    void settingChanged();
     void transcriptionFinished(bool);
 public:
     explicit TranscriberWindow(QWidget *parent = 0);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>454</width>
-    <height>492</height>
+    <width>446</width>
+    <height>509</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,11 +20,20 @@
       <property name="spacing">
        <number>0</number>
       </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetNoConstraint</enum>
+      </property>
       <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
        <widget class="stand::gui::MappingView" name="MappingView" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>256</width>
@@ -35,6 +44,12 @@
       </item>
       <item>
        <widget class="stand::gui::HorizontalPianoView" name="PianoView" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>256</width>
@@ -47,6 +62,18 @@
     </item>
     <item>
      <widget class="QTabWidget" name="SettingTabs">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>192</height>
+       </size>
+      </property>
       <property name="tabPosition">
        <enum>QTabWidget::North</enum>
       </property>
@@ -76,8 +103,23 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetFixedSize</enum>
+      </property>
       <item>
        <widget class="QLabel" name="AnalysisLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
+         </size>
+        </property>
         <property name="text">
          <string>Analysis Setting</string>
         </property>
@@ -87,6 +129,9 @@
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -98,13 +143,26 @@
       </item>
       <item>
        <widget class="QLabel" name="ThreadLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Threads</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="NumThreads"/>
+       <widget class="QSpinBox" name="NumThreads">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -117,8 +175,17 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
       <item>
        <widget class="QPushButton" name="AddButton">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
         <property name="text">
          <string>Add Tab</string>
         </property>
@@ -126,6 +193,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="RemoveButton">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
         <property name="text">
          <string>Remove Tab</string>
         </property>
@@ -146,6 +219,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="AnalyzeButton">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
         <property name="text">
          <string>Analyze</string>
         </property>
@@ -153,6 +232,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="ExitButton">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>24</height>
+         </size>
+        </property>
         <property name="text">
          <string>Exit</string>
         </property>
@@ -163,7 +248,10 @@
     <item>
      <widget class="QProgressBar" name="ProgressBar">
       <property name="value">
-       <number>24</number>
+       <number>0</number>
+      </property>
+      <property name="format">
+       <string>%v/%m</string>
       </property>
      </widget>
     </item>
@@ -177,7 +265,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>454</width>
+     <width>446</width>
      <height>24</height>
     </rect>
    </property>

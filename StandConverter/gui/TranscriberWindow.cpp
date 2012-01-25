@@ -23,16 +23,37 @@ TranscriberWindow::TranscriberWindow(QWidget *parent) :
         ui->SettingTabs->removeTab(0);
         delete p;
     }
-    ui->SettingTabs->addTab(new TranscriberWidget(this), tr("Base"));
+    TranscriberWidget *w = new TranscriberWidget(ui->SettingTabs);
+    ui->SettingTabs->addTab(w, tr("Base"));
+
+    connect(w, SIGNAL(changed(QWidget*)), this, SLOT(settingChanged()));
+    connect(this, SIGNAL(mappingChanged(QVector<stand::gui::MappingView::Map>&)), ui->MappingView, SLOT(setMapping(QVector<stand::gui::MappingView::Map>&)));
 
     isAnalyzing = false;
     current = NULL;
+    settingChanged();
     _setItemEnabled();
 }
 
 TranscriberWindow::~TranscriberWindow()
 {
+    disconnect();
     delete ui;
+}
+
+void TranscriberWindow::settingChanged()
+{
+    QVector<stand::gui::MappingView::Map> mapping;
+    stand::gui::MappingView::Map m;
+    for(int i = 0; i < ui->SettingTabs->count(); i++)
+    {
+        TranscriberWidget *w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(i));
+        m.brightness = w->bri();
+        m.note = w->note();
+        m.color = QColor(w->colorName());
+        mapping.push_back(m);
+    }
+    emit mappingChanged(mapping);
 }
 
 void TranscriberWindow::closeEvent(QCloseEvent *e)
@@ -67,7 +88,11 @@ void TranscriberWindow::addTab()
     QString num;
     num.setNum(index);
 
-    ui->SettingTabs->addTab(new TranscriberWidget(this, index), tr("Opt. ") + num);
+    TranscriberWidget *w = new TranscriberWidget(ui->SettingTabs, index);
+    ui->SettingTabs->addTab(w, tr("Opt. ") + num);
+    connect(w, SIGNAL(changed(QWidget*)), this, SLOT(settingChanged()));
+    connect(this, SIGNAL(mappingChanged(QVector<stand::gui::MappingView::Map>&)), ui->MappingView, SLOT(setMapping(QVector<stand::gui::MappingView::Map>&)));
+    settingChanged();
 }
 
 void TranscriberWindow::removeTab()
@@ -88,6 +113,7 @@ void TranscriberWindow::removeTab()
     }
     QWidget *p = ui->SettingTabs->widget(index);
     ui->SettingTabs->removeTab(index);
+    settingChanged();
     delete p;
 }
 
@@ -129,8 +155,10 @@ void TranscriberWindow::_beginAnalyze()
         QMessageBox::critical(this, tr("Error"), tr("Some settings are invalid."));
         return;
     }
-    current = new stand::synthesis::Transcriber(s, this);
+    ui->ProgressBar->setMaximum(s.base.lib->size());
+    current = new stand::synthesis::Transcriber(&s, this);
     connect(this, SIGNAL(sendCancelToTranscriber()), current, SLOT(cancel()));
+    connect(current, SIGNAL(progressChanged(int)), ui->ProgressBar, SLOT(setValue(int)));
     connect(current, SIGNAL(finish(bool)), SLOT(transcriptionFinished(bool)));
 
     current->start();
@@ -157,40 +185,63 @@ void TranscriberWindow::_cancelAnalyze()
 bool TranscriberWindow::_createSetting(stand::synthesis::TranscriberSetting &s)
 {
     s.numThreads = ui->NumThreads->value();
-    s.base = new stand::io::UtauLibrary();
+    s.base.lib = new stand::io::UtauLibrary();
 
     TranscriberWidget *w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(0));
     QString filename = w->dir() + QDir::separator() + "oto.ini";
-    if(!s.base->readFromOtoIni(filename, w->codec()))
+    if(!s.base.lib->readFromOtoIni(filename, w->codec()))
     {
         QMessageBox::critical(this, tr("Error"), tr("Base file path is invalid\n") + filename);
-        delete s.base;
+        delete s.base.lib;
         return false;
     }
-    s.optionals.clear();
+    s.base.brightness = w->bri();
+    s.base.note = w->note();
 
     for(int i = 0; i < ui->SettingTabs->count() - 1; i++)
     {
+        stand::synthesis::Transcriber::TranscriberItem item;
         w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(i + 1));
         QString filename = w->dir() + QDir::separator() + "oto.ini";
         stand::io::UtauLibrary *lib = new stand::io::UtauLibrary();
         if(lib->readFromOtoIni(filename, w->codec()))
         {
-            s.optionals.push_back(lib);
+            item.lib = lib;
+            item.brightness = w->bri();
+            item.note = w->note();
+            s.optionals.push_back(item);
         }
         else
         {
             QMessageBox::critical(this, tr("Error"), tr("Invalid file path\n") + filename);
             delete lib;
-            delete s.base;
+            delete s.base.lib;
             for(int i = 0; i < s.optionals.size(); i++)
             {
-                delete s.optionals.at(i);
+                delete s.optionals.at(i).lib;
             }
             return false;
         }
     }
-    // ToDo::ばぶるそーーーーと！！
+    // ToDo::そーーーーと！！
+    for(int i = 0; i < s.optionals.size(); i++)
+    {
+        int minimum = s.optionals.at(i).brightness;
+        int index = i;
+        for(int j = i + 1; j < s.optionals.size(); j++)
+        {
+            if(minimum < s.optionals.at(j).brightness)
+            {
+                minimum = s.optionals.at(j).brightness;
+                index = j;
+            }
+        }
+        stand::synthesis::Transcriber::TranscriberItem item, tmp;
+        item = s.optionals.at(index);
+        tmp = s.optionals.at(i);
+        s.optionals.replace(i, item);
+        s.optionals.replace(index, tmp);
+    }
 
     return true;
 }

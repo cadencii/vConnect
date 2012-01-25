@@ -1,10 +1,11 @@
 #include "Transcriber.h"
+#include "TranscriberSetting.h"
 #include "TranscriberElement.h"
 #include "../io/UtauLibrary.h"
 
 using namespace stand::synthesis;
 
-Transcriber::Transcriber(const TranscriberSetting &s, QObject *parent) :
+Transcriber::Transcriber(const TranscriberSetting *s, QObject *parent) :
     QThread(parent)
 {
     setting = s;
@@ -12,10 +13,10 @@ Transcriber::Transcriber(const TranscriberSetting &s, QObject *parent) :
 
 Transcriber::~Transcriber()
 {
-    delete setting.base;
-    for(int i = 0; i < setting.optionals.size();i ++)
+    delete setting->base.lib;
+    for(int i = 0; i < setting->optionals.size();i ++)
     {
-        delete setting.optionals.at(i);
+        delete setting->optionals.at(i).lib;
     }
     for(int i = 0; i < elements.size(); i++)
     {
@@ -33,9 +34,9 @@ void Transcriber::run()
     QMutex mutex;
     mutex.lock();
     elements.clear();
-    for(int i = 0; i < setting.numThreads && i < setting.base->size(); i++)
+    for(int i = 0; i < setting->numThreads && i < setting->base.lib->size(); i++)
     {
-        TranscriberElement *e = new TranscriberElement(i, &setting, &mutex, this);
+        TranscriberElement *e = new TranscriberElement(i, setting, &mutex, this);
         elements.push_back(e);
         e->start();
         currentIndex = i;
@@ -54,7 +55,7 @@ void Transcriber::run()
 void Transcriber::elementFinished(TranscriberElement *e)
 {
     currentFinished++;
-    if(currentIndex < setting.base->size())
+    if(currentIndex < setting->base.lib->size())
     {
         e->setIndex(currentIndex);
         currentIndex++;
@@ -64,13 +65,14 @@ void Transcriber::elementFinished(TranscriberElement *e)
         e->finishTranscription();
     }
     // SafeGuard (要るかな？)
-    if(currentFinished == setting.base->size() - 1)
+    if(currentFinished == setting->base.lib->size() - 1)
     {
-        for(int i = 0; i < setting.numThreads; i++)
+        for(int i = 0; i < setting->numThreads; i++)
         {
 
         }
     }
+    emit progressChanged(currentFinished);
 }
 
 void Transcriber::cancel()

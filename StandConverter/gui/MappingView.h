@@ -27,7 +27,7 @@ public:
     void paintEvent(QPaintEvent *e);
 
 public slots:
-    void setMapping(QVector<Map> &mapping);
+    void setMapping(QVector<stand::gui::MappingView::Map> &mapping);
 
 signals:
 

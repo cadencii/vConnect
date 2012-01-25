@@ -19,12 +19,17 @@ class TranscriberWidget : public QWidget
     Q_OBJECT
 public slots:
     void openDirDialog();
+    void settingChanged();
+
+signals:
+    void changed(QWidget *);
 
 public:
     explicit TranscriberWidget(QWidget *parent = 0, int index = 0ULL);
     ~TranscriberWidget();
 
     QString dir();
+    QString colorName();
     int bri();
     int note();
     QTextCodec *codec();

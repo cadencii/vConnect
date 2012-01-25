@@ -4,6 +4,8 @@
 #include <QThread>
 #include <QVector>
 
+#include "Transcriber.h"
+
 class QMutex;
 
 namespace stand
@@ -15,7 +17,6 @@ class UtauLibrary;
 namespace synthesis
 {
 
-class Transcriber;
 class TranscriberSetting;
 
 class TranscriberElement : public QThread
@@ -34,7 +35,7 @@ private:
     QMutex *mutex;
     Transcriber *transcriber;
 
-    QVector<stand::io::UtauLibrary *> libs;
+    QVector<Transcriber::TranscriberItem> items;
 
     bool isFinished;
 };

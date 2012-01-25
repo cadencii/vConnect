@@ -6,14 +6,17 @@
 #include <QWaitCondition>
 #include <QVector>
 
-#include "TranscriberSetting.h"
-
 namespace stand
 {
+namespace io
+{
+class UtauLibrary;
+}
 namespace synthesis
 {
 
 class TranscriberElement;
+class TranscriberSetting;
 
 class Transcriber : public QThread
 {
@@ -27,13 +30,20 @@ public slots:
     void elementFinished(stand::synthesis::TranscriberElement *e);
 
 public:
-    explicit Transcriber(const TranscriberSetting &s, QObject *parent = 0);
+    struct TranscriberItem
+    {
+        stand::io::UtauLibrary *lib;
+        int note;
+        int brightness;
+    };
+
+    explicit Transcriber(const TranscriberSetting *s, QObject *parent = 0);
     ~Transcriber();
 
     void run();
 
 private:
-    TranscriberSetting setting;
+    const TranscriberSetting *setting;
     int currentFinished;
     int currentIndex;
     QVector<TranscriberElement *> elements;
