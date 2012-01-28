@@ -11,7 +11,7 @@ namespace io
 class WaveFile
 {
 public:
-    struct WaveHeader
+    struct Header
     {
         qint16 formatID;
         qint32 chunksize;
@@ -31,7 +31,7 @@ public:
     bool read(const char* filename);
     bool write(const char* filename);
 
-    void setHeader(const WaveHeader &h)
+    void setHeader(const Header &h)
     {
         _header = h;
     }
@@ -54,7 +54,7 @@ public:
         return (!_data || _length == 0);
     }
 
-    const WaveHeader *header() const
+    const Header *header() const
     {
         return &_header;
     }
@@ -65,7 +65,7 @@ public:
     }
 
     double normalize();
-    const static WaveHeader DEFAULT_WAVE_FORMAT;
+    const static Header DEFAULT_WAVE_FORMAT;
 private:
     void _createBuffer(unsigned int l);
     void _destroy();
@@ -82,7 +82,7 @@ private:
     void _writeData24(qint8 *p);
     void _writeData32(qint8 *p);
 
-    WaveHeader _header;
+    Header _header;
     double *_data;
     unsigned int _length;
 };

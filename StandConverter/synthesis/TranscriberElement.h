@@ -30,6 +30,8 @@ public:
     void setIndex(int index);
     void finishTranscription();
 private:
+    void _analyze();
+
     unsigned int index;
     const TranscriberSetting *setting;
     QMutex *mutex;

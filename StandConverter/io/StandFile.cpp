@@ -72,6 +72,7 @@ void StandFile::_create(int tLen, int cLen)
 
 bool StandFile::read(const char *path)
 {
+    qDebug("StandFile::read(\"%s\");", path);
     FILE *fp = fopen(path, "rb");
     if(!fp)
     {
@@ -113,6 +114,7 @@ bool StandFile::read(const char *path)
 
 bool StandFile::write(const char *path)
 {
+    qDebug("StandFile::write(\"%s\");", path);
     if(!_f0 || !_t || !_MFCC || !vorbis.data)
     {
         qDebug("StandFile::write(\"%s\"); // Empty Data.", path);
@@ -121,7 +123,7 @@ bool StandFile::write(const char *path)
     FILE *fp = fopen(path, "wb");
     if(!fp)
     {
-        qDebug("StandFile::write(\"%s\"); // File could not be opened.", path);
+        qDebug("StandFile::write(\"%s\"); // File open error.", path);
         return false;
     }
 
@@ -289,17 +291,22 @@ void StandFile::matching(StandFile *src, StandFile *dst)
     stand::math::smoothMatching(dst_to_src_stretched, src_to_dst, src_env, dst_to_src_stretched, src_len);
 
     double framePeriod = src->framePeriod();
-    for( int i = 0; i < dst_len - 1; i++ ){
+    for( int i = 0; i < dst_len - 1; i++ )
+    {
         double tmp = (double)i / (double)dst_len * (double)src_len;
-        if( tmp >= src_len - 1 ){
-            dst_to_src[i] = dst_to_src_stretched[src_len-1];
-        }else{
+        if( tmp >= src_len - 1 )
+        {
+            dst_to_src[i] = dst_to_src_stretched[src_len-1] * dst->framePeriod() / 1000.0 / (double)src_len * (double)dst_len;
+        }
+        else
+        {
             dst_to_src[i] = stand::math::interpolateArray(tmp, dst_to_src_stretched) * dst->framePeriod() / 1000.0 / (double)src_len * (double)dst_len;
         }
     }
-    dst_to_src[dst_len-1] = dst_to_src_stretched[src_len-1] / (double)src_len * (double)dst_len;
+    dst_to_src[dst_len-1] = dst_to_src_stretched[src_len-1] * dst->framePeriod() / 1000.0 / (double)src_len * (double)dst_len;
 
-    for( int i = 0; i < src_len; i++ ){
+    for( int i = 0; i < src_len; i++ )
+    {
         dst_to_src_stretched[i] = src_to_dst[i] * framePeriod / 1000.0;
     }
     memcpy( src_to_dst, dst_to_src_stretched, sizeof( double ) * src_len );

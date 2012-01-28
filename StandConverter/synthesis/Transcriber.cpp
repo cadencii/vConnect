@@ -8,15 +8,19 @@ using namespace stand::synthesis;
 Transcriber::Transcriber(const TranscriberSetting *s, QObject *parent) :
     QThread(parent)
 {
-    setting = s;
+    setting = new TranscriberSetting();
+    setting->numThreads = s->numThreads;
+    for(int i = 0; i < s->libraries.size(); i++)
+    {
+        setting->libraries.push_back(s->libraries.at(i));
+    }
 }
 
 Transcriber::~Transcriber()
 {
-    delete setting->base.lib;
-    for(int i = 0; i < setting->optionals.size();i ++)
+    for(int i = 0; i < setting->libraries.size();i ++)
     {
-        delete setting->optionals.at(i).lib;
+        delete setting->libraries.at(i).body;
     }
     for(int i = 0; i < elements.size(); i++)
     {
@@ -25,6 +29,7 @@ Transcriber::~Transcriber()
         elements.at(i)->disconnect();
         delete elements.at(i);
     }
+    delete setting;
 }
 
 void Transcriber::run()
@@ -34,16 +39,17 @@ void Transcriber::run()
     QMutex mutex;
     mutex.lock();
     elements.clear();
-    for(int i = 0; i < setting->numThreads && i < setting->base.lib->size(); i++)
+    for(int i = 0; i < setting->numThreads && i < setting->libraries.at(0).body->size(); i++)
     {
         TranscriberElement *e = new TranscriberElement(i, setting, &mutex, this);
         elements.push_back(e);
         e->start();
         currentIndex = i;
     }
+    currentIndex++;
     mutex.unlock();
 
-    currentIndex = currentFinished = 0;
+    currentFinished = 0;
     waitMutex.lock();
     condition.wait(&waitMutex);
     waitMutex.unlock();
@@ -55,7 +61,7 @@ void Transcriber::run()
 void Transcriber::elementFinished(TranscriberElement *e)
 {
     currentFinished++;
-    if(currentIndex < setting->base.lib->size())
+    if(currentIndex < setting->libraries.at(0).body->size())
     {
         e->setIndex(currentIndex);
         currentIndex++;
@@ -64,14 +70,12 @@ void Transcriber::elementFinished(TranscriberElement *e)
     {
         e->finishTranscription();
     }
-    // SafeGuard (要るかな？)
-    if(currentFinished == setting->base.lib->size() - 1)
-    {
-        for(int i = 0; i < setting->numThreads; i++)
-        {
 
-        }
+    if(currentFinished == setting->libraries.at(0).body->size())
+    {
+        cancel();
     }
+
     emit progressChanged(currentFinished);
 }
 

@@ -33,7 +33,7 @@ signals:
     void sendCancelToConverter();
 
 public:
-    explicit ConverterWindow(QWidget *parent = 0);
+    explicit ConverterWindow(QWidget *parent = 0, Qt::WindowFlags f = Qt::Window);
     ~ConverterWindow();
 
     /// <summary> オーバーライドされた closeEvent ．ユーザが Window を閉じようとしたときに呼ばれます． </summary>

@@ -25,14 +25,16 @@ class TranscriberWindow : public QMainWindow
     Q_OBJECT
 signals:
     void sendCancelToTranscriber();
-    void mappingChanged(QVector<stand::gui::MappingView::Map> &mapping);
+    void mappingChanged(QVector<stand::gui::MappingView::Item> &mapping);
 public slots:
     void addTab();
     void removeTab();
 
     void pushAnalyze();
+    void pushRootDir();
     void settingChanged();
     void transcriptionFinished(bool);
+
 public:
     explicit TranscriberWindow(QWidget *parent = 0);
     ~TranscriberWindow();
@@ -45,6 +47,7 @@ private:
     void _setItemEnabled();
 
     bool _createSetting(stand::synthesis::TranscriberSetting &s);
+    bool _checkSettingAvailability();
 
     Ui::TranscriberWindow *ui;
     stand::synthesis::Transcriber *current;

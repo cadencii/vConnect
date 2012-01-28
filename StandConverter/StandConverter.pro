@@ -44,7 +44,8 @@ SOURCES += \
     synthesis/TranscriberSetting.cpp \
     synthesis/ConverterElement.cpp \
     gui/TranscriberWidget.cpp \
-    synthesis/TranscriberElement.cpp
+    synthesis/TranscriberElement.cpp \
+    io/StandLibrary.cpp
 
 HEADERS  += gui/ConverterWindow.h \
     io/UtauLibrary.h \
@@ -73,7 +74,8 @@ HEADERS  += gui/ConverterWindow.h \
     synthesis/TranscriberSetting.h \
     synthesis/ConverterElement.h \
     gui/TranscriberWidget.h \
-    synthesis/TranscriberElement.h
+    synthesis/TranscriberElement.h \
+    io/StandLibrary.h
 
 FORMS    += \
     gui/ConverterWindow.ui \

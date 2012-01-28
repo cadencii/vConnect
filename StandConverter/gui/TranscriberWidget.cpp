@@ -16,7 +16,7 @@ TranscriberWidget::TranscriberWidget(QWidget *parent, int index) :
 
     // Set ColorComboBox
     QStringList colorNames;
-    colorNames << tr("red") << tr("green") << tr("blue") << tr("cyan") << tr("magenta") << tr("yellow") << tr("white");
+    colorNames << tr("red") << tr("lime") << tr("blue") << tr("cyan") << tr("magenta") << tr("yellow") << tr("white");
     QPalette pallete = ui->ColorSelector->palette();
     pallete.setColor(QPalette::Highlight, Qt::transparent);
 

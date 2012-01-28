@@ -76,9 +76,8 @@ public:
     /// <param name = s> 追加したい原音設定 </parm>
     void push_back(const UtauPhoneme &s)
     {
-        UtauPhoneme u = s;
-        settingList.push_back(u);
-        settingMap.insert(u.pronounce, &(settingList.back()));
+        settingMap[s.pronounce] = settingList.count();
+        settingList.push_back(s);
     }
 
     /// <summary> 指定発音の原音設定を返します． </summary>
@@ -92,7 +91,7 @@ private:
     bool _readRecursive(const QString &filename, QTextCodec *codec = NULL, int maxDepth = 1);
 
     QVector<UtauPhoneme> settingList;
-    QHash<QString, UtauPhoneme *> settingMap;
+    QHash<QString, int> settingMap;
 
     QDir _directory;
 };

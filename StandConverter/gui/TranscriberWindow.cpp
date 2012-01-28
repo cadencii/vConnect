@@ -5,8 +5,11 @@
 #include "../synthesis/Transcriber.h"
 #include "../synthesis/TranscriberSetting.h"
 #include "../io/UtauLibrary.h"
+#include "../utility/Utility.h"
+#include "ConverterWindow.h"
 
 #include <QMessageBox>
+#include <QFileDialog>
 #include <QCloseEvent>
 
 using namespace stand::gui;
@@ -17,6 +20,8 @@ TranscriberWindow::TranscriberWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // TabWidget の中身を空にする．
+    // 今のとこ必要なんだけど， ui の設定でどうにかならないのかな？
     while(ui->SettingTabs->count() != 0)
     {
         QWidget *p = ui->SettingTabs->widget(0);
@@ -24,10 +29,10 @@ TranscriberWindow::TranscriberWindow(QWidget *parent) :
         delete p;
     }
     TranscriberWidget *w = new TranscriberWidget(ui->SettingTabs);
-    ui->SettingTabs->addTab(w, tr("Base"));
+    ui->SettingTabs->addTab(w, tr("Lib. 1"));
 
     connect(w, SIGNAL(changed(QWidget*)), this, SLOT(settingChanged()));
-    connect(this, SIGNAL(mappingChanged(QVector<stand::gui::MappingView::Map>&)), ui->MappingView, SLOT(setMapping(QVector<stand::gui::MappingView::Map>&)));
+    connect(this, SIGNAL(mappingChanged(QVector<stand::gui::MappingView::Item>&)), ui->MappingView, SLOT(setMapping(QVector<stand::gui::MappingView::Item>&)));
 
     isAnalyzing = false;
     current = NULL;
@@ -43,8 +48,8 @@ TranscriberWindow::~TranscriberWindow()
 
 void TranscriberWindow::settingChanged()
 {
-    QVector<stand::gui::MappingView::Map> mapping;
-    stand::gui::MappingView::Map m;
+    QVector<stand::gui::MappingView::Item> mapping;
+    stand::gui::MappingView::Item m;
     for(int i = 0; i < ui->SettingTabs->count(); i++)
     {
         TranscriberWidget *w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(i));
@@ -86,22 +91,22 @@ void TranscriberWindow::addTab()
 {
     int index = ui->SettingTabs->count();
     QString num;
-    num.setNum(index);
+    num.setNum(index + 1);
 
     TranscriberWidget *w = new TranscriberWidget(ui->SettingTabs, index);
-    ui->SettingTabs->addTab(w, tr("Opt. ") + num);
+    ui->SettingTabs->addTab(w, tr("Lib. ") + num);
     connect(w, SIGNAL(changed(QWidget*)), this, SLOT(settingChanged()));
-    connect(this, SIGNAL(mappingChanged(QVector<stand::gui::MappingView::Map>&)), ui->MappingView, SLOT(setMapping(QVector<stand::gui::MappingView::Map>&)));
+    connect(this, SIGNAL(mappingChanged(QVector<stand::gui::MappingView::Item>&)), ui->MappingView, SLOT(setMapping(QVector<stand::gui::MappingView::Item>&)));
     settingChanged();
 }
 
 void TranscriberWindow::removeTab()
 {
     int index = ui->SettingTabs->currentIndex();
-    // Base tab cannot be removed.
-    if(index == 0)
+    // 少なくとも一つのタブは必要である．
+    if(ui->SettingTabs->count() == 1)
     {
-        QMessageBox::critical(this, tr("Error"), tr("You can not remove base tab."), QMessageBox::Ok);
+        QMessageBox::critical(this, tr("Error"), tr("You need at least one lib."), QMessageBox::Ok);
         return;
     }
 
@@ -131,6 +136,8 @@ void TranscriberWindow::_setItemEnabled()
     ui->ProgressBar->setEnabled(isAnalyzing);
     ui->RemoveButton->setEnabled(!isAnalyzing);
     ui->SettingTabs->setEnabled(!isAnalyzing);
+    ui->RootDirectory->setEnabled(!isAnalyzing);
+    ui->RootSelector->setEnabled(!isAnalyzing);
 }
 
 void TranscriberWindow::pushAnalyze()
@@ -145,17 +152,36 @@ void TranscriberWindow::pushAnalyze()
     }
 }
 
+void TranscriberWindow::pushRootDir()
+{
+    QString dirName = QFileDialog::getExistingDirectory(
+                this,
+                tr("Select connect root directory."),
+                tr("")
+                );
+    ui->RootDirectory->setText(dirName);
+}
+
 void TranscriberWindow::_beginAnalyze()
 {
     stand::synthesis::TranscriberSetting s;
-    // ToDo::Create Setting
-
+    // Directory の存在チェック．なければ作成するなどの処理．
+    if(!stand::utility::makeDirectory(this, ui->RootDirectory->text(), true))
+    {
+        return;
+    }
+    // 設定がおかしい．
+    if(!_checkSettingAvailability())
+    {
+        return;
+    }
+    // コンバータが使える設定に変換する．できなければ帰る．
     if(!_createSetting(s))
     {
         QMessageBox::critical(this, tr("Error"), tr("Some settings are invalid."));
         return;
     }
-    ui->ProgressBar->setMaximum(s.base.lib->size());
+    ui->ProgressBar->setMaximum(s.libraries.at(0).body->size());
     current = new stand::synthesis::Transcriber(&s, this);
     connect(this, SIGNAL(sendCancelToTranscriber()), current, SLOT(cancel()));
     connect(current, SIGNAL(progressChanged(int)), ui->ProgressBar, SLOT(setValue(int)));
@@ -185,62 +211,63 @@ void TranscriberWindow::_cancelAnalyze()
 bool TranscriberWindow::_createSetting(stand::synthesis::TranscriberSetting &s)
 {
     s.numThreads = ui->NumThreads->value();
-    s.base.lib = new stand::io::UtauLibrary();
 
-    TranscriberWidget *w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(0));
-    QString filename = w->dir() + QDir::separator() + "oto.ini";
-    if(!s.base.lib->readFromOtoIni(filename, w->codec()))
-    {
-        QMessageBox::critical(this, tr("Error"), tr("Base file path is invalid\n") + filename);
-        delete s.base.lib;
-        return false;
-    }
-    s.base.brightness = w->bri();
-    s.base.note = w->note();
-
-    for(int i = 0; i < ui->SettingTabs->count() - 1; i++)
+    // 指定されたライブラリを全部読み込む．
+    for(int i = 0; i < ui->SettingTabs->count(); i++)
     {
         stand::synthesis::Transcriber::TranscriberItem item;
-        w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(i + 1));
+        TranscriberWidget *w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(i));
         QString filename = w->dir() + QDir::separator() + "oto.ini";
         stand::io::UtauLibrary *lib = new stand::io::UtauLibrary();
-        if(lib->readFromOtoIni(filename, w->codec()))
+        if(lib->readFromOtoIni(filename, w->codec()) && lib->size() != 0)
         {
-            item.lib = lib;
+            item.body = lib;
             item.brightness = w->bri();
             item.note = w->note();
-            s.optionals.push_back(item);
+            s.libraries.push_back(item);
+            const stand::io::UtauPhoneme *p = lib->at(0);
+            // 波形データの場合，とりあえずユーザに通知しておしまいにする．
+            //  ConverterDialogにしておけばよかったか…
+            if(p->filename.contains(".wav"))
+            {
+                QMessageBox::critical(this, tr("Error"), tr("You must convert the library below.\n") + lib->directory().absolutePath());
+                for(int i = 0; i < s.libraries.size(); i++)
+                {
+                    delete s.libraries.at(i).body;
+                }
+                return false;
+            }
         }
         else
         {
-            QMessageBox::critical(this, tr("Error"), tr("Invalid file path\n") + filename);
+            // 読み込めなかった．
+            QMessageBox::critical(this, tr("Error"), tr("Could not find the library below\n") + filename);
             delete lib;
-            delete s.base.lib;
-            for(int i = 0; i < s.optionals.size(); i++)
+            for(int i = 0; i < s.libraries.size(); i++)
             {
-                delete s.optionals.at(i).lib;
+                delete s.libraries.at(i).body;
             }
             return false;
         }
     }
     // ToDo::そーーーーと！！
-    for(int i = 0; i < s.optionals.size(); i++)
+    for(int i = 0; i < s.libraries.size(); i++)
     {
-        int minimum = s.optionals.at(i).brightness;
+        int minimum = s.libraries.at(i).brightness;
         int index = i;
-        for(int j = i + 1; j < s.optionals.size(); j++)
+        for(int j = i + 1; j < s.libraries.size(); j++)
         {
-            if(minimum < s.optionals.at(j).brightness)
+            if(minimum < s.libraries.at(j).brightness)
             {
-                minimum = s.optionals.at(j).brightness;
+                minimum = s.libraries.at(j).brightness;
                 index = j;
             }
         }
         stand::synthesis::Transcriber::TranscriberItem item, tmp;
-        item = s.optionals.at(index);
-        tmp = s.optionals.at(i);
-        s.optionals.replace(i, item);
-        s.optionals.replace(index, tmp);
+        item = s.libraries.at(index);
+        tmp = s.libraries.at(i);
+        s.libraries.replace(i, item);
+        s.libraries.replace(index, tmp);
     }
 
     return true;
@@ -255,3 +282,21 @@ void TranscriberWindow::transcriptionFinished(bool)
     isAnalyzing = false;
     _setItemEnabled();
 }
+
+bool TranscriberWindow::_checkSettingAvailability()
+{
+    QDir root(ui->RootDirectory->text());
+    for(int i = 0; i < ui->SettingTabs->count(); i++)
+    {
+        TranscriberWidget *w = dynamic_cast<TranscriberWidget *>(ui->SettingTabs->widget(i));
+        QString relative = root.relativeFilePath(w->dir());
+        QString absolute = QDir(relative).absolutePath();
+        if(relative == absolute)
+        {
+            QMessageBox::critical(this, tr("Error"), tr("Could not create relative path of the library below;\n") + relative);
+            return false;
+        }
+    }
+    return true;
+}
+

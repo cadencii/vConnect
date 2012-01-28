@@ -14,7 +14,7 @@ class MappingView : public QWidget
 {
     Q_OBJECT
 public:
-    struct Map
+    struct Item
     {
         int note;
         int brightness;
@@ -27,7 +27,7 @@ public:
     void paintEvent(QPaintEvent *e);
 
 public slots:
-    void setMapping(QVector<stand::gui::MappingView::Map> &mapping);
+    void setMapping(QVector<stand::gui::MappingView::Item> &mapping);
 
 signals:
 
@@ -40,7 +40,7 @@ private:
     };
 
     _color **_map;
-    QVector<Map> _data;
+    QVector<Item> _data;
     const static int _MAPPING_SIZE;
 };
 

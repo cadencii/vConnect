@@ -78,13 +78,13 @@ void MappingView::paintEvent(QPaintEvent *e)
     }
 }
 
-void MappingView::setMapping(QVector<stand::gui::MappingView::Map> &mapping)
+void MappingView::setMapping(QVector<stand::gui::MappingView::Item> &mapping)
 {
     _data = mapping;
     unsigned int i;
     for(i = 0; i < _data.size(); i++)
     {
-        Map m = _data.at(i), tmp;
+        Item m = _data.at(i), tmp;
         int index = i;
         for(int j = i + 1; j < _data.size(); j++)
         {

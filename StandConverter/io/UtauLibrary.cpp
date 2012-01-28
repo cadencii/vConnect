@@ -20,7 +20,8 @@ UtauLibrary::UtauLibrary(const QString &filename, QTextCodec *codec, int maxDept
 
 bool UtauLibrary::readFromOtoIni(const QString &filename, QTextCodec *codec)
 {
-    _directory = QDir(filename);
+    QFileInfo info(filename);
+    _directory = info.absoluteDir().absolutePath();
     clear();
     return _readFromOtoIni(filename, codec);
 }
@@ -28,19 +29,19 @@ bool UtauLibrary::readFromOtoIni(const QString &filename, QTextCodec *codec)
 bool UtauLibrary::_readFromOtoIni(const QString &filename, QTextCodec *codec)
 {
     QFile file(filename);
-    qDebug("UtauLibrary::readFromOtoIni(%s, %s)", filename, (codec)?(codec->name().data()):"\"\"");
+    qDebug("UtauLibrary::readFromOtoIni(%s, %s)", filename.toLocal8Bit().data(), (codec)?(codec->name().data()):"\"\"");
 
     // ファイルが存在しない．
     if(file.exists() == false)
     {
-        qDebug(" File Not Found :%s", filename);
+        qDebug(" File Not Found :%s", filename.toLocal8Bit().data());
         return false;
     }
 
     // 開けない．
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qDebug(" File Open Error :%s", filename);
+        qDebug(" File Open Error :%s", filename.toLocal8Bit().data());
         return false;
     }
 
@@ -51,7 +52,7 @@ bool UtauLibrary::_readFromOtoIni(const QString &filename, QTextCodec *codec)
     }
 
     QFileInfo fileInfo(filename);
-    QString relative = _directory.relativeFilePath(fileInfo.absoluteDir().absolutePath()) + QDir::separator();
+    QString relative = _directory.relativeFilePath(fileInfo.absoluteDir().absolutePath());
     if(relative == QDir::separator())
     {
         relative = "";
@@ -68,7 +69,7 @@ bool UtauLibrary::_readFromOtoIni(const QString &filename, QTextCodec *codec)
         c++;
         if(!_readOneLine(line, relative))
         {
-            qDebug(" Invalid args in l.%d\t: %s", c, line);
+            qDebug(" Invalid args in l.%d\t: %s", c, line.toLocal8Bit().data());
         }
     }
 
@@ -89,7 +90,7 @@ bool UtauLibrary::readRecursive(const QString &filename, QTextCodec *codec, int 
 
 bool UtauLibrary::_readRecursive(const QString &filename, QTextCodec *codec, int maxDepth)
 {
-    qDebug("UtauLibrary::readRecursive(%s, %s, %d)", filename, (codec)?(codec->name().data()):"\"\"", maxDepth);
+    qDebug("UtauLibrary::readRecursive(%s, %s, %d)", filename.toLocal8Bit().data(), (codec)?(codec->name().data()):"\"\"", maxDepth);
     bool ret = false;
     QDir dir(filename);
     QFileInfoList dirList = dir.entryInfoList(QDir::AllDirs);
@@ -174,11 +175,11 @@ const UtauPhoneme *UtauLibrary::at(unsigned int i)
 
 const UtauPhoneme *UtauLibrary::find(const QString &pronounce)
 {
-    QHash<QString, UtauPhoneme *>::iterator it;
+    QHash<QString, int>::iterator it;
     it = settingMap.find(pronounce);
     if(it != settingMap.end())
     {
-        return it.value();
+        return at(it.value());
     }
     return NULL;
 }

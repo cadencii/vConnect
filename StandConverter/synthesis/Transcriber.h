@@ -32,7 +32,7 @@ public slots:
 public:
     struct TranscriberItem
     {
-        stand::io::UtauLibrary *lib;
+        stand::io::UtauLibrary *body;
         int note;
         int brightness;
     };
@@ -43,7 +43,7 @@ public:
     void run();
 
 private:
-    const TranscriberSetting *setting;
+    TranscriberSetting *setting;
     int currentFinished;
     int currentIndex;
     QVector<TranscriberElement *> elements;

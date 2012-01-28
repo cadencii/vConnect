@@ -17,8 +17,8 @@
 
 using namespace stand::gui;
 
-ConverterWindow::ConverterWindow(QWidget *parent) :
-    QMainWindow(parent),
+ConverterWindow::ConverterWindow(QWidget *parent, Qt::WindowFlags f) :
+    QMainWindow(parent, f),
     ui(new Ui::ConverterWindow())
 {
     ui->setupUi(this);

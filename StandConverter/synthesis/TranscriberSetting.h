@@ -16,8 +16,7 @@ namespace synthesis
 class TranscriberSetting
 {
 public:
-    Transcriber::TranscriberItem base;
-    QVector<Transcriber::TranscriberItem> optionals;
+    QVector<Transcriber::TranscriberItem> libraries;
 
     unsigned int numThreads;
 };

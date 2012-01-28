@@ -6,7 +6,7 @@
 
 using namespace stand::io;
 
-const WaveFile::WaveHeader WaveFile::DEFAULT_WAVE_FORMAT =
+const WaveFile::Header WaveFile::DEFAULT_WAVE_FORMAT =
 {
     1,
     0,
