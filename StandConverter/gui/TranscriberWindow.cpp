@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QCloseEvent>
+#include <QTextCodec>
 
 using namespace stand::gui;
 
@@ -162,6 +163,16 @@ void TranscriberWindow::pushRootDir()
     ui->RootDirectory->setText(dirName);
 }
 
+void TranscriberWindow::pushIcon()
+{
+    QString filename = QFileDialog::getOpenFileName(
+                this,
+                tr("Select library's icon."),
+                tr("")
+                );
+    ui->LibraryIconPath->setText(filename);
+}
+
 void TranscriberWindow::_beginAnalyze()
 {
     stand::synthesis::TranscriberSetting s;
@@ -210,7 +221,18 @@ void TranscriberWindow::_cancelAnalyze()
 
 bool TranscriberWindow::_createSetting(stand::synthesis::TranscriberSetting &s)
 {
+    s.root = ui->RootDirectory->text();
+    s.libraryAuthor = ui->LibraryAuthor->text();
+    s.libraryName = ui->LibraryName->text();
+    s.libraryIconPath = ui->LibraryIconPath->text();
+    s.libraryWeb = ui->LibraryWeb->text();
+    qDebug("%s", s.root.absolutePath().toUtf8().data());
     s.numThreads = ui->NumThreads->value();
+    s.codec = QTextCodec::codecForName(ui->RootEncode->currentText().toLocal8Bit().data());
+    if(!s.codec)
+    {
+        s.codec = QTextCodec::codecForLocale();
+    }
 
     // 指定されたライブラリを全部読み込む．
     for(int i = 0; i < ui->SettingTabs->count(); i++)
@@ -270,6 +292,26 @@ bool TranscriberWindow::_createSetting(stand::synthesis::TranscriberSetting &s)
         s.libraries.replace(index, tmp);
     }
 
+    // ディレクトリがかぶるのはアウト → 最悪再帰呼び出しでシンセサイザが死ぬ．
+    for(int i = 0; i < s.libraries.size(); i++)
+    {
+        for(int j = i + 1; j < s.libraries.size(); j++)
+        {
+            if(s.libraries.at(i).body->directory().absolutePath()
+                    == s.libraries.at(j).body->directory().absolutePath())
+            {
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("Directory duplicated. You can not use one lib for two or more settings.\n")
+                                      + s.libraries.at(i).body->directory().absolutePath());
+                for(int k = 0; k < s.libraries.size(); k++)
+                {
+                    delete s.libraries.at(k).body;
+                }
+                return false;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -285,6 +327,7 @@ void TranscriberWindow::transcriptionFinished(bool)
 
 bool TranscriberWindow::_checkSettingAvailability()
 {
+    // ルートからたどれないディレクトリはダメ．
     QDir root(ui->RootDirectory->text());
     for(int i = 0; i < ui->SettingTabs->count(); i++)
     {
@@ -297,6 +340,7 @@ bool TranscriberWindow::_checkSettingAvailability()
             return false;
         }
     }
+
     return true;
 }
 

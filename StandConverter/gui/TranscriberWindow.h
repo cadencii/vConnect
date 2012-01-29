@@ -32,6 +32,7 @@ public slots:
 
     void pushAnalyze();
     void pushRootDir();
+    void pushIcon();
     void settingChanged();
     void transcriptionFinished(bool);
 

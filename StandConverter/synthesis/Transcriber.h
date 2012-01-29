@@ -43,6 +43,8 @@ public:
     void run();
 
 private:
+    bool _writeSettings();
+
     TranscriberSetting *setting;
     int currentFinished;
     int currentIndex;

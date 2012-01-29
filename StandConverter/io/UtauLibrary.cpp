@@ -218,3 +218,14 @@ bool UtauLibrary::write(const QString &filename, QTextCodec *codec)
     file.close();
     return true;
 }
+
+void UtauLibrary::changeDirectory(const QDir &dst)
+{
+    // 相対パスに変えてディレクトリを変更する．
+    for(int i = 0; i < settingList.size(); i++)
+    {
+        // セパレータを変更する必要はあるのかどうなのか．
+        settingList[i].filename = QDir::toNativeSeparators(dst.relativeFilePath(_directory.absoluteFilePath(settingList.at(i).filename)));
+    }
+    _directory = dst;
+}

@@ -85,6 +85,8 @@ public:
     /// <returns> NULL: 失敗，それ以外: 成功． </returns>
     const UtauPhoneme *find(const QString &pronounce);
 
+    void changeDirectory(const QDir &dst);
+
 private:
     bool _readFromOtoIni(const QString &filename, QTextCodec *codec = NULL);
     bool _readOneLine(QString &line, QString &dir);
