@@ -33,17 +33,18 @@ namespace vconnect
         data.push_back( current );
     }
 
-    void BPList::getList( vector<FrameBP>& dst, double tempo )
+    void BPList::getList( vector<FrameBP>& dst, TempoList &tempo )
     {
         vector<BP>::size_type size = this->data.size();
         dst.clear();
         dst.resize( size );
-        double framePeriod = Configuration::getMilliSecondsPerFrame();
+        double framePerMilliSecond = 1.0 / Configuration::getMilliSecondsPerFrame();
         for( vector<BP>::size_type i = 0; i < size; i++ ){
             dst[i].value = this->data[i].value;
             dst[i].frameTime = INT_MAX;                // the value will continue till this time.
             if( i ){
-                dst[i - 1].frameTime = (long)(1000.0 * (double)(this->data[i].tick) / 480.0 * 60.0 / tempo / framePeriod);
+                double second = tempo.tickToSecond( this->data[i].tick );
+                dst[i - 1].frameTime = 1000.0 * second * framePerMilliSecond;
             }
         }
     }

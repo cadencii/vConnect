@@ -8,36 +8,26 @@ using namespace vconnect;
 
 class TempoListTest : public CppUnit::TestFixture {
 public:
-    void testConstruct()
-    {
-        TempoList list;
-        CPPUNIT_ASSERT_EQUAL( 120.0, list.getTempo() );
-    }
-
-    void testSetParameter()
-    {
-        TempoList list;
-        list.setParameter( "60", "" );
-        CPPUNIT_ASSERT_EQUAL( 60.0, list.getTempo() );
-    }
-
-    void testSecondToTick()
-    {
-        TempoList list;
-        CPPUNIT_ASSERT_EQUAL( (long)480, list.secondToTick( 0.5 ) );
-    }
-
     void testTickToSecond()
     {
         TempoList list;
         CPPUNIT_ASSERT_EQUAL( 0.5, list.tickToSecond( 480 ) );
     }
 
+    void testPush()
+    {
+        TempoList list;
+        list.push( 0, 100.0 ); // 0.6 s / beat
+        list.push( 480, 50.0 ); // 1.2 s / beat
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.0, list.tickToSecond( 0 ), DBL_EPSILON );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.6, list.tickToSecond( 480 ), DBL_EPSILON );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( (double)1.8, list.tickToSecond( 960 ), DBL_EPSILON );
+    }
+
     CPPUNIT_TEST_SUITE( TempoListTest );
-    CPPUNIT_TEST( testConstruct );
-    CPPUNIT_TEST( testSetParameter );
-    CPPUNIT_TEST( testSecondToTick );
     CPPUNIT_TEST( testTickToSecond );
+    CPPUNIT_TEST( testPush );
     CPPUNIT_TEST_SUITE_END();
 };
 REGISTER_TEST_SUITE( TempoListTest );

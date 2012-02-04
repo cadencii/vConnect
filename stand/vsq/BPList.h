@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "BP.h"
+#include "TempoList.h"
 #include "../FrameBP.h"
 
 namespace vconnect
@@ -28,7 +29,12 @@ namespace vconnect
     class BPList
     {
     public:
-        void getList( vector<FrameBP> &dst, double tempo );
+        /**
+         * このインスタンスが表現するコントロールカーブの時間変化を、FrameBP の配列に変換する
+         * @param dst 変換後配列の格納先
+         * @param tempo 秒時の算出に必要なテンポ変更リスト
+         */
+        void getList( vector<FrameBP> &dst, TempoList &tempo );
 
         void setParameter( long tick, int value );
 

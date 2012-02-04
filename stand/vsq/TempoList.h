@@ -16,6 +16,8 @@
 #define __TempoList_h__
 
 #include <string>
+#include <map>
+#include "TempoBP.h"
 
 using namespace std;
 
@@ -31,30 +33,34 @@ namespace vconnect
 
     private:
         /**
-         * テンポ値
+         * tick 単位の時刻をキーとした、テンポ変更点の連想配列
          */
-        double tempo;
+        std::map<long, TempoBP> points;
+
+        /**
+         * points フィールドの中身のテンポ変更点の時刻が更新されたかどうか
+         */
+        bool isUpdated;
 
     public:
-        TempoList()
-        {
-            this->tempo = DEFAULT_TEMPO;
+        TempoList(){
+            this->isUpdated = false;
         }
 
-        void setParameter( string left, string right );
-
-        long secondToTick( double second );
+        /**
+         * @brief テンポ値と時刻のセットを、テンポリストに追加する
+         * @param tick tick 単位の時刻
+         * @param tempo テンポ値
+         */
+        void push( long tick, double tempo );
 
         double tickToSecond( long tick );
 
+    private:
         /**
-         * テンポ値を取得する
-         * @return テンポ値
+         * リスト内のテンポ変更情報の秒単位の時刻部分を更新する
          */
-        double getTempo()
-        {
-            return this->tempo;
-        }
+        void updateTempoInfo();
     };
 }
 #endif

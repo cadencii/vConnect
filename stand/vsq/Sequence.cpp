@@ -83,10 +83,10 @@ namespace vconnect
         return this->events.endTick;
     }
 
-    double Sequence::getTempo()
+    /*double Sequence::getTempo()
     {
         return this->vsqTempoBp.getTempo();
-    }
+    }*/
 
     Sequence::Sequence()
     {
@@ -166,7 +166,7 @@ namespace vconnect
                 this->setParamOtoIni( singerName, otoIniPath, encodingOtoIni );
             }else if( search.compare( OBJ_NAME_TEMPO ) == 0 ){
                 // [Tempo]
-                this->vsqTempoBp.setParameter( left, right );
+                this->vsqTempoBp.push( 0L, atof( left.c_str() ) );
             }else if( search.find( "[ID#" ) == 0 ){
                 // ID
                 Map<string, Event *>::iterator i;

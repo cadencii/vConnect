@@ -73,11 +73,6 @@ namespace vconnect
         int getSingerIndex( string singer_name );
 
         /// <summary>
-        /// テンポ値を取得します．
-        /// </summary>
-        double getTempo();
-
-        /// <summary>
         /// シーケンスの長さ（tick単位）を取得します．
         /// </summary>
         /// <returns>シーケンスの長さ（tick単位）</returns>

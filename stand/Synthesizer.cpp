@@ -989,7 +989,7 @@ void Synthesizer::calculateVsqInfo( void )
     mControlCurves.resize( mVsq.controlCurves.size() );
     for( unsigned int i = 0; i < mControlCurves.size(); i++ )
     {
-        mVsq.controlCurves[i].getList( mControlCurves[i], mVsq.getTempo() );
+        mVsq.controlCurves[i].getList( mControlCurves[i], mVsq.vsqTempoBp );
     }
 }
 
