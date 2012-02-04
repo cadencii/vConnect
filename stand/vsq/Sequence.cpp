@@ -20,6 +20,7 @@ namespace vconnect
     const string Sequence::OBJ_NAME_OTOINI     = "[oto.ini]";
     const string Sequence::OBJ_NAME_EVENT_LIST = "[EventList]";
     const string Sequence::OBJ_NAME_TEMPO      = "[Tempo]";
+    const string Sequence::OBJ_NAME_TEMPO_LIST = "[TempoList]";
 
     void Sequence::setParamOtoIni( string singerName, string otoIniPath, string encoding )
     {
@@ -83,11 +84,6 @@ namespace vconnect
         return this->events.endTick;
     }
 
-    /*double Sequence::getTempo()
-    {
-        return this->vsqTempoBp.getTempo();
-    }*/
-
     Sequence::Sequence()
     {
         vector<CurveTypeEnum::CurveType> values = CurveTypeEnum::values();
@@ -103,7 +99,6 @@ namespace vconnect
 
     bool Sequence::read( string file_name, RuntimeOption option )
     {
-        bool result = false;
         TextInputStream *stream = new TextInputStream( file_name, option.getEncodingVsqText() );
         bool ret = this->readCore( stream, file_name, option.getEncodingOtoIni() );
         delete stream;
@@ -115,7 +110,6 @@ namespace vconnect
         if( !stream ) return false;
 
         string temp, search, left, right;
-        //Map<string, vsqBase *>::iterator i;
 
         while( stream->ready() ){
             temp = stream->readLine();
@@ -167,6 +161,9 @@ namespace vconnect
             }else if( search.compare( OBJ_NAME_TEMPO ) == 0 ){
                 // [Tempo]
                 this->vsqTempoBp.push( 0L, atof( left.c_str() ) );
+            }else if( search.compare( OBJ_NAME_TEMPO_LIST ) == 0 ){
+                // [TempoList]
+                this->vsqTempoBp.push( atol( left.c_str() ), atof( right.c_str() ) );
             }else if( search.find( "[ID#" ) == 0 ){
                 // ID
                 Map<string, Event *>::iterator i;

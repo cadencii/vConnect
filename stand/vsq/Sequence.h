@@ -181,6 +181,11 @@ namespace vconnect
          */
         static const string OBJ_NAME_TEMPO;
 
+        /**
+         * [TempoList] セクションの名前
+         */
+        static const string OBJ_NAME_TEMPO_LIST;
+
     private:
 
 #if defined( _DEBUG )
