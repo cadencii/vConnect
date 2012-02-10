@@ -50,6 +50,7 @@ private:
     int currentIndex;
     QVector<TranscriberElement *> elements;
 
+    QMutex mutex;
     QMutex waitMutex;
     QWaitCondition condition;
 };

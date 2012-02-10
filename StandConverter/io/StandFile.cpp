@@ -45,7 +45,7 @@ void StandFile::_destroy()
     _fftl = 2048;
     _fs = 44100;
 
-    delete vorbis.data;
+    delete[] vorbis.data;
     vorbis.data = NULL;
     vorbis.size = 0;
 }

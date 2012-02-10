@@ -19,7 +19,9 @@ int main(int argc, char *argv[])
 
     // 実行
 //    ConverterWindow w;
+//  w.setWindowTitle("Compressor");
     TranscriberWindow w;
+    w.setWindowTitle("Transcriber");
     w.show();
 
     return a.exec();

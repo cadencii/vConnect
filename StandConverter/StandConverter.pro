@@ -31,7 +31,6 @@ SOURCES += \
     math/MatlabFunctions.cpp \
     math/MinimumPhaseSpectrum.cpp \
     math/MFCCSet.cpp \
-    gui/WorldWidget.cpp \
     io/VorbisFile.cpp \
     io/StandFile.cpp \
     math/WorldSynthesis.cpp \
@@ -45,7 +44,8 @@ SOURCES += \
     synthesis/ConverterElement.cpp \
     gui/TranscriberWidget.cpp \
     synthesis/TranscriberElement.cpp \
-    io/StandLibrary.cpp
+    io/StandLibrary.cpp \
+    gui/SpecgramViewer.cpp
 
 HEADERS  += gui/ConverterWindow.h \
     io/UtauLibrary.h \
@@ -61,7 +61,6 @@ HEADERS  += gui/ConverterWindow.h \
     math/MatlabFunctions.h \
     math/MinimumPhaseSpectrum.h \
     math/MFCCSet.h \
-    gui/WorldWidget.h \
     io/VorbisFile.h \
     io/StandFile.h \
     math/WorldSynthesis.h \
@@ -75,7 +74,8 @@ HEADERS  += gui/ConverterWindow.h \
     synthesis/ConverterElement.h \
     gui/TranscriberWidget.h \
     synthesis/TranscriberElement.h \
-    io/StandLibrary.h
+    io/StandLibrary.h \
+    gui/SpecgramViewer.h
 
 FORMS    += \
     gui/ConverterWindow.ui \

@@ -52,6 +52,7 @@ void TranscriberElement::run()
 
 void TranscriberElement::_analyze()
 {
+    qDebug("Transcriber::_analyze(%d);", index);
     stand::io::StandFile *prev, *current = NULL;
     prev = new stand::io::StandFile();
     QString filename = items.at(0).body->directory().absolutePath() + QDir::separator() + items.at(0).body->at(index)->filename;
@@ -64,15 +65,22 @@ void TranscriberElement::_analyze()
     for(int i = 1; i < items.size(); i++)
     {
         const stand::io::UtauPhoneme *phoneme = items.at(i).body->find(items.at(0).body->at(index)->pronounce);
-        if(phoneme)
+        if(!phoneme)
+        {
+            current = NULL;
+        }
+        else
         {
             filename = items.at(i).body->directory().absolutePath() + QDir::separator() + phoneme->filename;
             current = new stand::io::StandFile();
             // 現在のファイルを読み込む→現在のファイルがよめていて，前回もファイルが読めていた場合だけ分析を行う．
-            if(filename.contains(".vvd") && current->read(QDir::toNativeSeparators(filename).toLocal8Bit().data()) && prev)
+            if(filename.contains(".vvd") && current->read(QDir::toNativeSeparators(filename).toLocal8Bit().data()))
             {
                 // 写像関数の計算と保存
-                stand::io::StandFile::matching(prev, current);
+                if(prev)
+                {
+                    stand::io::StandFile::matching(prev, current);
+                }
                 current->write(QDir::toNativeSeparators(filename).toLocal8Bit().data());
             }
             else
@@ -84,5 +92,7 @@ void TranscriberElement::_analyze()
         delete prev;
         prev = current;
     }
-    delete current;
+    delete prev;
+    qDebug(" Done : matching \"%s\"", items.at(0).body->at(index)->pronounce.toUtf8().data());
+    qDebug("      : finished calculation between %d elements at %d", items.size(), index);
 }

@@ -22,16 +22,16 @@ Transcriber::Transcriber(const TranscriberSetting *s, QObject *parent) :
 
 Transcriber::~Transcriber()
 {
-    for(int i = 0; i < setting->libraries.size();i ++)
-    {
-        delete setting->libraries.at(i).body;
-    }
     for(int i = 0; i < elements.size(); i++)
     {
         elements.at(i)->finishTranscription();
         elements.at(i)->wait();
         elements.at(i)->disconnect();
         delete elements.at(i);
+    }
+    for(int i = 0; i < setting->libraries.size();i ++)
+    {
+        delete setting->libraries.at(i).body;
     }
     delete setting;
 }
@@ -46,7 +46,6 @@ void Transcriber::run()
         return;
     }
 
-    QMutex mutex;
     mutex.lock();
     elements.clear();
     for(int i = 0; i < setting->numThreads && i < setting->libraries.at(0).body->size(); i++)
