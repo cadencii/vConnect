@@ -131,6 +131,7 @@ bool vConnectPhoneme::readPhoneme(const char *path)
     if(fread(&baseTimeLength, sizeof(int), 1, fp) == 1 && baseTimeLength > 0)
     {
         baseTimeAxis = new float[baseTimeLength];
+		fread(baseTimeAxis, sizeof(float), baseTimeLength, fp);
     }
     else
     {

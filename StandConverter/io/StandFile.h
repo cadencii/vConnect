@@ -89,6 +89,10 @@ public:
     {
         return _baseTimeAxis;
     }
+    float *timeAxis()
+    {
+        return _t;
+    }
 
     float framePeriod() const
     {

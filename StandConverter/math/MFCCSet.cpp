@@ -51,6 +51,10 @@ double *MFCCSet::extract(double *melCepstrum, unsigned int l, int fs)
 
     _ffft->execute();
     stretchFromMelScale(result, (double *)_ffft->out(), length() / 2 + 1, fs / 2);
+    for(int i = 0; i <= length() / 2; i++)
+    {
+        result[i] = exp(result[i]);
+    }
     return result;
 }
 
@@ -72,6 +76,10 @@ double *MFCCSet::extract(float *melCepstrum, unsigned int l, int fs)
 
     _ffft->execute();
     stretchFromMelScale(result, (double *)_ffft->out(), length() / 2 + 1, fs / 2);
+    for(int i = 0; i <= length() / 2; i++)
+    {
+        result[i] = exp(result[i]);
+    }
     return result;
 }
 

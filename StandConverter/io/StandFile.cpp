@@ -101,6 +101,7 @@ bool StandFile::read(const char *path)
     if(fread(&_baseTimeLength, sizeof(qint32), 1, fp) == 1 && _baseTimeLength > 0)
     {
         _baseTimeAxis = new float[_baseTimeLength];
+        fread(_baseTimeAxis, sizeof(float), _baseTimeLength, fp);
     }
     else
     {
@@ -278,11 +279,15 @@ void StandFile::matching(StandFile *src, StandFile *dst)
     _calculateVolumeEnvelope(src_env, src, src_len);
     _calculateVolumeEnvelope(dst_env, dst, dst_len);
 
-    for( int i = 0; i < src_len - 1; i++ ){
+    for( int i = 0; i < src_len - 1; i++ )
+    {
         double tmp = (double)i / (double)src_len * (double)dst_len;
-        if( tmp >= dst_len - 1 ){
+        if( tmp >= dst_len - 1 )
+        {
             dst_to_src_stretched[i] = dst_env[dst_len-1];
-        }else{
+        }
+        else
+        {
             dst_to_src_stretched[i] = stand::math::interpolateArray(tmp, dst_env);
         }
     }
@@ -290,26 +295,24 @@ void StandFile::matching(StandFile *src, StandFile *dst)
 
     stand::math::smoothMatching(dst_to_src_stretched, src_to_dst, src_env, dst_to_src_stretched, src_len);
 
-    double framePeriod = src->framePeriod();
     for( int i = 0; i < dst_len - 1; i++ )
     {
         double tmp = (double)i / (double)dst_len * (double)src_len;
         if( tmp >= src_len - 1 )
         {
-            dst_to_src[i] = dst_to_src_stretched[src_len-1] * dst->framePeriod() / 1000.0 / (double)src_len * (double)dst_len;
+            dst_to_src[i] = (dst_len - 1) * dst->framePeriod() / 1000.0;
         }
         else
         {
             dst_to_src[i] = stand::math::interpolateArray(tmp, dst_to_src_stretched) * dst->framePeriod() / 1000.0 / (double)src_len * (double)dst_len;
         }
     }
-    dst_to_src[dst_len-1] = dst_to_src_stretched[src_len-1] * dst->framePeriod() / 1000.0 / (double)src_len * (double)dst_len;
+    dst_to_src[dst_len-1] = (dst_len - 1) * dst->framePeriod() / 1000.0;
 
     for( int i = 0; i < src_len; i++ )
     {
-        dst_to_src_stretched[i] = src_to_dst[i] * framePeriod / 1000.0;
+        src_to_dst[i] *= src->framePeriod() / 1000.0;
     }
-    memcpy( src_to_dst, dst_to_src_stretched, sizeof( double ) * src_len );
 
     dst->setTimeAxis(dst_to_src, dst_len);
     dst->setBaseTimeAxis(src_to_dst, src_len);
@@ -391,6 +394,7 @@ void StandFile::setTimeAxis(double *t, int length)
 {
     if(length != _tLen)
     {
+        qDebug("StandFile::setTimeAxis(%d); // length is not equalt to innner data(%d)", length, _tLen);
         return;
     }
     for(int i = 0; i < length; i++)

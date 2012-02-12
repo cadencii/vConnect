@@ -131,9 +131,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisfile.lib shlwapi.lib"
+				AdditionalDependencies="libogg.lib libvorbis.lib libvorbisfile.lib shlwapi.lib iconv.lib"
 				OutputFile="$(OutDir)\$(ProjectName)-STAND.exe"
 				LinkIncremental="1"
+				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				GenerateDebugInformation="false"
 				TargetMachine="1"
 			/>

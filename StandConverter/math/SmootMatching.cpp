@@ -25,6 +25,16 @@ const double GRAD = 2.0;
 /* 変形関数の傾きに対する重み */
 const double G_WEIGHT = 1.5;
 
+void stand::math::applyStretching( double *T, double *target, int length )
+{
+    int i;
+    double *tmp = (double *)malloc(sizeof(double) * length);
+    for( i = 0; i < length; i++ )
+        tmp[i] = interpolateArray( T[i], target );
+    memcpy( target, tmp, sizeof(double) * length );
+    free(tmp);
+}
+
 void get_graduation( double* src, double* dst, int length,
                                      double *d1s, double *d2s, double *d1d, double *d2d)
 {
