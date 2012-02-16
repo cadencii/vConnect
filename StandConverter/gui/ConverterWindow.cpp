@@ -84,6 +84,8 @@ void ConverterWindow::setEditorEnabled(bool e)
     // Analysis Settings
     ui->ThreadNumber->setEnabled(e);
     ui->AnalysisFramePeriod->setEnabled(false);
+    ui->F0Ceil->setEnabled(e);
+    ui->F0Floor->setEnabled(e);
 
     // ProgressBar Setting
     ui->AnalysisProgress->setEnabled(!e);
@@ -193,6 +195,9 @@ bool ConverterWindow::_setConverterSetting(stand::synthesis::ConverterSetting &s
     setting.phonemeLength = ui->PhonemeLength->value();
     setting.numThreads = ui->ThreadNumber->value();
 
+    setting.f0Ceil = ui->F0Ceil->value();
+    setting.f0Floor = ui->F0Floor->value();
+
     setting.framePeriod = ui->AnalysisFramePeriod->value();
     setting.outCodec = QTextCodec::codecForName(ui->DestEncodingType->currentText().toLocal8Bit().data());
 
@@ -251,4 +256,14 @@ void ConverterWindow::converterFinished(bool f)
     currentConverter = NULL;
     isAnalyzing = false;
     setEditorEnabled(true);
+}
+
+void ConverterWindow::ceilChanged(double val)
+{
+    ui->F0Floor->setMaximum(val);
+}
+
+void ConverterWindow::floorChanged(double val)
+{
+    ui->F0Ceil->setMinimum(val);
 }

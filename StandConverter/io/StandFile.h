@@ -37,6 +37,8 @@ public:
     /// <param name="minBitrate">Vorbis 圧縮の最小ビットレートの設定．</param>
     /// <param name="maxBitrate">Vorbis 圧縮の最大ビットレートの設定．</param>
     /// <param name="averageBitrate">Vorbis 圧縮の平均ビットレートの設定．</param>
+    /// <param name="f0Ceil">DIO による F0 推定値のうち許容する最大値．</param>
+    /// <param name="f0Floor">DIO による F0 推定値のうち許容する最小値．</param>
     /// <returns>計算に成功したときは true, 失敗したときは false を返します．</returns>
     bool compute(double *x,
                  int xLen,
@@ -45,7 +47,9 @@ public:
                  int cepstrumLength,
                  int minBitrate,
                  int maxBitrate,
-                 int averageBitrate);
+                 int averageBitrate,
+                 double f0Ceil,
+                 double f0Floor);
 
     static void matching(StandFile *src, StandFile *dst);
 

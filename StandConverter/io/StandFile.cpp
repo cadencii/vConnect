@@ -153,7 +153,7 @@ bool StandFile::write(const char *path)
     return true;
 }
 
-bool StandFile::compute(double *x, int xLen, int fs, double framePeriod, int cepstrumLength, int minBitrate, int maxBitrate, int averageBitrate)
+bool StandFile::compute(double *x, int xLen, int fs, double framePeriod, int cepstrumLength, int minBitrate, int maxBitrate, int averageBitrate, double f0Ceil, double f0Floor)
 {
     if(!x || xLen < 0)
     {
@@ -169,12 +169,13 @@ bool StandFile::compute(double *x, int xLen, int fs, double framePeriod, int cep
     this->_fftl = FFTLengthForStar(fs);
     this->_fs = fs;
 
-    World::WorldSetting s = {
+    stand::math::SpecgramSet::SpecgramSetting s =
+    {
         fs,
         framePeriod
     };
 
-    World w(_tLen , _fftl, &s);
+    WorldSet w(_tLen , _fftl, &s);
     MFCCSet mfcc(_fftl);
     _create(_tLen, _cLen);
 
@@ -182,7 +183,7 @@ bool StandFile::compute(double *x, int xLen, int fs, double framePeriod, int cep
     /* まず WORLD による分析を行う．                           */
     /* ただしスペクトルの代わりにメルケプを使用する．                   */
     /****************************************************/
-    dio(x, xLen, fs, framePeriod, w.t(), w.f0());
+    dio(x, xLen, fs, framePeriod, w.t(), w.f0(), f0Ceil, f0Floor);
     star(x, xLen, fs, w.t(), w.f0(), w.specgram());
 
     for(int i = 0; i < _tLen; i++)
@@ -226,7 +227,7 @@ bool StandFile::compute(double *x, int xLen, int fs, double framePeriod, int cep
         fftw_complex *in = (fftw_complex *)fft.in();
         double *out = (double *)fft.out();
 
-        World::extractResidual(in, w.residualAt(i), _fftl);
+        extractResidual(in, w.residualAt(i), _fftl);
 
         fft.execute();
 

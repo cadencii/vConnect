@@ -1,3 +1,18 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file Star.cpp
+ *  @brief Specgram estimation method STAR
+ *         Original source codes are below.
+ *         http://www.aspl.is.ritsumei.ac.jp/morise/world/
+ *         This code is redistributed to support thread safety with Qt Library.
+ *  @author HAL@shurabaP
+ */
 #include "Star.h"
 #include "World.h"
 #include "Dio.h"
@@ -15,10 +30,24 @@
 #define max(a,b) (((a)<(b))?(b):(a))
 #endif
 
+namespace stand
+{
+namespace math
+{
+namespace world
+{
+namespace starsup
+{
+void starGeneralBody(const double *x, int xLen, int fs, double f0, double t, int fftl, double * sliceSTAR, FFTSet &forward);
+}
+}
+}
+}
+
 using namespace stand::math;
 using namespace stand::math::world;
+using namespace stand::math::world::starsup;
 
-static void starGeneralBody(const double *x, int xLen, int fs, double f0, double t, int fftl, double * sliceSTAR, FFTSet &forward);
 
 int stand::math::world::FFTLengthForStar(int fs)
 {
@@ -46,7 +75,7 @@ void stand::math::world::star(const double *x, int xLen, int fs, double *timeAxi
 }
 
 
-void starGeneralBody(const double *x, int xLen, int fs, double f0, double t, int fftl, double * sliceSTAR, FFTSet &forward)
+void stand::math::world::starsup::starGeneralBody(const double *x, int xLen, int fs, double f0, double t, int fftl, double * sliceSTAR, FFTSet &forward)
 {
     int i,j;
 

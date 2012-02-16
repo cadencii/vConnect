@@ -1,3 +1,18 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file Platinum.cpp
+ *  @brief Excitation signal estimation method PLATINUM
+ *         Original source codes are below.
+ *         http://www.aspl.is.ritsumei.ac.jp/morise/world/
+ *         This code is redistributed to support thread safety with Qt Library.
+ *  @author HAL@shurabaP
+ */
 #include "Platinum.h"
 #include "World.h"
 #include "Dio.h"
@@ -18,6 +33,15 @@ using namespace stand::math::world;
 #ifndef max
 #define max(a,b) (((a)<(b))?(b):(a))
 #endif
+
+namespace stand
+{
+namespace math
+{
+namespace world
+{
+namespace platinumsup
+{
 
 static void getOneFrameResidualSpec(const double *x, int xLen, int fs, int positionIndex, double framePeriod, double f0, double *specgram, int fftl, double *pulseLocations, int pCount,
                             double *residualSpec, FFTSet *forwardR2C, FFTSet *forward, FFTSet *inverse)
@@ -149,6 +173,14 @@ static void getWedgeList(const double *x, int xLen, int vuvNum, int *stList, int
     }
     free(tmpWav);
 }
+
+}
+}
+}
+}
+
+using namespace stand::math::world::platinumsup;
+
 
 // PLATINUM Version 0.0.4. 恐らくこの仕様で確定です．
 // Aperiodicity estimation by PLATINUM

@@ -1,3 +1,18 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file WorldSynthesis.cpp
+ *  @brief Synthesis for WORLD data.
+ *         Original source codes are below.
+ *         http://www.aspl.is.ritsumei.ac.jp/morise/world/
+ *         This code is redistributed to support thread safety with Qt Library.
+ *  @author HAL@shurabaP
+ */
 #include "WorldSynthesis.h"
 
 #include "FFTSet.h"
@@ -10,7 +25,7 @@ using namespace stand::math;
 #include <stdlib.h>
 
 // 特定時刻の応答を取得する．
-static void oneFrameSegment(double *f0, double **specgram, double **residualSpecgram, int fftl, double framePeriod, double currentTime, int fs, double defaultF0,
+void stand::math::world::oneFrameSegment(double *f0, double **specgram, double **residualSpecgram, int fftl, double framePeriod, double currentTime, int fs, double defaultF0,
                         FFTSet *forward, FFTSet *inverse, FFTSet *toWave)
 {
     double tmp;

@@ -73,6 +73,9 @@ private:
         int size;
     };
 
+    const static int bufSize;
+    const static char ENCODER_TAG[];
+
     static size_t _read(void *dst, size_t size, size_t maxCount, void *vp);
     static int _seek(void *vp, ogg_int64_t offset, int flag);
     static int _close(void *vp);

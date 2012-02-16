@@ -4,9 +4,17 @@
 
 #include <math.h>
 
+namespace stand
+{
+namespace utility
+{
+
 // 波形の正規化に使う定数群
 const static unsigned int NUM_NORMALIZE = 2048;
 const static double VOL_NORMALIZE = 0.06;
+
+}
+}
 
 bool stand::utility::makeDirectory(QWidget *w, const QDir &dir, bool confirm)
 {

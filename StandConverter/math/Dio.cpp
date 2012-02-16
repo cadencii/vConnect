@@ -1,3 +1,18 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file Dio.cpp
+ *  @brief F0 estimation method DIO
+ *         Original source codes are below.
+ *         http://www.aspl.is.ritsumei.ac.jp/morise/world/
+ *         This code is redistributed to support thread safety with Qt Library.
+ *  @author HAL@shurabaP
+ */
 #include "Dio.h"
 #include "FFTSet.h"
 #include "World.h"
@@ -14,30 +29,40 @@
 #define max(a,b) (((a)<(b))?(b):(a))
 #endif
 
-using namespace stand::math;
-using namespace stand::math::world;
-
 // These functions are only used for DIO.
 // You should not modify them.
+namespace stand
+{
+namespace math
+{
+namespace world
+{
+namespace diosup
+{
 static void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLength, int fftl, double shiftTime, double f0Floor, double f0Ceil, double *timeAxis, int tLen,
                    double *f0Deviations, double *interpolatedF0);
 static void zeroCrossingEngine(double *x, int xLen, double fs,
                         double *eLocations, double *iLocations, double *intervals, int *iLen);
 static long decimateForF0(double *x, int xLen, double *y, int r);
 static void filterForDecimate(double *x, int xLen, double *y, int r);
-static void nuttallWindow(int yLen, double *y);
 static void postprocessing(double framePeriod, double f0Floor, int candidates, int xLen, int fs,
                     double **f0Map, double *bestF0, double *f0);
+static int checkEvent(int x);
+}
+}
+}
+}
 
-void stand::math::world::dio(const double *x, int xLen, int fs, double framePeriod, double *timeAxis, double *f0)
+using namespace stand::math;
+using namespace stand::math::world;
+using namespace stand::math::world::diosup;
+
+void stand::math::world::dio(const double *x, int xLen, int fs, double framePeriod, double *timeAxis, double *f0,
+                             double f0Ceil, double f0Floor, double channelsInOctave, double targetFs)
 {
     int i,j;
 
-    // 初期条件 (改良したい人はここから頑張って)
-    double f0Floor = DIO_FLOOR_F0;
-    double f0Ceil = DIO_CEIL_F0;
-    double channelsInOctave = DIO_CHANNNELS;
-    double targetFs = DIO_TARGET_FS;
+    // 初期条件はデフォルト引数へ引き取られました
 
     // 基礎パラメタの計算
     int decimationRatio = (int)(fs/targetFs);
@@ -149,14 +174,14 @@ int stand::math::world::samplesForDio(int fs, int xLen, double framePeriod)
 
 // イベント数があったか判定
 // longの範囲を超えてしまったので苦肉の策
-int checkEvent(int x)
+int stand::math::world::diosup::checkEvent(int x)
 {
     if(x > 0) return 1;
     return 0;
 }
 
 // 後処理（4ステップ）
-void postprocessing(double framePeriod, double f0Floor, int candidates, int xLen, int fs, double **f0Map, double *bestF0,
+void stand::math::world::diosup::postprocessing(double framePeriod, double f0Floor, int candidates, int xLen, int fs, double **f0Map, double *bestF0,
                     double *f0)
 {
     int i, j, k;
@@ -314,7 +339,7 @@ void postprocessing(double framePeriod, double f0Floor, int candidates, int xLen
 }
 
 // イベントを計算する内部関数 (内部変数なので引数・戻り値に手加減なし)
-void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLength, int fftl, double framePeriod, double f0Floor, double f0Ceil, double *timeAxis, int tLen,
+void stand::math::world::diosup::rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLength, int fftl, double framePeriod, double f0Floor, double f0Ceil, double *timeAxis, int tLen,
                    double *f0Deviations, double *interpolatedF0)
 {
     int i;
@@ -439,7 +464,7 @@ void rawEventByDio(double boundaryF0, double fs, fftw_complex *xSpec, int xLengt
 }
 
 // ゼロ交差を計算
-void zeroCrossingEngine(double *x, int xLen, double fs,
+void stand::math::world::diosup::zeroCrossingEngine(double *x, int xLen, double fs,
                         double *eLocations, double *iLocations, double *intervals, int *iLen)
 {
     int i;
@@ -490,7 +515,7 @@ void zeroCrossingEngine(double *x, int xLen, double fs,
 }
 
 // ナットール窓．マジックナンバーのように見えるけどこれが正解．
-void nuttallWindow(int yLen, double *y)
+void stand::math::nuttallWindow(int yLen, double *y)
 {
     int i;
     double tmp;

@@ -1,3 +1,15 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file SmoothMatching.cpp
+ *  @brief Functions that calculates matching between two arrays.
+ *  @author HAL@shurabaP
+ */
 #include "SmootMatching.h"
 
 #include "MathSet.h"
@@ -7,8 +19,12 @@
 #include <math.h>
 #include <float.h>
 
-using namespace stand::math;
-
+namespace stand
+{
+namespace math
+{
+namespace matching
+{
 //! @brief 一回微分と二階微分を計算します．
 static void get_graduation(double* src, double* dst, int length,
                             double *d1s, double *d2s, double *d1d, double *d2d);
@@ -19,11 +35,17 @@ static void log_normalize_infinite( double* dst, int length );
 //! @brief 写像関数を DP で求める際の枝の重みを計算します．
 static double get_cost( double* src, double* dst, int i, int j, int n, int m,
                          double *d1d, double *d2d, double *d1s, double *d2s);
-
 /* 許容する傾きの最大値 */
 const double GRAD = 2.0;
 /* 変形関数の傾きに対する重み */
 const double G_WEIGHT = 1.5;
+}
+}
+}
+
+using namespace stand::math;
+using namespace stand::math::matching;
+
 
 void stand::math::applyStretching( double *T, double *target, int length )
 {
@@ -35,7 +57,7 @@ void stand::math::applyStretching( double *T, double *target, int length )
     free(tmp);
 }
 
-void get_graduation( double* src, double* dst, int length,
+void stand::math::matching::get_graduation( double* src, double* dst, int length,
                                      double *d1s, double *d2s, double *d1d, double *d2d)
 {
     /* 導関数の数値を計算 */
@@ -69,7 +91,7 @@ void get_graduation( double* src, double* dst, int length,
     free(temp_spectrum);
 }
 
-void log_normalize_infinite( double* dst, int length )
+void stand::math::matching::log_normalize_infinite( double* dst, int length )
 {
     /* 正規化の結果は０～１の範囲になる． */
     int i;
@@ -84,7 +106,7 @@ void log_normalize_infinite( double* dst, int length )
         dst[i] = log( dst[i] / min_v ) / log( max_v );
 }
 
-double get_cost( double* src, double* dst, int i, int j, int n, int m,
+double stand::math::matching::get_cost( double* src, double* dst, int i, int j, int n, int m,
                        double *d1d, double *d2d, double *d1s, double *d2s)
 {
     int k;

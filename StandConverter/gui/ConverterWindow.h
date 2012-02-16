@@ -65,6 +65,9 @@ public slots:
     /// <summary> 変換が終了した際に呼ばれるスロット． </summary>
     void converterFinished(bool f);
 
+    void ceilChanged(double val);
+    void floorChanged(double val);
+
 private:
     bool _setConverterSetting(stand::synthesis::ConverterSetting &setting);
     void _errorMessage(const QString &text);

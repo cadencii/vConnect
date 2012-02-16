@@ -1,3 +1,17 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file FFTSet.cpp
+ *  @brief FFTSet class supports fft calculation
+ *         and keep data for FFT.
+ *         This code supports thread safety with Qt Library.
+ *  @author HAL@shurabaP
+ */
 #include "FFTSet.h"
 
 using namespace stand::math;

@@ -132,7 +132,7 @@ void ConverterElement::_analyze()
     }
 
     // 変数準備
-    stand::math::world::World::WorldSetting s;
+    stand::math::SpecgramSet::SpecgramSetting s;
     s.framePeriod = setting.framePeriod;
     s.fs = wave.header()->samplesPerSecond;
 
@@ -150,7 +150,9 @@ void ConverterElement::_analyze()
 
     // 波形から 1 ファイルを計算．
     stand::io::StandFile stf;
-    stf.compute(x, xLen, s.fs, s.framePeriod, setting.cepstrumLength, -1, -1, setting.vorbisBitrate * 1024);
+    stf.compute(x, xLen, s.fs, s.framePeriod,
+                setting.cepstrumLength, -1, -1, setting.vorbisBitrate * 1024,
+                setting.f0Ceil, setting.f0Floor);
 
     delete[] x;
 

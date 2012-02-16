@@ -1,3 +1,17 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file FFTSet.h
+ *  @brief FFTSet class supports fft calculation
+ *         and keep data for FFT.
+ *         This code supports thread safety with Qt Library.
+ *  @author HAL@shurabaP
+ */
 #ifndef FFTSET_H
 #define FFTSET_H
 
@@ -8,9 +22,13 @@ namespace stand
 {
 namespace math
 {
+/*!
+ *  @brief FFTSet class supports FFT by FFTW.
+ */
 class FFTSet
 {
 public:
+    //! @brief FFTType
     enum FFTtype
     {
         FFTW_UNKNOWN = -1,

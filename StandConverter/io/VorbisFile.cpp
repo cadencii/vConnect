@@ -10,8 +10,8 @@
 using namespace stand::io;
 
 // OggVorbis のエンコードに必要な定数群
-const static char ENCODER_TAG[] = "Stand Library";
-const static int bufSize = 4096;
+const char VorbisFile::ENCODER_TAG[] = "Stand Library";
+const int VorbisFile::bufSize = 4096;
 
 // VorbisFile の操作に必要な構造体
 struct stand::io::VorbisBuffer

@@ -35,6 +35,9 @@ public:
     float preUtterance;
     float phonemeLength;
 
+    double f0Ceil;
+    double f0Floor;
+
     double framePeriod;
 
     unsigned int numThreads;

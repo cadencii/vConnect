@@ -1,6 +1,7 @@
 #include <QtGui/QApplication>
 #include "gui/ConverterWindow.h"
 #include "gui/TranscriberWindow.h"
+#include "gui/WorldWindow.h"
 
 #include <QTextCodec>
 
@@ -18,10 +19,11 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForTr(codec);
 
     // 実行
-//    ConverterWindow w;
-//    w.setWindowTitle("Compressor");
-    TranscriberWindow w;
-    w.setWindowTitle("Transcriber");
+    //WorldWindow w;
+    ConverterWindow w;
+    w.setWindowTitle("Compressor");
+//    TranscriberWindow w;
+//    w.setWindowTitle("Transcriber");
     w.show();
 
     return a.exec();

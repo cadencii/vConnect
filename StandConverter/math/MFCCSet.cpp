@@ -1,3 +1,17 @@
+/*!
+ * Stand Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU GPL License
+ *
+ * Stand Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *  @file MFCCSet.cpp
+ *  @brief MFCCSet class supports calculation of MFCC,
+ *         and keeps data for MFCC.
+ *         This class is thread safe with Qt Library.
+ *  @author HAL@shurabaP
+ */
 #include "MFCCSet.h"
 
 #include "MathSet.h"

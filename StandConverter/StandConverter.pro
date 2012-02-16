@@ -45,7 +45,10 @@ SOURCES += \
     gui/TranscriberWidget.cpp \
     synthesis/TranscriberElement.cpp \
     io/StandLibrary.cpp \
-    gui/SpecgramViewer.cpp
+    gui/WorldWindow.cpp \
+    math/SpecgramSet.cpp \
+    math/WorldSet.cpp \
+    io/SpecgramImage.cpp
 
 HEADERS  += gui/ConverterWindow.h \
     io/UtauLibrary.h \
@@ -75,9 +78,13 @@ HEADERS  += gui/ConverterWindow.h \
     gui/TranscriberWidget.h \
     synthesis/TranscriberElement.h \
     io/StandLibrary.h \
-    gui/SpecgramViewer.h
+    gui/WorldWindow.h \
+    math/SpecgramSet.h \
+    math/WorldSet.h \
+    io/SpecgramImage.h
 
 FORMS    += \
     gui/ConverterWindow.ui \
     gui/TranscriberWindow.ui \
-    gui/TranscriberWidget.ui
+    gui/TranscriberWidget.ui \
+    gui/WorldWindow.ui
