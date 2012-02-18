@@ -30,16 +30,20 @@ HorizontalPianoView::HorizontalPianoView(QWidget *parent) :
     setMinimumSize(_MINIMUM_WIDTH, _MINIMUM_HEIGHT);
 }
 
+HorizontalPianoView::~HorizontalPianoView()
+{
+}
+
 void HorizontalPianoView::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
     int begin = (double)(e->rect().x() - 1) / width() * 128;
     int end = (double)(e->rect().x() + e->rect().width() + 1) / width() * 128;
+    p.fillRect(e->rect(), Qt::white);
     for(int i = begin; i < end; i++)
     {
         int x = i / 128.0 * width();
         int w = (i + 1) / 128.0 * width() - x;
-        p.fillRect(x, 0, w, height(), Qt::white);
         if(_IS_BLACK[i%12])
         {
             p.fillRect(x, 0, w, height() * 2 / 3, QColor(128, 128, 128));

@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForTr(codec);
 
     // 実行
-    //WorldWindow w;
-    ConverterWindow w;
+    WorldWindow w;
+//    ConverterWindow w;
     w.setWindowTitle("Compressor");
 //    TranscriberWindow w;
 //    w.setWindowTitle("Transcriber");

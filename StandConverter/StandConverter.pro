@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui\
+         += multimedia
 
 TARGET = StandConverter
 TEMPLATE = app
@@ -48,7 +49,13 @@ SOURCES += \
     gui/WorldWindow.cpp \
     math/SpecgramSet.cpp \
     math/WorldSet.cpp \
-    io/SpecgramImage.cpp
+    io/SpecgramImage.cpp \
+    gui/VerticalPianoView.cpp \
+    math/LPCSet.cpp \
+    io/audio/StreamDevice.cpp \
+    io/audio/AudioTrack.cpp \
+    io/audio/RawWaveTrack.cpp \
+    io/audio/AudioMixer.cpp
 
 HEADERS  += gui/ConverterWindow.h \
     io/UtauLibrary.h \
@@ -81,7 +88,14 @@ HEADERS  += gui/ConverterWindow.h \
     gui/WorldWindow.h \
     math/SpecgramSet.h \
     math/WorldSet.h \
-    io/SpecgramImage.h
+    io/SpecgramImage.h \
+    gui/VerticalPianoView.h \
+    math/LPCSet.h \
+    io/audio/StreamDevice.h \
+    stand.h \
+    io/audio/AudioTrack.h \
+    io/audio/RawWaveTrack.h \
+    io/audio/AudioMixer.h
 
 FORMS    += \
     gui/ConverterWindow.ui \

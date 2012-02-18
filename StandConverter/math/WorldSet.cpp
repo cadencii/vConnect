@@ -52,19 +52,18 @@ void WorldSet::compute(const double *x, int xLen, const SpecgramSet::SpecgramSet
     {
         return;
     }
-    int tLen = samplesForDio(s->fs, xLen, s->framePeriod);
-    int fftl = FFTLengthForStar(s->fs);
+
+    if(s)
+    {
+        _setting = *s;
+    }
+    int tLen = samplesForDio(_setting.fs, xLen, _setting.framePeriod);
+    int fftl = FFTLengthForStar(_setting.fs);
     _create(tLen, fftl);
 
-    if(!s)
-    {
-        s = &SPECGRAM_DEFAULT_SETTING;
-    }
-    _setting = *s;
-
-    dio(x, xLen, s->fs, s->framePeriod, _t, _f0);
-    star(x, xLen, s->fs, _t, _f0, _specgram);
-    platinum(x, xLen, s->fs, _t, _f0, _specgram, _residual);
+    dio(x, xLen, _setting.fs, _setting.framePeriod, _t, _f0);
+    star(x, xLen, _setting.fs, _t, _f0, _specgram);
+    platinum(x, xLen, _setting.fs, _t, _f0, _specgram, _residual);
 }
 
 double *WorldSet::spectrumAt(double t)

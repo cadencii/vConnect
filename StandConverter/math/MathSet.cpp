@@ -17,3 +17,15 @@ double stand::math::interpolateArray( double x, const double *p )
     double r = x - (double)t;
     return ( p[t] * ( 1.0 - r ) + p[t+1] * r );
 }
+
+void stand::math::autoCorrelation(double *a, int aLen, const double *y, int yLen)
+{
+    for(int i = 0; i < aLen; i++)
+    {
+        a[i] = 0;
+        for(int j = 0; j < yLen -i; j++)
+        {
+            a[i] += y[j] * y[j + i];
+        }
+    }
+}

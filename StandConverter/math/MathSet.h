@@ -29,6 +29,15 @@ namespace math
 /// <returns>配列の中間値を返します．</returns>
 double interpolateArray(double x, const double *p);
 
+/*!
+ *  @brief 自己相関関数を計算する．
+ *  @param[out] a 計算結果．
+ *  @param[in] aLen 自己相関関数の長さ
+ *  @param[in] y 信号
+ *  @param[in] yLen 信号長
+ */
+void autoCorrelation(double *a, int aLen, const double *y, int yLen);
+
 }
 }
 

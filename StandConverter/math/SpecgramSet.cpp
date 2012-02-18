@@ -92,7 +92,7 @@ void SpecgramSet::compute(const double *x, int xLen, const SpecgramSetting *s)
     {
         _setting = *s;
     }
-    int tLen = (double)xLen / (double)s->fs * 1000.0 / s->framePeriod + 1;
+    int tLen = (double)xLen / (double)_setting.fs * 1000.0 / _setting.framePeriod + 1;
     _destroySpecgram();
     _createSpecgram(tLen, 2048);
 
@@ -102,7 +102,7 @@ void SpecgramSet::compute(const double *x, int xLen, const SpecgramSetting *s)
 
     for(int i = 0; i < tLen; i++)
     {
-        int begin = i * s->framePeriod / 1000.0 * (double)s->fs - _fftl / 2;
+        int begin = i * _setting.framePeriod / 1000.0 * (double)_setting.fs - _fftl / 2;
         // 時刻 t の前後 1024 点ずつを取り出す
         for(int j = begin, k = 0; k < _fftl; j++, k++)
         {

@@ -13,10 +13,11 @@ class HorizontalPianoView : public QWidget
     Q_OBJECT
 public:
     explicit HorizontalPianoView(QWidget *parent = 0);
+    virtual ~HorizontalPianoView();
 
-    void paintEvent(QPaintEvent *e);
+    virtual void paintEvent(QPaintEvent *e);
 
-private:
+protected:
     static const int _MINIMUM_WIDTH;
     static const int _MINIMUM_HEIGHT;
     static const bool _IS_BLACK[12];

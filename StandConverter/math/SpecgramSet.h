@@ -15,6 +15,10 @@
 #ifndef SPECGRAMSET_H
 #define SPECGRAMSET_H
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 namespace stand
 {
 namespace math
@@ -35,7 +39,7 @@ public:
     explicit SpecgramSet(int tLen, int fftl, const SpecgramSetting *s = & SPECGRAM_DEFAULT_SETTING);
     virtual ~SpecgramSet();
 
-    virtual void compute(const double *x, int xLen, const SpecgramSetting *s = &SPECGRAM_DEFAULT_SETTING);
+    virtual void compute(const double *x, int xLen, const SpecgramSetting *s = NULL);
     double *spectrumAt(int i);
 
     double **specgram()

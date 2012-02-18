@@ -16,7 +16,13 @@
 #define FFTSET_H
 
 #include <QMutex>
+#include "../stand.h"
+
+#ifdef USE_FFTW
 #include <fftw3.h>
+#else
+typedef double fftw_complex[2];
+#endif
 
 namespace stand
 {
@@ -45,6 +51,7 @@ public:
 
     void setFFT(unsigned int length, FFTtype type);
 
+
     unsigned int length() const
     {
         return _length;
@@ -62,20 +69,33 @@ public:
 
     void execute()
     {
+#ifdef USE_FFTW
         fftw_execute(_plan);
+#else
+        _func((double *)_in, (double *)_out, _length);
+#endif
     }
 
 private:
     void _destroy();
-
-    static QMutex _mutex;
 
     FFTtype _type;
     void *_in;
     void *_out;
     unsigned int _length;
 
+#ifdef USE_FFTW
     fftw_plan _plan;
+    static QMutex _mutex;
+#else
+    int (*_func)(double *, double *, int);
+    static int sptk_fft(double *x, double *y, int m);
+    static int sptk_fftr(double *x, double *y, int m);
+    static int sptk_ifft(double *x, double *y, int m);
+    static int sptk_ifftr(double *x, double *y, int m);
+    double *_sineTable;
+    int _sineTableSize;
+#endif
 };
 
 }

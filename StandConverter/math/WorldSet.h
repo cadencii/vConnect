@@ -38,7 +38,7 @@ public:
 
     ~WorldSet();
 
-    void compute(const double *x, int xLen, const SpecgramSet::SpecgramSetting *s = &SPECGRAM_DEFAULT_SETTING);
+    void compute(const double *x, int xLen, const SpecgramSet::SpecgramSetting *s = NULL);
 
 
     double *spectrumAt(int i);
