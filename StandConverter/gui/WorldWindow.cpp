@@ -8,6 +8,9 @@
 #include "../io/audio/AudioMixer.h"
 #include "../io/audio/RawWaveTrack.h"
 
+#include "editor/SpecgramPianoroll.h"
+#include "../utility/F0Contour.h"
+
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -23,12 +26,13 @@ WorldWindow::WorldWindow(QWidget *parent) :
     _w = NULL;
     _wave = NULL;
 
-    ui->ViewerArea->setWidget(new QLabel(""));
+    SpecgramView::Setting s = {NULL, 0, 0, SpecgramView::Linear};
+    ui->ViewerArea->setWidget(new editor::SpecgramPianoroll(s, 1920, 14, this));
 
     _f.setByteOrder(QAudioFormat::LittleEndian);
     _f.setChannels(2);
     _f.setCodec("audio/pcm");
-    _f.setSampleRate(44100);
+    _f.setSampleRate(44100 /4);
     _f.setSampleSize(16);
     _f.setSampleType(QAudioFormat::SignedInt);
 
@@ -71,10 +75,12 @@ void WorldWindow::beginAnalyze()
         _s->compute(_wave->data(), _wave->length());
         _lpc->compute(_wave->data(), _wave->length());
         _w->compute(_wave->data(), _wave->length());
-        _imagePowerSpec.set(_s->specgram(), _s->tLen(), _s->fftl() / 2 + 1, _s->samplingFrequency() / 2);
-        _imageLPCSpec.set(_lpc->specgram(), _lpc->tLen(), _lpc->fftl() / 2 + 1, _lpc->samplingFrequency() / 2);
-        _imageStarSpec.set(_w->specgram(), _w->tLen(), _w->fftl() / 2 + 1, _w->samplingFrequency() / 2);
         changeSpectrumType(true);
+        editor::SpecgramPianoroll *w = dynamic_cast<editor::SpecgramPianoroll *>(ui->ViewerArea->widget());
+        if(w)
+        {
+            w->addF0Contour(new stand::utility::F0Contour(_w->f0(), _w->tLen(), _w->framePeriod()), true);
+        }
     }
 }
 
@@ -84,23 +90,24 @@ void WorldWindow::changeSpectrumType(bool b)
     {
         return;
     }
-    QImage image;
+    stand::math::SpecgramSet *s = NULL;
+    SpecgramView *w = dynamic_cast<SpecgramView *>(ui->ViewerArea->widget());
     if(ui->TypeFFT->isChecked())
     {
-        image = _imagePowerSpec.image();
+        s = _s;
     }
     else if(ui->TypeLPC->isChecked())
     {
-        image = _imageLPCSpec.image();
+        s = _lpc;
     }
     else if(ui->TypeStar->isChecked())
     {
-        image = _imageStarSpec.image();
+        s = _w;
     }
-    QLabel *l = dynamic_cast<QLabel *>(ui->ViewerArea->widget());
-    if(l)
+    if(w)
     {
-        l->setPixmap(QPixmap::fromImage(image));
+        w->setSpecgram(s, 100, 22050, SpecgramView::Log);
+        w->update();
     }
 }
 

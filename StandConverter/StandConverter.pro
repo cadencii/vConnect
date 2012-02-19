@@ -55,7 +55,11 @@ SOURCES += \
     io/audio/StreamDevice.cpp \
     io/audio/AudioTrack.cpp \
     io/audio/RawWaveTrack.cpp \
-    io/audio/AudioMixer.cpp
+    io/audio/AudioMixer.cpp \
+    gui/SpecgramView.cpp \
+    gui/editor/StandEditor.cpp \
+    gui/editor/SpecgramPianoroll.cpp \
+    utility/F0Contour.cpp
 
 HEADERS  += gui/ConverterWindow.h \
     io/UtauLibrary.h \
@@ -92,13 +96,18 @@ HEADERS  += gui/ConverterWindow.h \
     gui/VerticalPianoView.h \
     math/LPCSet.h \
     io/audio/StreamDevice.h \
-    stand.h \
     io/audio/AudioTrack.h \
     io/audio/RawWaveTrack.h \
-    io/audio/AudioMixer.h
+    io/audio/AudioMixer.h \
+    gui/SpecgramView.h \
+    configure.h \
+    gui/editor/StandEditor.h \
+    gui/editor/SpecgramPianoroll.h \
+    utility/F0Contour.h
 
 FORMS    += \
     gui/ConverterWindow.ui \
     gui/TranscriberWindow.ui \
     gui/TranscriberWidget.ui \
-    gui/WorldWindow.ui
+    gui/WorldWindow.ui \
+    gui/editor/StandEditor.ui

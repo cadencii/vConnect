@@ -19,7 +19,7 @@ void VerticalPianoView::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
     int begin = (double)(e->rect().y() - 1) / height() * 128;
-    int end = (double)(e->rect().y() + e->rect().height() + 1) / height() * 128;
+    int end = (double)(e->rect().y() + e->rect().height() + 1) / height() * 128 + 1;
     p.fillRect(e->rect(), Qt::white);
     for(int i = begin; i < end; i++)
     {

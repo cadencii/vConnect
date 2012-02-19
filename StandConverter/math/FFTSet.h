@@ -16,7 +16,7 @@
 #define FFTSET_H
 
 #include <QMutex>
-#include "../stand.h"
+#include "../configure.h"
 
 #ifdef USE_FFTW
 #include <fftw3.h>

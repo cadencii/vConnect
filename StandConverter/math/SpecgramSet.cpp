@@ -118,8 +118,8 @@ void SpecgramSet::compute(const double *x, int xLen, const SpecgramSetting *s)
         // 窓掛ける
         for(int j = 0; j < _fftl; j++)
         {
-            double theta = stand::math::PI * (double)j / (double)_fftl;
-            in[j] *= sin(theta);
+            double x = (double)j / _fftl;
+            in[j] *= 0.54 - 0.46 * cos(2 * stand::math::PI * x);
         }
         // FFT する
         forward.execute();

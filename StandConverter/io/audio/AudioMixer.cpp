@@ -76,6 +76,14 @@ void AudioMixer::stop()
 
 void AudioMixer::addTrack(AudioTrack *t, int volume, int pan)
 {
+    for(int i = 0; i < _tracks.size(); i++)
+    {
+        if(t == _tracks[i].t)
+        {
+            qWarning("AudioMixer::addTrack(); // Track duplication.");
+            return;
+        }
+    }
     t->setFormat(_format);
     Track track = {t, volume, pan};
     _tracks.push_back(track);
