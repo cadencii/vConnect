@@ -1,6 +1,6 @@
 /*
  *
- *    waveFileEx.cpp                                         
+ *    WaveBuffer.cpp                                         
  *                              (c) HAL 2010-           
  *
  *  This file is a part of STAND Library.
@@ -13,12 +13,16 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
-#include "waveFileEx.h"
+#include "WaveBuffer.h"
 
-const waveFileEx::waveFormatEx waveFileEx::defaultFormat =
+#include "RiffFile.h"
+#include "stdint.h"
+
+using namespace std;
+using namespace vconnect;
+
+const WaveBuffer::Format WaveBuffer::DefaultFormat =
 {
-    1,
-    0,
     1,
     1,
     44100,
@@ -27,11 +31,11 @@ const waveFileEx::waveFormatEx waveFileEx::defaultFormat =
     16,
 };
 
-void waveFileEx::outputError( string s ){
+void WaveBuffer::outputError( string s ){
     cout << s << endl;
 }
 
-waveFileEx::waveFileEx()
+WaveBuffer::WaveBuffer()
 {
     setDefaultFormat();
     waveLength = 0;
@@ -39,19 +43,13 @@ waveFileEx::waveFileEx()
     secOffset = 0.0;
 }
 
-void waveFileEx::setDefaultFormat( void )
+void WaveBuffer::setDefaultFormat( void )
 {
     /* WaveFileFormat will be 16 bits, 44,100Hz, mono Liniar PCM */
-    format.bitsPerSample = 16;
-    format.blockAlign = 2;
-    format.bytesPerSecond = 88200;
-    format.chunkID = 1;    /* Linear PCM */
-    format.formatTag = 1;
-    format.numChannels = 1;
-    format.samplePerSecond = 44100;
+    format = DefaultFormat;
 }
 
-int waveFileEx::getWaveBuffer( vector<double>& dstBuffer )
+int WaveBuffer::getWaveBuffer( vector<double>& dstBuffer )
 {
     int result = 0;
 
@@ -65,7 +63,7 @@ int waveFileEx::getWaveBuffer( vector<double>& dstBuffer )
     return result;
 }
 
-int waveFileEx::getWaveBuffer( double* dstBuffer, unsigned long* bufferLength )
+int WaveBuffer::getWaveBuffer( double* dstBuffer, unsigned long* bufferLength )
 {
     int result = 0;
 
@@ -78,7 +76,7 @@ int waveFileEx::getWaveBuffer( double* dstBuffer, unsigned long* bufferLength )
     return result;
 }
 
-int waveFileEx::setWaveBuffer( vector<double>& srcBuffer )
+int WaveBuffer::setWaveBuffer( vector<double>& srcBuffer )
 {
     int result = 0;
 
@@ -92,7 +90,7 @@ int waveFileEx::setWaveBuffer( vector<double>& srcBuffer )
     return result;
 }
 
-int waveFileEx::setWaveBuffer( double* srcBuffer, unsigned long bufferLength )
+int WaveBuffer::setWaveBuffer( double* srcBuffer, unsigned long bufferLength )
 {
     int result = 0;
     
@@ -104,131 +102,102 @@ int waveFileEx::setWaveBuffer( double* srcBuffer, unsigned long bufferLength )
     return result;
 }
 
-int waveFileEx::readWaveFile( string fileName ){
-    int result = 2;
-    FILE *fp;
-
-#ifdef __GNUC__
-    fp = fopen( fileName.c_str(), "rb" );
-#else
-    fopen_s( &fp, fileName.c_str(), "rb" );
-#endif
-
-    if( fp ){
-        if( readWaveHeader( fp ) ){
-            if( readWaveData( fp ) ){
-                result = 1;
-            }else{
-                result = -1;
-            }
-        }else{
-            result = 0;
-        }
-        fclose( fp );
+int WaveBuffer::readWaveFile( const string &fileName )
+{
+    RiffFile f;
+    if(!f.read(fileName.c_str()))
+    {
+        return 0;
     }
+    if(!f.is("WAVE"))
+    {
+        outputError(" WaveBuffer::readWaveFile(" + fileName + "); // This is not WAVE file");
+        return 0;
+    }
+    const RiffChunk *c;
+    if((c = f.chunk("fmt ")) == NULL)
+    {
+        outputError(" WaveBuffer::readWaveFile(" + fileName + "); // \"fmt \" chunk not found");
+        return 0;
+    }
+    _setHeader(c);
 
-    return result;
+
+    if((c = f.chunk("data")) == NULL)
+    {
+        outputError(" WaveBuffer::readWaveFile(" + fileName + "); // \"data\" chunk not found");
+        return 0;
+    }
+    _setData(c);
+
+
+    return 1;
 }
 
-bool    waveFileEx::readWaveHeader( FILE *fp )
+void WaveBuffer::_setHeader(const RiffChunk *fmt)
 {
-    bool result = false;
-    char buffer[5];
-    string temp;
-    unsigned int fileSize;
-    waveFormatEx formatChunk;
-
-    /* read 4 byte for RIFF chunk */
-    fread( (void*)buffer, sizeof(char), 4, fp );
-    buffer[4] = '\0';
-    temp = buffer;
-
-    if( temp.compare( "RIFF" ) == 0 ){
-        /* read format chunk */
-        fread( (void*)&fileSize, sizeof(int), 1, fp );
-        fread( (void*)buffer, sizeof(char), 4, fp ); 
-        buffer[4] = '\0';
-        temp = buffer;
-        if( temp.compare( "WAVE" ) == 0 ){
-            fread( (void*)buffer, sizeof(char), 4, fp ); 
-            buffer[4] = '\0';
-            temp = buffer;
-            if( temp.compare( "fmt " ) == 0 ){
-                int chunkSize;
-                fread( (void*)&chunkSize, 4, 1, fp );
-                fread( (void*)&(formatChunk.chunkID), 2, 1, fp );
-                fread( (void*)&(formatChunk.numChannels), 2, 1, fp );
-                fread( (void*)&(formatChunk.samplePerSecond), 4, 1, fp );
-                fread( (void*)&(formatChunk.bytesPerSecond), 4, 1, fp );
-                fread( (void*)&(formatChunk.blockAlign), 2, 1, fp );
-                fread( (void*)&(formatChunk.bitsPerSample), 2, 1, fp );
-                if( chunkSize > 16 ){
-                    for( int i = 0; i < 16 - chunkSize; i++ ){
-                        fgetc( fp );
-                    }
-                }
-
-                if( formatChunk.bitsPerSample == 16 && formatChunk.chunkID == 1 ){
-                    result = true;
-                    memcpy( &format, &formatChunk, sizeof(waveFormatEx) );
-                } else {
-                    outputError( "WaveFileEx: WaveFileEx can use only for 16bits PCM Audio" );
-                }
-            }
-        }
+    if(fmt->length() < 16)
+    {
+        format = DefaultFormat;
     }
-    return result;
+    else
+    {
+        memcpy(&format, fmt->data(), sizeof(Format));
+    }
 }
 
-bool    waveFileEx::readWaveData( FILE* fp )
+void WaveBuffer::_setData(const RiffChunk *data)
 {
-    bool result = false;
-    char buffer[5];
-    string temp;
-    int dataSize;
-    unsigned long maxNum = 0;
-
-    // その場しのぎ．
-    buffer[0] = 0;
-    while( fread( (void*)buffer, sizeof(char), 1, fp ) == 1 )  {
-        if( buffer[0] == 'd' ){
-            fread( (void*)(buffer+1),sizeof(char),3,fp );
-            break;
-        }
-    }
-
-//    fread( (void)*buffer, sizeof(char), 4, fp );
-    buffer[4] = '\0';
-    temp = buffer;
-
-    if( temp.compare( "data" ) == 0 ){
-        char *data;
-        fread( (void*)&dataSize, sizeof(int), 1, fp );
-        maxNum = dataSize / format.numChannels / ( format.bitsPerSample / 8 );
-        data = new char[dataSize];
-        fread(data, sizeof(char), dataSize, fp);
-
-        createBuffer(maxNum);
-
-        for(unsigned int index = 0, waveIndex = 0; waveIndex < maxNum; index += format.numChannels, waveIndex++)
+    int l = data->length() / format.numChannels / (format.bitsPerSample / 8);
+    createBuffer(l);
+    switch(format.bitsPerSample)
+    {
+    case 8:
         {
-            // short 固定．いずれ拡張したいけど．．．
-            int value = ((short*)data)[index];
-            // これ半分になってね？とりあえず今は放置．
-            waveBuffer[waveIndex] = (double)value / (double)(1 << format.bitsPerSample);
+            for(int i = 0; i < data->length(); i += format.numChannels)
+            {
+                waveBuffer[i / format.numChannels] = (data->data()[i] - 128) / 128.0;
+            }
         }
-
-        delete[] data;
-
-        result = true;
-    }else{
-        outputError( "This wave file does not contain any data!" );
+        break;
+    case 16:
+        {
+            const int16_t *p = (int16_t *)(data->data());
+            for(int i = 0; i < data->length() / 2; i += format.numChannels)
+            {
+                waveBuffer[i / format.numChannels] = p[i] / (double)(1 << 15);
+            }
+        }
+        break;
+    case 24:
+        {
+            for(int i = 0; i < data->length(); i += format.numChannels * (24 / 8))
+            {
+                int32_t val = 0;
+                char *p = (char *)(&val);
+                p[3] = data->data()[i + 2];
+                p[2] = data->data()[i + 1];
+                p[1] = data->data()[i + 0];
+                waveBuffer[i / 3 / format.numChannels] = val / (double)(1 << 31);
+            }
+        }
+        break;
+    case 32:
+        {
+            const int32_t *p = (int32_t *)(data->data());
+            for(int i = 0; i < data->length() / 4; i += format.numChannels)
+            {
+                waveBuffer[i / format.numChannels] = data->data()[i] / (double)(1 << 31);
+            }
+        }
+        break;
+    default:
+        return;
     }
-
-    return result;
 }
 
-int    waveFileEx::writeWaveFile( string fileName, const double *wave, int length, double secOffset, const waveFormatEx *format )
+
+int    WaveBuffer::writeWaveFile(const string &fileName, const double *wave, int length, double secOffset, const Format *format )
 {
     int result = 2;
     FILE *fp;
@@ -240,7 +209,7 @@ int    waveFileEx::writeWaveFile( string fileName, const double *wave, int lengt
 
     if( !format )
     {
-        format = &defaultFormat;
+        format = &DefaultFormat;
     }
 
 #ifdef __GNUC__
@@ -272,7 +241,7 @@ int    waveFileEx::writeWaveFile( string fileName, const double *wave, int lengt
         fwrite( (void*)&fileSize, 4, 1, fp );
         fprintf( fp, "WAVEfmt " );
         fwrite( (void*)&chunkSize, 4, 1, fp );
-        fwrite( (void*)&(format->chunkID), 2, 1, fp );
+        fwrite( (void*)&(format->formatID), 2, 1, fp );
         fwrite( (void*)&(format->numChannels), 2, 1, fp );
         fwrite( (void*)&(format->samplePerSecond), 4, 1, fp );
         fwrite( (void*)&(format->bytesPerSecond), 4, 1, fp );
@@ -291,12 +260,12 @@ int    waveFileEx::writeWaveFile( string fileName, const double *wave, int lengt
     return result;
 }
 
-int    waveFileEx::writeWaveFile( string fileName )
+int    WaveBuffer::writeWaveFile(const string &fileName )
 {
     return writeWaveFile( fileName, waveBuffer, waveLength, secOffset, &format);
 }
 
-void    waveFileEx::normalize( void )
+void    WaveBuffer::normalize( void )
 {
     double temp;
     double max = 1.0;
@@ -313,7 +282,7 @@ void    waveFileEx::normalize( void )
     }
 }
 
-void    waveFileEx::applyDynamics( vector<double>& dynamics, int sample_rate, double framePeriod ){
+void    WaveBuffer::applyDynamics( vector<double>& dynamics, int sample_rate, double framePeriod ){
     long frameIndex;
     double rate;
 
@@ -331,7 +300,7 @@ void    waveFileEx::applyDynamics( vector<double>& dynamics, int sample_rate, do
     }
 }
 
-int    waveFileEx::getWaveBuffer( vector<double>& dstBuffer, double leftBlank, double rightBlank )
+int    WaveBuffer::getWaveBuffer( vector<double>& dstBuffer, double leftBlank, double rightBlank )
 {
     int ret = 0;
     if( waveLength != 0 ){
@@ -361,7 +330,7 @@ int    waveFileEx::getWaveBuffer( vector<double>& dstBuffer, double leftBlank, d
     return ret;
 }
 
-long   waveFileEx::getWaveLength( double leftBlank, double rightBlank )
+long   WaveBuffer::getWaveLength( double leftBlank, double rightBlank )
 {
     long length = (long)( leftBlank / 1000.0 * (double)format.samplePerSecond );
     long endIndex;
@@ -373,7 +342,7 @@ long   waveFileEx::getWaveLength( double leftBlank, double rightBlank )
     return ( endIndex - length );
 }
 
-int    waveFileEx::getWaveBuffer( double *dstBuffer, double leftBlank, double rightBlank, int length )
+int    WaveBuffer::getWaveBuffer( double *dstBuffer, double leftBlank, double rightBlank, int length )
 {
     int ret = 0;
     if( !length || !dstBuffer ) return ret;
@@ -413,7 +382,7 @@ int    waveFileEx::getWaveBuffer( double *dstBuffer, double leftBlank, double ri
 }
 
 
-int waveFileEx::setOffset( double secOffset )
+int WaveBuffer::setOffset( double secOffset )
 {
     int ret = 1;
 

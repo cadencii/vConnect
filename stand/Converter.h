@@ -20,7 +20,7 @@
 #include "vConnectPhoneme.h"
 #include "StringUtil.h"
 #include "Task.h"
-#include "waveFileEx/waveFileEx.h"
+#include "WaveBuffer/WaveBuffer.h"
 
 namespace vconnect
 {
@@ -105,7 +105,7 @@ namespace vconnect
             cerr << "====" << endl;
             cerr << "Begin analysis : " << alias << " @ " << fileName << endl;
 
-            waveFileEx waveFile;
+            WaveBuffer waveFile;
             string waveFilePath = Path::combine( sourceDirectory, fileName );
             if( waveFile.readWaveFile( waveFilePath ) != 1 ){
                 cout << "error ; can't open the file, " << waveFilePath << endl;

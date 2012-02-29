@@ -476,14 +476,30 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="waveFileEx"
+			Name="WaveBuffer"
 			>
 			<File
-				RelativePath=".\waveFileEx\waveFileEx.cpp"
+				RelativePath=".\WaveBuffer\RiffChunk.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\waveFileEx\waveFileEx.h"
+				RelativePath=".\WaveBuffer\RiffChunk.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WaveBuffer\RiffFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WaveBuffer\RiffFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WaveBuffer\WaveBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WaveBuffer\WaveBuffer.h"
 				>
 			</File>
 		</Filter>

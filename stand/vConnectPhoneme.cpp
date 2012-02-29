@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "vConnectUtility.h"
 #include "world/world.h"
-#include "waveFileEx/waveFileEx.h"
+#include "WaveBuffer/WaveBuffer.h"
 #include "worldParameters.h"
 #include "Configuration.h"
 
@@ -452,7 +452,7 @@ bool vConnectPhoneme::readRawWave(string dir_path, const UtauParameter *utauPara
     {
         return false;
     }
-    waveFileEx waveFile;
+    WaveBuffer waveFile;
     string fileName = utauParams->fileName;
     fileName = dir_path + fileName;
 

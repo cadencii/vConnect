@@ -1,6 +1,6 @@
 /*
  *
- *    waveFileEx.cpp
+ *    WaveBuffer.h
  *                              (c) HAL 2010-, kbinani 2012
  *
  *  This file is a part of STAND Library.
@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef __waveFileEx_h__
-#define __waveFileEx_h__
+#ifndef __WaveBuffer_h__
+#define __WaveBuffer_h__
 
 #include <iostream>
 #include <string>
@@ -25,14 +25,15 @@
 #include <string.h>
 #include <stdint.h>
 
-using namespace std;
+namespace vconnect
+{
+    class RiffChunk;
+}
 
-class waveFileEx{
+class WaveBuffer{
 public:
-    struct waveFormatEx {
-        int16_t  chunkID;
-        int32_t  chunkSize;
-        int16_t  formatTag;
+    struct Format {
+        int16_t  formatID;
         uint16_t numChannels;
         uint32_t samplePerSecond;
         uint32_t bytesPerSecond;
@@ -40,21 +41,21 @@ public:
         uint16_t bitsPerSample;
     };
 
-    waveFileEx();
-    ~waveFileEx(){destroy();}
+    WaveBuffer();
+    ~WaveBuffer(){destroy();}
 
     /* If the data is stereo, only left-channel will be read. */
-    int    readWaveFile( string fileName );
-    int    writeWaveFile( string fileName );
-    static int writeWaveFile( string fileName, const double *wave, int length, double secOffset = 0.0, const waveFormatEx *format = NULL );
+    int    readWaveFile( const std::string &fileName );
+    int    writeWaveFile( const std::string &fileName );
+    static int writeWaveFile( const std::string &fileName, const double *wave, int length, double secOffset = 0.0, const Format *format = NULL );
 
-    int    setWaveBuffer( vector<double>& srcBuffer );
+    int    setWaveBuffer( std::vector<double>& srcBuffer );
     int    setWaveBuffer( double* srcBuffer, unsigned long bufferLength );
 
-    int    getWaveBuffer( vector<double>& dstBuffer );
+    int    getWaveBuffer( std::vector<double>& dstBuffer );
     int    getWaveBuffer( double* dstBuffer, unsigned long* bufferLength );
 
-    int    getWaveBuffer( vector<double>& dstBuffer, double leftBlank, double rightBlank );
+    int    getWaveBuffer( std::vector<double>& dstBuffer, double leftBlank, double rightBlank );
     int    getWaveBuffer( double *dstBuffer, double leftBlank, double rightBlank, int length );
 
     int    getSamplingFrequency() { return format.samplePerSecond; }
@@ -73,26 +74,27 @@ public:
 
     int    setOffset( double secOffset );
     void   normalize( void );
-    void   applyDynamics( vector<double>& dynamics, int sample_rate, double frame_period );
+    void   applyDynamics( std::vector<double>& dynamics, int sample_rate, double frame_period );
 
 protected:
 private:
     void        destroy(void){delete[] waveBuffer; waveLength = 0; secOffset = 0.0;}
     void        createBuffer(int length){destroy(); waveBuffer = new double[length]; waveLength = length;}
-    bool        readWaveHeader( FILE* fp );
-    bool        readWaveData( FILE* fp );
+
+    void _setHeader(const vconnect::RiffChunk *fmt);
+    void _setData(const vconnect::RiffChunk *data);
 
     void        setDefaultFormat( void );
 
-    static void outputError( string s );
+    static void outputError( std::string s );
 
     double          *waveBuffer;
     int             waveLength;
     // 空白時間を持つことにした．
     double          secOffset;
-    waveFormatEx    format;
+    Format    format;
 
-    static const waveFormatEx defaultFormat;
+    static const Format DefaultFormat;
 };
 
 #endif

@@ -31,7 +31,7 @@
 #include <list>
 
 #include "world/world.h"
-#include "waveFileEx/waveFileEx.h"
+#include "WaveBuffer/WaveBuffer.h"
 #include "Mutex.h"
 
 using namespace std;

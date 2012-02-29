@@ -24,7 +24,7 @@
 #include "utau/UtauDBManager.h"
 #include "vsq/CurveTypeEnum.h"
 #include "world/world.h"
-#include "waveFileEx/waveFileEx.h"
+#include "WaveBuffer/WaveBuffer.h"
 
 #define TRANS_MAX 4096
 double temporary1[TRANS_MAX];
@@ -126,7 +126,7 @@ double Synthesizer::getPitchFluctuation( double second )
 
 void Synthesizer::emptyPath( double secOffset, string output )
 {
-    waveFileEx wave;
+    WaveBuffer wave;
     wave.setOffset( secOffset );
     wave.writeWaveFile( output );
     return;
@@ -470,7 +470,7 @@ void Synthesizer::run()
         wave[i] = max(-1.0, min(1.0, wave[i]));
     }
     // ファイルに書き下す．
-    waveFileEx::writeWaveFile( output, wave, waveLength, (double)beginFrame * framePeriod / 1000.0 );
+    WaveBuffer::writeWaveFile( output, wave, waveLength, (double)beginFrame * framePeriod / 1000.0 );
 
     for(int i = 0; i < frameLength; i++)
     {
