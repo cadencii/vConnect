@@ -1,7 +1,7 @@
 SRC=*.cpp \
     utau/*.cpp \
     vsq/*.cpp \
-    waveFileEx/*.cpp \
+    WaveBuffer/*.cpp \
     world/*.cpp
 
 HEADER=*.h \

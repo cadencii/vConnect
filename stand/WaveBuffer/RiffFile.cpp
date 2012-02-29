@@ -18,7 +18,7 @@ RiffFile::~RiffFile(void)
 
 bool RiffFile::read(const char *path)
 {
-    // Ç ÇÈÇ€Ç™Ç¡
+    // „Å¨„Çã„ÅΩ„Åå„Å£
     if(!path)
     {
         return false;
