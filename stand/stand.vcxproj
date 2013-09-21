@@ -64,7 +64,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\lib\fftw3\api;$(ProjectDir)..\lib\iconv\include;$(ProjectDir)..\lib\vorbis\include;$(ProjectDir)..\lib\ogg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;shlwapi.lib;libiconvD.lib%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;shlwapi.lib;libiconvD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-STAND.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
