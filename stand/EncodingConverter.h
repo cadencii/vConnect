@@ -73,7 +73,7 @@ namespace vconnect
             }
 
             string result;
-            char *input = const_cast<char *>( source.c_str() );
+            char const* input = source.c_str();
             size_t remainingInputBytes = source.size();
 
             char *buffer = new char[remainingInputBytes + 1];
@@ -82,7 +82,7 @@ namespace vconnect
             size_t outputBytes = remainingInputBytes;
 
             while( remainingInputBytes > 0 ){
-                char *originalInput = input;
+                char const* originalInput = input;
                 size_t n = iconv( this->converter, &input, &remainingInputBytes, &output, &remainingOutputBytes );
                 int error = errno;
                 if( (n != (size_t) - 1 && remainingInputBytes == 0) || (error == EINVAL) ){
