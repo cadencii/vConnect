@@ -1,0 +1,12 @@
+[submodule "lib/iconv"]
+	path = lib/iconv
+	url = https://github.com/olegchir/iconv-for-windows.git
+[submodule "lib/ogg"]
+	path = lib/ogg
+	url = https://github.com/soundcloud/ogg.git
+[submodule "lib/vorbis"]
+	path = lib/vorbis
+	url = https://github.com/soundcloud/vorbis.git
+[submodule "lib/fftw3"]
+	path = lib/fftw3
+	url = https://github.com/FFTW/fftw3.git
