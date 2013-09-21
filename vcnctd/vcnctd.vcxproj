@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{23C3A6EB-48E0-47BE-BD0E-45AEA5888B0F}</ProjectGuid>
+    <RootNamespace>vcnctd</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.60610.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;libogg.lib;libvorbis.lib;libvorbisenc.lib;libvorbisfile.lib</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug>true</AssemblyDebug>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;libogg.lib;libvorbis.lib;libvorbisenc.lib;libvorbisfile.lib</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Data">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Xml">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ConfDB.cpp" />
+    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="daemon.c" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="vcnctd.cpp" />
+    <ClCompile Include="..\stand\corpusManager.cpp" />
+    <ClCompile Include="..\stand\mb_text.cpp" />
+    <ClCompile Include="..\stand\stand.cpp" />
+    <ClCompile Include="..\stand\vConnect.cpp" />
+    <ClCompile Include="..\stand\vConnectPhoneme.cpp" />
+    <ClCompile Include="..\stand\vConnectSetting.cpp" />
+    <ClCompile Include="..\stand\vConnectUtility.cpp" />
+    <ClCompile Include="..\stand\utauVoiceDB\UtauDB.cpp" />
+    <ClCompile Include="..\stand\vsqMetaText\vsqBase.cpp" />
+    <ClCompile Include="..\stand\vsqMetaText\vsqBPList.cpp" />
+    <ClCompile Include="..\stand\vsqMetaText\vsqEventEx.cpp" />
+    <ClCompile Include="..\stand\vsqMetaText\vsqEventList.cpp" />
+    <ClCompile Include="..\stand\vsqMetaText\vsqFileEx.cpp" />
+    <ClCompile Include="..\stand\vsqMetaText\vsqHandle.cpp" />
+    <ClCompile Include="..\stand\vsqMetaText\vsqTempo.cpp" />
+    <ClCompile Include="..\stand\waveFileEx\waveFileEx.cpp" />
+    <ClCompile Include="..\stand\world\dio.cpp" />
+    <ClCompile Include="..\stand\world\matlabfunctions.cpp" />
+    <ClCompile Include="..\stand\world\platinum.cpp" />
+    <ClCompile Include="..\stand\world\platinum_v4.cpp" />
+    <ClCompile Include="..\stand\world\star.cpp" />
+    <ClCompile Include="..\stand\world\synthesis.cpp" />
+    <ClCompile Include="..\stand\world\synthesis_v4.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConfDB.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="daemon.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="vcnctd.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqBase.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqBP.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqBPList.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqEventEx.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqEventList.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqFileEx.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqHandle.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqLyric.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqPhonemeDB.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqTempo.h" />
+    <ClInclude Include="..\stand\vsqMetaText\vsqVibratoBP.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\libgcc.lib" />
+    <Library Include="..\libiconv.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

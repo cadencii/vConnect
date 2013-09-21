@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="utauVoiceDB">
+      <UniqueIdentifier>{edea4dcc-0dd2-4121-8e94-3f96b4578f80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand">
+      <UniqueIdentifier>{7e7cf4ca-9195-45a2-a05a-c3d8eb588a75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="world">
+      <UniqueIdentifier>{802e7e84-12cd-4fd0-ac4e-fc0fcc370b3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="waveFileEx">
+      <UniqueIdentifier>{7502f3da-e392-4926-826f-1d13d890ed8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vConnect">
+      <UniqueIdentifier>{36c9672f-9caa-49c0-bd0d-567f92325955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsqMetaText">
+      <UniqueIdentifier>{a114a455-dfbf-4d5d-8482-e11a62aa09fd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\stand\utauVoiceDB\utauFreq.cpp">
+      <Filter>utauVoiceDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\utauVoiceDB\utauVoiceDataBase.cpp">
+      <Filter>utauVoiceDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\matching.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\stand.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\standSpecgram.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\standTexture.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\dio.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\matlabfunctions.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\platinum.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\star.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\straight.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\synthesis.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\synthesis_ap.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\tandem_ap.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\wavread.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\waveFileEx\waveFileEx.cpp">
+      <Filter>waveFileEx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\corpusManager.cpp">
+      <Filter>vConnect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vConnect.cpp">
+      <Filter>vConnect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vowelTable.cpp">
+      <Filter>vConnect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqBase.cpp">
+      <Filter>vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqBPList.cpp">
+      <Filter>vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqEventEx.cpp">
+      <Filter>vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqEventList.cpp">
+      <Filter>vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqFileEx.cpp">
+      <Filter>vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqHandle.cpp">
+      <Filter>vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqTempo.cpp">
+      <Filter>vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\mb_text.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\stand\utauVoiceDB\utauFreq.h">
+      <Filter>utauVoiceDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\utauVoiceDB\utauParameters.h">
+      <Filter>utauVoiceDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\utauVoiceDB\utauVoiceDataBase.h">
+      <Filter>utauVoiceDB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\matching.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\stand.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\standFrame.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\standSpecgram.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\standTexture.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\world\wavread.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\world\world.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\waveFileEx\waveFileEx.h">
+      <Filter>waveFileEx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\corpusManager.h">
+      <Filter>vConnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\runtimeOptions.h">
+      <Filter>vConnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vConnect.h">
+      <Filter>vConnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vowelTable.h">
+      <Filter>vConnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqBase.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqBPList.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqEventEx.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqEventList.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqFileEx.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqHandle.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqPhonemeDB.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqTempo.h">
+      <Filter>vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\mb_text.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\libgcc.lib" />
+    <Library Include="..\libiconv.lib" />
+  </ItemGroup>
+</Project>

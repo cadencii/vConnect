@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="vsq">
+      <UniqueIdentifier>{d64713c4-853d-4f04-8f77-8470a6319d2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="world">
+      <UniqueIdentifier>{422bf56f-efc5-4e95-8847-37f4351d34aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand">
+      <UniqueIdentifier>{75028097-2083-45c8-9a8d-996300ada711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WaveBuffer">
+      <UniqueIdentifier>{d8afdc48-7771-4bc6-9608-525d409fbb5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utau">
+      <UniqueIdentifier>{a2c26597-129b-4e90-8788-c51ac6a712b5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="vsq\BP.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\BPList.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\CurveTypeEnum.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\Event.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\EventList.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\Handle.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\Lyric.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\Sequence.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\TempoList.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="vsq\VibratoBP.h">
+      <Filter>vsq</Filter>
+    </ClInclude>
+    <ClInclude Include="world\world.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Converter.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="corpusManager.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="EncodingConverter.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBP.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Mutex.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Path.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="RuntimeOption.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Socket.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="stand.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtil.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Synthesizer.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Task.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="TextInputStream.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="TextOutputStream.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="Transcriber.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="vConnectPhoneme.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="vConnectSetting.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="vConnectUtility.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="worldParameters.h">
+      <Filter>stand</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveBuffer\RiffChunk.h">
+      <Filter>WaveBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveBuffer\RiffFile.h">
+      <Filter>WaveBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveBuffer\WaveBuffer.h">
+      <Filter>WaveBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="utau\UtauDB.h">
+      <Filter>utau</Filter>
+    </ClInclude>
+    <ClInclude Include="utau\UtauDBManager.h">
+      <Filter>utau</Filter>
+    </ClInclude>
+    <ClInclude Include="utau\UtauParameter.h">
+      <Filter>utau</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="vsq\BPList.cpp">
+      <Filter>vsq</Filter>
+    </ClCompile>
+    <ClCompile Include="vsq\EventList.cpp">
+      <Filter>vsq</Filter>
+    </ClCompile>
+    <ClCompile Include="vsq\Handle.cpp">
+      <Filter>vsq</Filter>
+    </ClCompile>
+    <ClCompile Include="vsq\Lyric.cpp">
+      <Filter>vsq</Filter>
+    </ClCompile>
+    <ClCompile Include="vsq\Sequence.cpp">
+      <Filter>vsq</Filter>
+    </ClCompile>
+    <ClCompile Include="vsq\TempoList.cpp">
+      <Filter>vsq</Filter>
+    </ClCompile>
+    <ClCompile Include="world\dio.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="world\matlabfunctions.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="world\platinum.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="world\platinum_v4.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="world\star.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="world\synthesis.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="world\synthesis_v4.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="corpusManager.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="Mutex.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="stand.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="Synthesizer.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="Transcriber.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="vConnectPhoneme.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="vConnectSetting.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="vConnectUtility.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="worldParameters.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveBuffer\RiffChunk.cpp">
+      <Filter>WaveBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveBuffer\RiffFile.cpp">
+      <Filter>WaveBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveBuffer\WaveBuffer.cpp">
+      <Filter>WaveBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="utau\UtauDB.cpp">
+      <Filter>utau</Filter>
+    </ClCompile>
+    <ClCompile Include="utau\UtauDBManager.cpp">
+      <Filter>utau</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\libgcc.lib" />
+    <Library Include="..\libiconv.lib" />
+    <Library Include="..\pthreadVC2.lib" />
+  </ItemGroup>
+</Project>

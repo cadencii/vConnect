@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="stand">
+      <UniqueIdentifier>{2ee70d56-8f44-42ad-8020-e5725a835d51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand\utauVoiceDB">
+      <UniqueIdentifier>{f937ddac-2229-4c2c-84fb-b4abf9fbbd82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand\vsqMetaText">
+      <UniqueIdentifier>{d8bdf510-4dbc-4743-83c1-e8baae7c5edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand\waveFileEx">
+      <UniqueIdentifier>{fb2fa02b-724c-4ba0-af24-3d54a6c7405b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand\world">
+      <UniqueIdentifier>{4e4f5712-1486-4072-b2af-c13bb84b05ea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ConfDB.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="daemon.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="vcnctd.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\corpusManager.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\mb_text.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\stand.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vConnect.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vConnectPhoneme.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vConnectSetting.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vConnectUtility.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\utauVoiceDB\UtauDB.cpp">
+      <Filter>stand\utauVoiceDB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqBase.cpp">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqBPList.cpp">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqEventEx.cpp">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqEventList.cpp">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqFileEx.cpp">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqHandle.cpp">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\vsqMetaText\vsqTempo.cpp">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\waveFileEx\waveFileEx.cpp">
+      <Filter>stand\waveFileEx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\dio.cpp">
+      <Filter>stand\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\matlabfunctions.cpp">
+      <Filter>stand\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\platinum.cpp">
+      <Filter>stand\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\platinum_v4.cpp">
+      <Filter>stand\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\star.cpp">
+      <Filter>stand\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\synthesis.cpp">
+      <Filter>stand\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\stand\world\synthesis_v4.cpp">
+      <Filter>stand\world</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConfDB.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="daemon.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="vcnctd.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqBase.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqBP.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqBPList.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqEventEx.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqEventList.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqFileEx.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqHandle.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqLyric.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqPhonemeDB.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqTempo.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+    <ClInclude Include="..\stand\vsqMetaText\vsqVibratoBP.h">
+      <Filter>stand\vsqMetaText</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\libgcc.lib" />
+    <Library Include="..\libiconv.lib" />
+  </ItemGroup>
+</Project>
