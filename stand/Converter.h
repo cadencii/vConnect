@@ -15,6 +15,7 @@
 #define __Converter_h__
 
 #include <time.h>
+#include <sstream>
 #include "TextInputStream.h"
 #include "TextOutputStream.h"
 #include "vConnectPhoneme.h"
@@ -97,9 +98,9 @@ namespace vconnect
             float preUtterance = atof( parameters[4].c_str() );
             float voiceOverlap = atof( parameters[5].c_str() );
 
-            char buf[16];
-            sprintf( buf, "%d.vvd", count );
-            string vvdName = buf;
+            ostringstream buf;
+            buf << count << ".vvd";
+            string vvdName = buf.str();
             string line = vvdName + "=" + parametersString;
 
             cerr << "====" << endl;
