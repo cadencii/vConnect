@@ -113,7 +113,8 @@ namespace vconnect
                 return "";
             }
             int waveLength = waveFile.getWaveLength( leftBlank, rightBlank );
-            double *wave = new double[waveLength];
+            std::auto_ptr<double> wave_ptr(new double[waveLength]);
+            double * wave = wave_ptr.get();
             waveFile.getWaveBuffer( wave, leftBlank, rightBlank, waveLength );
 
             // 音量の正規化を行う．
@@ -149,8 +150,6 @@ namespace vconnect
                 cerr << "Error. Failed to write : " << vvdFilePath << endl;
             }
             cerr << "====" << endl;
-
-            delete[] wave;
 
             return line;
         }
