@@ -34,7 +34,7 @@ bool RiffFile::read(const char *path)
 
     // is RIFF format ?
     fread(header, 4, sizeof(char), fp);
-    header[5] = 0;
+    header[4] = 0;
     if(strcmp(header, "RIFF"))
     {
         fclose(fp);
