@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis_static", "lib\lib
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbisfile", "lib\libvorbisfile_static.vcxproj", "{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vConnectTest", "stand\tests\vConnectTest.vcxproj", "{39E3206A-4B08-42A8-95BB-68B7D3BE72EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -63,6 +65,12 @@ Global
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.Release|Win32.Build.0 = Release|Win32
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.Release|x64.ActiveCfg = Release|x64
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC}.Release|x64.Build.0 = Release|x64
+		{39E3206A-4B08-42A8-95BB-68B7D3BE72EC}.Debug|Win32.ActiveCfg = Release|Win32
+		{39E3206A-4B08-42A8-95BB-68B7D3BE72EC}.Debug|Win32.Build.0 = Release|Win32
+		{39E3206A-4B08-42A8-95BB-68B7D3BE72EC}.Debug|x64.ActiveCfg = Release|Win32
+		{39E3206A-4B08-42A8-95BB-68B7D3BE72EC}.Release|Win32.ActiveCfg = Release|Win32
+		{39E3206A-4B08-42A8-95BB-68B7D3BE72EC}.Release|Win32.Build.0 = Release|Win32
+		{39E3206A-4B08-42A8-95BB-68B7D3BE72EC}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

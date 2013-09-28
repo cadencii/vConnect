@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="fixture">
+      <UniqueIdentifier>{ecaaf9d4-5db6-457f-95c3-c92f66753ee7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fixture\EncodingConverter">
+      <UniqueIdentifier>{b23329c4-e97b-4348-8488-79c7c20799b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fixture\TextInputStream">
+      <UniqueIdentifier>{80405e9f-6d44-4d33-a1b8-145a1a03c501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fixture\utau">
+      <UniqueIdentifier>{142f53cd-669a-41f1-8106-fb599959abb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fixture\utau\UtauDB">
+      <UniqueIdentifier>{7140ac5d-0ff5-4d09-bacf-58351ca43562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="expected">
+      <UniqueIdentifier>{669a46ac-1913-4e0e-b4bd-d2b2fb6cb803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="expected\TextOutputStream">
+      <UniqueIdentifier>{d3e952c0-6d41-4774-bfcf-04753d703c9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand">
+      <UniqueIdentifier>{a3380ef7-dcc2-4f10-b567-eb347b18ff78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand\utau">
+      <UniqueIdentifier>{a0134938-ef06-425c-b62c-5e804b4059e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stand\vsq">
+      <UniqueIdentifier>{2a70be7f-41a6-404b-891b-a74c965b7252}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utau">
+      <UniqueIdentifier>{5605630f-d4e6-4744-bef5-3d0bd7594a5e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fixture\EncodingConverter\shift_jis.txt">
+      <Filter>fixture\EncodingConverter</Filter>
+    </None>
+    <None Include="fixture\EncodingConverter\utf16le.txt">
+      <Filter>fixture\EncodingConverter</Filter>
+    </None>
+    <None Include="fixture\EncodingConverter\utf32le.txt">
+      <Filter>fixture\EncodingConverter</Filter>
+    </None>
+    <None Include="fixture\TextInputStream\shift_jis_crlf.txt">
+      <Filter>fixture\TextInputStream</Filter>
+    </None>
+    <None Include="fixture\TextInputStream\utf8_lf.txt">
+      <Filter>fixture\TextInputStream</Filter>
+    </None>
+    <None Include="fixture\utau\UtauDB\oto.ini">
+      <Filter>fixture\utau\UtauDB</Filter>
+    </None>
+    <None Include="expected\TextOutputStream\shift_jis_crlf.txt">
+      <Filter>expected\TextOutputStream</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Mutex.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Thread.cpp">
+      <Filter>stand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utau\UtauDB.cpp">
+      <Filter>stand\utau</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vsq\Lyric.cpp">
+      <Filter>stand\vsq</Filter>
+    </ClCompile>
+    <ClCompile Include="utau\UtauDBTest.cpp">
+      <Filter>utau</Filter>
+    </ClCompile>
+    <ClCompile Include="AllTests.cpp" />
+    <ClCompile Include="EncodingConverterTest.cpp" />
+    <ClCompile Include="LyricTest.cpp" />
+    <ClCompile Include="PathTest.cpp" />
+    <ClCompile Include="StringUtilTest.cpp" />
+    <ClCompile Include="TextInputStreamTest.cpp" />
+    <ClCompile Include="TextOutputStreamTest.cpp" />
+    <ClCompile Include="ThreadTest.cpp" />
+    <ClCompile Include="UtauParameterTest.cpp" />
+    <ClCompile Include="vsq\SequenceTest.cpp" />
+    <ClCompile Include="vsq\TempoListTest.cpp" />
+    <ClCompile Include="..\vsq\Sequence.cpp" />
+    <ClCompile Include="..\vsq\TempoList.cpp" />
+    <ClCompile Include="..\vsq\Handle.cpp" />
+    <ClCompile Include="..\vsq\BPList.cpp" />
+    <ClCompile Include="..\vsq\EventList.cpp" />
+    <ClCompile Include="..\utau\UtauDBManager.cpp" />
+    <ClCompile Include="MapTest.cpp" />
+  </ItemGroup>
+</Project>

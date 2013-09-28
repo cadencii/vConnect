@@ -1,61 +1,53 @@
-﻿#include "AllTests.h"
+﻿#include <boost/test/unit_test.hpp>
 #include "../TextInputStream.h"
 
 using namespace vconnect;
 
-class TextInputStreamTest : public CppUnit::TestFixture
+BOOST_AUTO_TEST_SUITE(TextInputStreamTest)
+
+BOOST_AUTO_TEST_CASE(testTextInputStreamShiftJIS)
 {
-public:
-    void testTextInputStreamShiftJIS()
-    {
-        TextInputStream reader( "fixture/TextInputStream/shift_jis_crlf.txt", "Shift_JIS" );
+    TextInputStream reader( "fixture/TextInputStream/shift_jis_crlf.txt", "Shift_JIS" );
 
-        CPPUNIT_ASSERT( true == reader.ready() );
+    BOOST_CHECK( true == reader.ready() );
 
-        string actual;
-        string expected;
-        actual = reader.readLine();
-        expected = "だ・い・じ・け・ん";
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
+    string actual;
+    string expected;
+    actual = reader.readLine();
+    expected = "だ・い・じ・け・ん";
+    BOOST_CHECK_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( true == reader.ready() );
+    BOOST_CHECK( true == reader.ready() );
 
-        actual = reader.readLine();
-        expected = "社会復帰できなくなっちゃうよ";
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
+    actual = reader.readLine();
+    expected = "社会復帰できなくなっちゃうよ";
+    BOOST_CHECK_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( false == reader.ready() );
-    }
+    BOOST_CHECK( false == reader.ready() );
+}
 
-    void testTextInputStreamUTF8()
-    {
-        TextInputStream *textInputStream = new TextInputStream( "fixture/TextInputStream/utf8_lf.txt", "UTF-8" );
-        InputStream *reader = (InputStream *)textInputStream;
+BOOST_AUTO_TEST_CASE(testTextInputStreamUTF8)
+{
+    TextInputStream *textInputStream = new TextInputStream( "fixture/TextInputStream/utf8_lf.txt", "UTF-8" );
+    InputStream *reader = (InputStream *)textInputStream;
 
-        CPPUNIT_ASSERT( true == reader->ready() );
+    BOOST_CHECK( true == reader->ready() );
 
-        string actual;
-        string expected;
+    string actual;
+    string expected;
 
-        CPPUNIT_ASSERT( true == reader->ready() );
-        actual = reader->readLine();
-        expected = "吾輩は猫である。名前はまだ無い。";
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
+    BOOST_CHECK( true == reader->ready() );
+    actual = reader->readLine();
+    expected = "吾輩は猫である。名前はまだ無い。";
+    BOOST_CHECK_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( true == reader->ready() );
-        actual = reader->readLine();
-        expected = "どこで生れたかとんと見当がつかぬ。";
-        CPPUNIT_ASSERT_EQUAL( expected, actual );
+    BOOST_CHECK( true == reader->ready() );
+    actual = reader->readLine();
+    expected = "どこで生れたかとんと見当がつかぬ。";
+    BOOST_CHECK_EQUAL( expected, actual );
 
-        CPPUNIT_ASSERT( false == reader->ready() );
+    BOOST_CHECK( false == reader->ready() );
 
-        delete textInputStream;
-    }
-
-    CPPUNIT_TEST_SUITE( TextInputStreamTest );
-    CPPUNIT_TEST( testTextInputStreamShiftJIS );
-    CPPUNIT_TEST( testTextInputStreamUTF8 );
-    CPPUNIT_TEST_SUITE_END();
-};
-
-REGISTER_TEST_SUITE( TextInputStreamTest );
+    delete textInputStream;
+}
+BOOST_AUTO_TEST_SUITE_END()

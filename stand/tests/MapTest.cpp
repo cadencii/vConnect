@@ -1,23 +1,16 @@
-#ifndef TEST_MapTest
-#define TEST_MapTest
-#include "AllTests.h"
+#include <boost/test/unit_test.hpp>
 #include "../Map.h"
 
 using namespace std;
 using namespace vconnect;
 
-class MapTest : public CppUnit::TestFixture {
-public:
-    void test()
-    {
-        Map<int, string> map;
-        map.insert( make_pair( 1, "a" ) );
-        CPPUNIT_ASSERT_EQUAL( string( "a" ), map[1] );
-    }
+BOOST_AUTO_TEST_SUITE(MapTest)
 
-    CPPUNIT_TEST_SUITE( MapTest );
-    CPPUNIT_TEST( test );
-    CPPUNIT_TEST_SUITE_END();
-};
-REGISTER_TEST_SUITE( MapTest );
-#endif
+BOOST_AUTO_TEST_CASE(test)
+{
+    Map<int, string> map;
+    map.insert( make_pair( 1, "a" ) );
+    BOOST_CHECK_EQUAL( string( "a" ), map[1] );
+}
+
+BOOST_AUTO_TEST_SUITE_END()
