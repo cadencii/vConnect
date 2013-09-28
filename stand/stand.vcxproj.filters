@@ -225,9 +225,4 @@
       <Filter>utau</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\libgcc.lib" />
-    <Library Include="..\libiconv.lib" />
-    <Library Include="..\pthreadVC2.lib" />
-  </ItemGroup>
 </Project>

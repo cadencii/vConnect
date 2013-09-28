@@ -163,11 +163,6 @@
     <ClCompile Include="utau\UtauDB.cpp" />
     <ClCompile Include="utau\UtauDBManager.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\libgcc.lib" />
-    <Library Include="..\libiconv.lib" />
-    <Library Include="..\pthreadVC2.lib" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
