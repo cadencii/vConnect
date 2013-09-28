@@ -45,7 +45,8 @@ void Transcriber::run()
 
         clock_t cl = clock();
 
-        if( dst.getParams( dst_param, src_param.lyric ) != 1 ){
+        //TODO: ノート番号をとりあえず 60 にしてある.
+        if( dst.getParams( dst_param, src_param.lyric, 60 ) != 1 ){
             cout << " error; not found : " << src_param.lyric << endl;
             continue;
         }

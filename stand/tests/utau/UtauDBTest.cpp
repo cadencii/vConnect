@@ -16,16 +16,16 @@ BOOST_AUTO_TEST_CASE(testConstruct)
     BOOST_CHECK_EQUAL( expectedPath, db.getOtoIniPath() );
 
     UtauParameter resultByLyric;
-    int ret = db.getParams( resultByLyric, "a あ" );
+    int ret = db.getParams(resultByLyric, "a あ", 60);
     BOOST_CHECK_EQUAL( 1, ret );
     BOOST_CHECK_EQUAL( string( "_ああいあうえあ" ), resultByLyric.fileName );
 
     UtauParameter resultByFileName;
-    ret = db.getParams( resultByFileName, "_ああいあうえあ" );
+    ret = db.getParams(resultByFileName, "_ああいあうえあ", 60);
     BOOST_CHECK_EQUAL( 1, ret );
     BOOST_CHECK_EQUAL( string( "_ああいあうえあ" ), resultByFileName.fileName );
 
-    ret = db.getParams( resultByFileName, "音源に存在しない歌詞を指定" );
+    ret = db.getParams(resultByFileName, "音源に存在しない歌詞を指定", 60);
     BOOST_CHECK_EQUAL( 0, ret );
 
     // インデックスによるアクセス

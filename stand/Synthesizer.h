@@ -47,11 +47,11 @@ namespace vconnect
         void run();
 
     public: // public static method
-        static corpusManager::phoneme *getPhoneme(
+/*        static corpusManager::phoneme *getPhoneme(
             string lyric,
             int singerIndex,
             vector<corpusManager *> *managers
-            );
+            );*/
 
     public: // public static field
         // BRE 用ノイズ源

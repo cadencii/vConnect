@@ -42,7 +42,7 @@ namespace vconnect
         /// <param name="parameters">パラメータの格納先</param>
         /// <param name="search">パラメータを取得する音素</param>
         /// <returns>取得に失敗した場合に0，成功した場合は0以外の値を返します．</returns>
-        int getParams(UtauParameter &parameters, string const& search);
+        int getParams(UtauParameter &parameters, string const& search, int note_number);
 
         int getParams( UtauParameter &parameters, int index );
 

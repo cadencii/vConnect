@@ -76,7 +76,7 @@ namespace vconnect
         : impl_(std::make_shared<Impl>(path_oto_ini, codepage))
     {}
 
-    int UtauDB::getParams(UtauParameter & parameters, string const& search)
+    int UtauDB::getParams(UtauParameter & parameters, string const& search, int note_number)
     {
         return impl_->doGetParamsByLyric(parameters, search);
     }
