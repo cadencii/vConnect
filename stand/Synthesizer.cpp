@@ -156,7 +156,7 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
         Event *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
         string lyric = itemThis->lyricHandle.getLyric();
         list<corpusManager::phoneme *> phonemeList;
-        corpusManager::phoneme *p;
+        corpusManager::phoneme * p = nullptr;
         managers[itemThis->singerIndex]->getPhoneme(lyric, phonemeList);
         double vel = pow(2.0, (double)(64 - itemThis->velocity) / 64);
 
@@ -189,6 +189,10 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
             {
                 phonemes.push_back(phoneme);
             }
+        }
+
+        if (!p) {
+            continue;
         }
 
         // 音符が有効な区間に今の音素を書き込む．
