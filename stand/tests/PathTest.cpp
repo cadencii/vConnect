@@ -8,8 +8,13 @@ BOOST_AUTO_TEST_SUITE(PathTest)
 
 BOOST_AUTO_TEST_CASE(getFullPath)
 {
+#ifdef _MSC_VER
+    string expected = "C:\\Windows";
+    string actual = Path::getFullPath("C:\\Windows\\..\\Windows\\..\\Windows");
+#else
     string expected = "/bin/sh";
     string actual = Path::getFullPath( "/bin/../bin/../bin/sh" );
+#endif
     BOOST_CHECK_EQUAL( expected, actual );
 
     expected = "";
@@ -40,12 +45,20 @@ BOOST_AUTO_TEST_CASE(getDirectoryName)
 BOOST_AUTO_TEST_CASE(exists)
 {
     BOOST_CHECK_EQUAL( false, Path::exists( "/bin/sladfjskajfsajfaeiuwfhajkrsfds" ) );
+#ifdef _MSC_VER
+    BOOST_CHECK_EQUAL(true, Path::exists("C:\\Windows"));
+#else
     BOOST_CHECK_EQUAL( true, Path::exists( "/bin/sh" ) );
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(testNormalize)
 {
+#ifdef _MSC_VER
+    string fixture = "abc/def\\ghi\\jkl/mno";
+#else
     string fixture = "abc/def\\ghi¥jkl₩mno";
+#endif
     string separator = Path::getDirectorySeparator();
     string expected = "abc" + separator + "def" + separator + "ghi" + separator + "jkl" + separator + "mno";
     string actual = Path::normalize( fixture );
