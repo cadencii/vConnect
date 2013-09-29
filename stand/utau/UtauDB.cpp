@@ -72,11 +72,11 @@ namespace vconnect
     UtauDB::~UtauDB()
     {}
 
-    UtauDB::UtauDB( string path_oto_ini, string codepage )
+    UtauDB::UtauDB(string const& path_oto_ini, string const& codepage)
         : impl_(std::make_shared<Impl>(path_oto_ini, codepage))
     {}
 
-    int UtauDB::getParams( UtauParameter &parameters, string search )
+    int UtauDB::getParams(UtauParameter & parameters, string const& search)
     {
         return impl_->doGetParamsByLyric(parameters, search);
     }
