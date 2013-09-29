@@ -15,6 +15,7 @@
 #define __UtauDB_h__
 
 #include <list>
+#include <memory>
 #include "UtauParameter.h"
 #include "../Map.h"
 
@@ -25,16 +26,6 @@ namespace vconnect
     /// </summary>
     class UtauDB
     {
-    protected:
-        /// <summary>
-        /// oto.iniファイルのパス．
-        /// </summary>
-        string mDBPath;
-
-        Map<string, UtauParameter *> mSettingMap;
-
-        list<UtauParameter *> mSettingList;
-
     public:
         /**
          * oto.iniのファイル名とそのテキスト・エンコーディングを指定して，oto.iniを読み込みます．
@@ -75,8 +66,10 @@ namespace vconnect
 
     private:
         UtauDB()
-        {
-        }
+        {}
+
+        struct Impl;
+        std::shared_ptr<Impl> impl_;
     };
 }
 #endif
