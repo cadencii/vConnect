@@ -65,4 +65,12 @@ BOOST_AUTO_TEST_CASE(testNormalize)
     BOOST_CHECK_EQUAL( expected, actual );
 }
 
+BOOST_AUTO_TEST_CASE(getExtension)
+{
+    string fixture = "A/bcd.hoge";
+    string expected = ".hoge";
+    string actual = Path::getExtension(fixture);
+    BOOST_CHECK_EQUAL(expected, actual);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
