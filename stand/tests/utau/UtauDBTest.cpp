@@ -36,6 +36,14 @@ BOOST_AUTO_TEST_CASE(testConstruct)
         BOOST_CHECK_EQUAL(string("あ↑"), parameter.fileName);
     }
 
+    {
+        // search phoneme in subdirectory.
+        UtauParameter parameter;
+        int const result = db.getParams(parameter, "わ", 60);
+        BOOST_CHECK_EQUAL(1, result);
+        BOOST_CHECK_EQUAL(string("A\\わ"), parameter.fileName);
+    }
+
     // インデックスによるアクセス
     // インデックスによるアクセスでは、エイリアスで登録したものについてはアクセスされない
     BOOST_CHECK_EQUAL( 3, db.size() );

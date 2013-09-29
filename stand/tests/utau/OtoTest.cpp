@@ -14,7 +14,7 @@ static string fixture_encoding_ = "Shift_JIS";
 BOOST_AUTO_TEST_CASE(find)
 {
     string path = Path::getFullPath(fixture_path_);
-    Oto oto(path, fixture_encoding_);
+    Oto oto(path, Path::getDirectoryName(path), fixture_encoding_);
     {
         UtauParameter * parameter = oto.find("a あ");
         BOOST_CHECK(parameter);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(find)
 BOOST_AUTO_TEST_CASE(indexAccess)
 {
     string path = Path::getFullPath(fixture_path_);
-    Oto oto(path, fixture_encoding_);
+    Oto oto(path, Path::getDirectoryName(path), fixture_encoding_);
     BOOST_CHECK_EQUAL((size_t)3, oto.count());
     {
         UtauParameter * actual = oto[0];

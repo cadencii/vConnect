@@ -20,20 +20,33 @@ namespace vconnect
 {
     struct Oto::Impl
     {
-        explicit Impl(std::string const& oto_ini_file, std::string const& encoding)
+        explicit Impl(std::string const& oto_ini_file, std::string const& db_root_directory, std::string const& encoding)
         {
-            TextInputStream stream(oto_ini_file, encoding);
+            string normalized_oto_ini_path = Path::normalize(oto_ini_file);
+            string normalized_db_root_directory = Path::normalize(db_root_directory);
+
+            TextInputStream stream(normalized_oto_ini_path, encoding);
 
             if (!stream.ready()) {
                 return;
             }
+
+            string directory = Path::getDirectoryName(normalized_oto_ini_path);
+            string directory_prefix =
+                directory.find((normalized_db_root_directory + Path::getDirectorySeparator()).c_str()) == 0
+                ? directory.substr(normalized_db_root_directory.length() + 1)
+                : "";
 
             while (stream.ready()) {
                 std::string line = stream.readLine();
                 if (line.empty()) {
                     continue;
                 }
-                parameters_.push_back(std::make_shared<UtauParameter>(line));
+                shared_ptr<UtauParameter> parameter = std::make_shared<UtauParameter>(line);
+                if (!directory_prefix.empty()) {
+                    parameter->fileName = Path::combine(directory_prefix, parameter->fileName);
+                }
+                parameters_.push_back(move(parameter));
             }
         }
 
@@ -67,8 +80,8 @@ namespace vconnect
         std::vector<std::shared_ptr<UtauParameter>> parameters_;
     };
 
-    Oto::Oto(std::string const& oto_ini_file, std::string const& encoding)
-        : impl_(std::make_shared<Impl>(oto_ini_file, encoding))
+    Oto::Oto(std::string const& oto_ini_file, string const& db_root_directory, std::string const& encoding)
+        : impl_(std::make_shared<Impl>(oto_ini_file, db_root_directory, encoding))
     {}
 
     UtauParameter * Oto::find(std::string const& lyric) { return impl_->doFind(lyric); }

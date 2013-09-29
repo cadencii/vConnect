@@ -11,6 +11,8 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+#include <iostream>
+#include <boost/filesystem.hpp>
 #include "UtauDB.h"
 #include "../TextInputStream.h"
 #include "./Oto.h"
@@ -23,11 +25,19 @@ namespace vconnect
         Impl(std::string const& path_oto_ini, std::string const& codepage)
         {
             string const path = Path::normalize(path_oto_ini);
-            root_ = make_shared<Oto>(path, codepage);
             string const directory = Path::getDirectoryName(path);
+            root_ = make_shared<Oto>(path, directory, codepage);
             string const prefixmap = Path::combine(directory, "prefix.map");
             prefixmap_ = make_shared<PrefixMap>(prefixmap, codepage);
             mDBPath = Path::combine(Path::getDirectoryName(path), "");
+
+            namespace fs = boost::filesystem;
+            std::for_each(fs::directory_iterator(directory), fs::directory_iterator(), [this, codepage, directory](fs::directory_entry const& dir) {
+                string oto_ini = Path::combine(dir.path().generic_string(), "oto.ini");
+                if (Path::exists(oto_ini)) {
+                    this->sub_.push_back(make_shared<Oto>(oto_ini, directory, codepage));
+                }
+            });
         }
 
         ~Impl()
@@ -75,15 +85,27 @@ namespace vconnect
     private:
         UtauParameter * findParam(string const& lyric)
         {
-            return root_->find(lyric);
+            UtauParameter * found = root_->find(lyric);
+            if (found) {
+                return found;
+            } else {
+                for (auto sub = std::begin(sub_); sub != std::end(sub_); ++sub) {
+                    UtauParameter * sub_found = (*sub)->find(lyric);
+                    if (sub_found) {
+                        return sub_found;
+                    }
+                }
+            }
+            return nullptr;
         }
 
         /// <summary>
         /// oto.iniファイルのパス．
         /// </summary>
         string mDBPath;
-        std::shared_ptr<Oto> root_;
-        std::shared_ptr<PrefixMap> prefixmap_;
+        shared_ptr<Oto> root_;
+        shared_ptr<PrefixMap> prefixmap_;
+        vector<shared_ptr<Oto>> sub_;
     };
 
     UtauDB::~UtauDB()

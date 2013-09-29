@@ -26,7 +26,7 @@ namespace vconnect
         typedef std::vector<UtauParameter *> container_type;
 
     public:
-        explicit Oto(std::string const& oto_ini_file, std::string const& encoding);
+        explicit Oto(std::string const& oto_ini_file, std::string const& db_root_directory, std::string const& encoding);
 
         ~Oto()
         {}
