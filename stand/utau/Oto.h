@@ -33,6 +33,10 @@ namespace vconnect
 
         UtauParameter * find(std::string const& lyric);
 
+        size_t count() const;
+
+        UtauParameter * operator [] (size_t const index) const;
+
     private:
         Oto(Oto const& lhs);
         Oto & operator = (Oto const& lhs);

@@ -53,6 +53,16 @@ namespace vconnect
             }
         }
 
+        size_t doCount() const
+        {
+            return parameters_.size();
+        }
+
+        UtauParameter * doGet(size_t const index) const
+        {
+            return parameters_[index].get();
+        }
+
     private:
         std::vector<std::shared_ptr<UtauParameter>> parameters_;
     };
@@ -62,4 +72,18 @@ namespace vconnect
     {}
 
     UtauParameter * Oto::find(std::string const& lyric) { return impl_->doFind(lyric); }
+
+    size_t Oto::count() const
+    {
+        return impl_->doCount();
+    }
+
+    UtauParameter * Oto::operator [] (size_t const index) const
+    {
+        if (index < impl_->doCount()) {
+            return impl_->doGet(index);
+        } else {
+            return nullptr;
+        }
+    }
 }
