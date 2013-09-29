@@ -95,8 +95,10 @@ namespace vconnect
                         return ch == '#';
                     });
                 string scale_string;
-                std::copy_if(std::begin(s), std::end(s), std::begin(scale_string), [](char const ch) {
-                    return std::isdigit(ch);
+                std::for_each(std::begin(s), std::end(s), [&scale_string](char ch) {
+                    if (std::isdigit(ch)) {
+                        scale_string += ch;
+                    }
                 });
                 int const scale = std::atoi(scale_string.c_str());
                 return (scale + 2) * 12 + key + sharp_accidentals - flat_accidentals;
