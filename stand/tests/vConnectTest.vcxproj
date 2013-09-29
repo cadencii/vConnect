@@ -125,6 +125,7 @@ xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\
   <ItemGroup>
     <ClCompile Include="..\Mutex.cpp" />
     <ClCompile Include="..\Thread.cpp" />
+    <ClCompile Include="..\utau\Oto.cpp" />
     <ClCompile Include="..\utau\UtauDB.cpp" />
     <ClCompile Include="..\utau\UtauDBManager.cpp" />
     <ClCompile Include="..\vsq\BPList.cpp" />
@@ -134,6 +135,7 @@ xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\
     <ClCompile Include="..\vsq\Sequence.cpp" />
     <ClCompile Include="..\vsq\TempoList.cpp" />
     <ClCompile Include="MapTest.cpp" />
+    <ClCompile Include="utau\OtoTest.cpp" />
     <ClCompile Include="utau\UtauDBTest.cpp" />
     <ClCompile Include="AllTests.cpp" />
     <ClCompile Include="EncodingConverterTest.cpp" />

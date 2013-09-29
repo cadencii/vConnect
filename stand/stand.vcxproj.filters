@@ -135,6 +135,7 @@
     <ClInclude Include="utau\UtauParameter.h">
       <Filter>utau</Filter>
     </ClInclude>
+    <ClInclude Include="utau\Oto.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vsq\BPList.cpp">
@@ -224,5 +225,6 @@
     <ClCompile Include="utau\UtauDBManager.cpp">
       <Filter>utau</Filter>
     </ClCompile>
+    <ClCompile Include="utau\Oto.cpp" />
   </ItemGroup>
 </Project>

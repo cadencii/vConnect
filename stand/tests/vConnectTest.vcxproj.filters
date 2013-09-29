@@ -92,5 +92,7 @@
     <ClCompile Include="..\vsq\EventList.cpp" />
     <ClCompile Include="..\utau\UtauDBManager.cpp" />
     <ClCompile Include="MapTest.cpp" />
+    <ClCompile Include="utau\OtoTest.cpp" />
+    <ClCompile Include="..\utau\Oto.cpp" />
   </ItemGroup>
 </Project>
