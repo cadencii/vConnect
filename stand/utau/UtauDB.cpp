@@ -60,24 +60,9 @@ namespace vconnect
             }
         }
 
-        Map<string, UtauParameter *>::iterator doBegin()
-        {
-            return mSettingMap.begin();
-        }
-
-        Map<string, UtauParameter *>::iterator doEnd()
-        {
-            return mSettingMap.end();
-        }
-
         string doGetOtoIniPath() const
         {
             return mDBPath;
-        }
-
-        bool doEmpty() const
-        {
-            return mSettingMap.empty();
         }
 
         size_t doSize() const
@@ -123,7 +108,7 @@ namespace vconnect
                     break;
                 }
             }
-            if (it!= mSettingList.end()) {
+            if (it != mSettingList.end()) {
                 parameters = *(*it);
             }
             return ret;
@@ -137,16 +122,6 @@ namespace vconnect
         Map<string, UtauParameter *> mSettingMap;
         list<UtauParameter *> mSettingList;
     };
-
-    Map<string, UtauParameter *>::iterator UtauDB::begin()
-    {
-        return impl_->doBegin();
-    }
-
-    Map<string, UtauParameter *>::iterator UtauDB::end()
-    {
-        return impl_->doEnd();
-    }
 
     UtauDB::~UtauDB()
     {}
@@ -163,11 +138,6 @@ namespace vconnect
     string UtauDB::getOtoIniPath()
     {
         return impl_->doGetOtoIniPath();
-    }
-
-    bool UtauDB::empty()
-    {
-        return impl_->doEmpty();
     }
 
     int UtauDB::size()

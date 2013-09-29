@@ -52,17 +52,7 @@ namespace vconnect
          */
         string getOtoIniPath();
 
-        /// <summary>
-        /// 音素の数が0かどうかを取得します．
-        /// </summary>
-        /// <returns>音素の数が0の場合trueを，そうでない場合はfalseを返します．</returns>
-        bool empty();
-
         int size();
-
-        Map<string, UtauParameter *>::iterator begin();
-
-        Map<string, UtauParameter *>::iterator end();
 
     private:
         UtauDB()

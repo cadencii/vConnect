@@ -28,27 +28,6 @@ BOOST_AUTO_TEST_CASE(testConstruct)
     ret = db.getParams( resultByFileName, "音源に存在しない歌詞を指定" );
     BOOST_CHECK_EQUAL( 0, ret );
 
-    // イテレータによるアクセス
-    // イテレータによるアクセスでは、エイリアスで登録したものについてもアクセスされる
-    Map<string, UtauParameter *>::iterator i;
-    int count = 0;
-    for( i = db.begin(); i != db.end(); i++ ){
-        count++;
-    }
-    BOOST_CHECK_EQUAL( 3, count );
-
-    Map<string, UtauParameter *>::iterator j = db.begin();
-    BOOST_CHECK_EQUAL( string( "_ああいあうえあ" ), j->first );
-    BOOST_CHECK_EQUAL( string( "_ああいあうえあ" ), j->second->fileName );
-    j++;
-    BOOST_CHECK_EQUAL( string( "a あ" ), j->first );
-    BOOST_CHECK_EQUAL( string( "_ああいあうえあ" ), j->second->fileName );
-    j++;
-    BOOST_CHECK_EQUAL( string( "あ" ), j->first );
-    BOOST_CHECK_EQUAL( string( "あ" ), j->second->fileName );
-    j++;
-    BOOST_CHECK( j == db.end() );
-
     // インデックスによるアクセス
     // インデックスによるアクセスでは、エイリアスで登録したものについてはアクセスされない
     BOOST_CHECK_EQUAL( 2, db.size() );
