@@ -1,6 +1,6 @@
 /*
  * UtauDB.cpp
- * Copyright © 2009-2012 HAL, 2012 kbinani
+ * Copyright © 2009-2012 HAL, 2012-2013 kbinani
  *
  * This file is part of vConnect-STAND.
  *
@@ -13,6 +13,7 @@
  */
 #include "UtauDB.h"
 #include "../TextInputStream.h"
+#include "./Oto.h"
 
 namespace vconnect
 {
@@ -20,45 +21,13 @@ namespace vconnect
     {
         Impl(std::string const& path_oto_ini, std::string const& codepage)
         {
-            int result = 2;
-
-            int index;
             string path = Path::normalize(path_oto_ini);
-
-            TextInputStream stream(path, codepage);
-
-            if (false == stream.ready()) {
-                return;
-            }
-
+            root_ = make_shared<Oto>(path, codepage);
             mDBPath = Path::combine(Path::getDirectoryName(path), "");
-
-            while (stream.ready()) {
-                string line = stream.readLine();
-                if (line.length() == 0){
-                    continue;
-                }
-                UtauParameter * current = new UtauParameter(line);
-                mSettingMap.insert(make_pair(current->lyric, current));
-                if (current->lyric.compare(current->fileName) != 0) {
-                    mSettingMap.insert(make_pair(current->fileName, current));
-                }
-                mSettingList.push_back(current);
-            }
-            if (result != 3) {
-                result = 1;
-            }
-            stream.close();
         }
 
         ~Impl()
-        {
-            for (auto i = mSettingList.begin(); i != mSettingList.end(); ++i) {
-                if ((*i)) {
-                    delete (*i);
-                }
-            }
-        }
+        {}
 
         string doGetOtoIniPath() const
         {
@@ -67,51 +36,29 @@ namespace vconnect
 
         size_t doSize() const
         {
-            return mSettingList.size();
+            return root_->count();
         }
 
         int doGetParamsByLyric(UtauParameter &parameters, string const& search)
         {
-            int result = 0;
-            auto i = mSettingMap.find(search);
-            if (i != mSettingMap.end()) {
-                if (i->second) {
-                    parameters.fileName         = i->second->fileName;
-                    parameters.lyric            = i->second->lyric;
-                    parameters.msFixedLength    = i->second->msFixedLength;
-                    parameters.msLeftBlank      = i->second->msLeftBlank;
-                    parameters.msPreUtterance   = i->second->msPreUtterance;
-                    parameters.msRightBlank     = i->second->msRightBlank;
-                    parameters.msVoiceOverlap   = i->second->msVoiceOverlap;
-                    parameters.isWave           = i->second->isWave;
-                    result = 1;
-                }
+            UtauParameter * found = root_->find(search);
+            if (found) {
+                parameters = *found;
+                return 1;
+            } else {
+                return 0;
             }
-            return result;
         }
 
         int doGetParamsByIndex(UtauParameter & parameters, int const index)
         {
-            int ret = 0;
-            auto it = mSettingList.begin();
-            for (int i = 0; i < doSize() && it != mSettingList.end(); i++, it++) {
-                if (index == i) {
-                    ret = 1;
-                    parameters.fileName         = (*it)->fileName;
-                    parameters.lyric            = (*it)->lyric;
-                    parameters.msFixedLength    = (*it)->msFixedLength;
-                    parameters.msLeftBlank      = (*it)->msLeftBlank;
-                    parameters.msPreUtterance   = (*it)->msPreUtterance;
-                    parameters.msRightBlank     = (*it)->msRightBlank;
-                    parameters.msVoiceOverlap   = (*it)->msVoiceOverlap;
-                    parameters.isWave           = (*it)->isWave;
-                    break;
-                }
+            UtauParameter * found = (*root_)[index];
+            if (found) {
+                parameters = *found;
+                return 1;
+            } else {
+                return 0;
             }
-            if (it != mSettingList.end()) {
-                parameters = *(*it);
-            }
-            return ret;
         }
 
     private:
@@ -119,8 +66,7 @@ namespace vconnect
         /// oto.iniファイルのパス．
         /// </summary>
         string mDBPath;
-        Map<string, UtauParameter *> mSettingMap;
-        list<UtauParameter *> mSettingList;
+        std::shared_ptr<Oto> root_;
     };
 
     UtauDB::~UtauDB()
