@@ -164,7 +164,7 @@ namespace vconnect
          * @param otoIniPath oto.ini のパス
          * @param encoding oto.ini のテキストエンコーディング
          */
-        void setParamOtoIni( string singerName, string otoIniPath, string encoding );
+        void setParamOtoIni(string const& singerName, string const& otoIniPath, string const& encoding);
 
         /**
          * [oto.ini] セクションの名前
