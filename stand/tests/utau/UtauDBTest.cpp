@@ -28,9 +28,17 @@ BOOST_AUTO_TEST_CASE(testConstruct)
     ret = db.getParams(resultByFileName, "音源に存在しない歌詞を指定", 60);
     BOOST_CHECK_EQUAL( 0, ret );
 
+    {
+        // search via prefix.map
+        UtauParameter parameter;
+        int const result = db.getParams(parameter, "あ", 62);
+        BOOST_CHECK_EQUAL(1, result);
+        BOOST_CHECK_EQUAL(string("あ↑"), parameter.fileName);
+    }
+
     // インデックスによるアクセス
     // インデックスによるアクセスでは、エイリアスで登録したものについてはアクセスされない
-    BOOST_CHECK_EQUAL( 2, db.size() );
+    BOOST_CHECK_EQUAL( 3, db.size() );
     UtauParameter result;
     ret = db.getParams( result, 0 );
     BOOST_CHECK_EQUAL( 1, ret );

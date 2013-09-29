@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(indexAccess)
 {
     string path = Path::getFullPath(fixture_path_);
     Oto oto(path, fixture_encoding_);
-    BOOST_CHECK_EQUAL((size_t)2, oto.count());
+    BOOST_CHECK_EQUAL((size_t)3, oto.count());
     {
         UtauParameter * actual = oto[0];
         BOOST_CHECK(actual != nullptr);
@@ -66,6 +66,18 @@ BOOST_AUTO_TEST_CASE(indexAccess)
     }
     {
         UtauParameter * actual = oto[2];
+        BOOST_CHECK(actual != nullptr);
+        BOOST_CHECK_EQUAL(string("あ↑"), actual->lyric);
+        BOOST_CHECK_EQUAL(string("あ↑"), actual->fileName);
+        BOOST_CHECK_CLOSE(500.0f, actual->msLeftBlank, FLT_EPSILON);
+        BOOST_CHECK_CLOSE(400.0f, actual->msFixedLength, FLT_EPSILON);
+        BOOST_CHECK_CLOSE(-500.0f, actual->msRightBlank, FLT_EPSILON);
+        BOOST_CHECK_CLOSE(250.0f, actual->msPreUtterance, FLT_EPSILON);
+        BOOST_CHECK_CLOSE(83.333f, actual->msVoiceOverlap, FLT_EPSILON);
+        BOOST_CHECK(actual->isWave);
+    }
+    {
+        UtauParameter * actual = oto[3];
         BOOST_CHECK(actual == nullptr);
     }
 }

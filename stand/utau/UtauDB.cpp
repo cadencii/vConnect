@@ -14,6 +14,7 @@
 #include "UtauDB.h"
 #include "../TextInputStream.h"
 #include "./Oto.h"
+#include "./PrefixMap.h"
 
 namespace vconnect
 {
@@ -21,8 +22,11 @@ namespace vconnect
     {
         Impl(std::string const& path_oto_ini, std::string const& codepage)
         {
-            string path = Path::normalize(path_oto_ini);
+            string const path = Path::normalize(path_oto_ini);
             root_ = make_shared<Oto>(path, codepage);
+            string const directory = Path::getDirectoryName(path);
+            string const prefixmap = Path::combine(directory, "prefix.map");
+            prefixmap_ = make_shared<PrefixMap>(prefixmap, codepage);
             mDBPath = Path::combine(Path::getDirectoryName(path), "");
         }
 
@@ -39,14 +43,21 @@ namespace vconnect
             return root_->count();
         }
 
-        int doGetParamsByLyric(UtauParameter &parameters, string const& search)
+        int doGetParamsByLyric(UtauParameter &parameters, string const& search, int note_number)
         {
-            UtauParameter * found = root_->find(search);
+            auto mapped_lyric = prefixmap_->getMappedLyric(search, note_number);
+            UtauParameter * found = findParam(mapped_lyric);
             if (found) {
                 parameters = *found;
                 return 1;
             } else {
-                return 0;
+                UtauParameter * retry_found = findParam(search);
+                if (retry_found) {
+                    parameters = *retry_found;
+                    return 1;
+                } else {
+                    return 0;
+                }
             }
         }
 
@@ -62,11 +73,17 @@ namespace vconnect
         }
 
     private:
+        UtauParameter * findParam(string const& lyric)
+        {
+            return root_->find(lyric);
+        }
+
         /// <summary>
         /// oto.iniファイルのパス．
         /// </summary>
         string mDBPath;
         std::shared_ptr<Oto> root_;
+        std::shared_ptr<PrefixMap> prefixmap_;
     };
 
     UtauDB::~UtauDB()
@@ -78,7 +95,7 @@ namespace vconnect
 
     int UtauDB::getParams(UtauParameter & parameters, string const& search, int note_number)
     {
-        return impl_->doGetParamsByLyric(parameters, search);
+        return impl_->doGetParamsByLyric(parameters, search, note_number);
     }
 
     string UtauDB::getOtoIniPath()
