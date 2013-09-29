@@ -88,7 +88,7 @@ xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\
 </Command>
     </PreBuildEvent>
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -121,11 +121,13 @@ xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\
     <None Include="fixture\TextInputStream\utf8_lf.txt" />
     <None Include="fixture\utau\UtauDB\oto.ini" />
     <None Include="expected\TextOutputStream\shift_jis_crlf.txt" />
+    <None Include="fixture\utau\UtauDB\prefix.map" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Mutex.cpp" />
     <ClCompile Include="..\Thread.cpp" />
     <ClCompile Include="..\utau\Oto.cpp" />
+    <ClCompile Include="..\utau\PrefixMap.cpp" />
     <ClCompile Include="..\utau\UtauDB.cpp" />
     <ClCompile Include="..\utau\UtauDBManager.cpp" />
     <ClCompile Include="..\vsq\BPList.cpp" />
@@ -136,6 +138,7 @@ xcopy /S /E /F /G /H /R /K /Y $(ProjectDir)expected\*.* $(TargetDir)expected\
     <ClCompile Include="..\vsq\TempoList.cpp" />
     <ClCompile Include="MapTest.cpp" />
     <ClCompile Include="utau\OtoTest.cpp" />
+    <ClCompile Include="utau\PrefixMapTest.cpp" />
     <ClCompile Include="utau\UtauDBTest.cpp" />
     <ClCompile Include="AllTests.cpp" />
     <ClCompile Include="EncodingConverterTest.cpp" />

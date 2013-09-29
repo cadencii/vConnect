@@ -136,6 +136,7 @@
       <Filter>utau</Filter>
     </ClInclude>
     <ClInclude Include="utau\Oto.h" />
+    <ClInclude Include="utau\PrefixMap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vsq\BPList.cpp">
@@ -226,5 +227,6 @@
       <Filter>utau</Filter>
     </ClCompile>
     <ClCompile Include="utau\Oto.cpp" />
+    <ClCompile Include="utau\PrefixMap.cpp" />
   </ItemGroup>
 </Project>

@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="utau\Oto.h" />
+    <ClInclude Include="utau\PrefixMap.h" />
     <ClInclude Include="vsq\BP.h" />
     <ClInclude Include="vsq\BPList.h" />
     <ClInclude Include="vsq\CurveTypeEnum.h" />
@@ -135,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utau\Oto.cpp" />
+    <ClCompile Include="utau\PrefixMap.cpp" />
     <ClCompile Include="vsq\BPList.cpp" />
     <ClCompile Include="vsq\EventList.cpp" />
     <ClCompile Include="vsq\Handle.cpp" />

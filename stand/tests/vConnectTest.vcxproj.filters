@@ -57,6 +57,7 @@
     <None Include="expected\TextOutputStream\shift_jis_crlf.txt">
       <Filter>expected\TextOutputStream</Filter>
     </None>
+    <None Include="fixture\utau\UtauDB\prefix.map" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Mutex.cpp">
@@ -94,5 +95,7 @@
     <ClCompile Include="MapTest.cpp" />
     <ClCompile Include="utau\OtoTest.cpp" />
     <ClCompile Include="..\utau\Oto.cpp" />
+    <ClCompile Include="utau\PrefixMapTest.cpp" />
+    <ClCompile Include="..\utau\PrefixMap.cpp" />
   </ItemGroup>
 </Project>
