@@ -21,7 +21,7 @@
 #include <string>
 #include <sys/stat.h>
 
-#include "StringUtil.h"
+#include "./StringUtil.h"
 
 namespace vconnect
 {
@@ -81,10 +81,16 @@ namespace vconnect
          */
         static string getDirectorySeparator()
         {
+            char ch = getDirectorySeparatorChar();
+            return string(&ch, 1);
+        }
+
+        static char getDirectorySeparatorChar()
+        {
             #ifdef _WIN32
-                return "\\";
+                return '\\';
             #else
-                return "/";
+                return '/';
             #endif
         }
 
@@ -132,6 +138,16 @@ namespace vconnect
             result = StringUtil::replace( result, "/", separator );
             result = StringUtil::replace( result, "\\", separator );
             return result;
+        }
+
+        static string getExtension(string const& path)
+        {
+            auto last_period = path.rfind('.');
+            if (last_period != std::string::npos) {
+                return path.substr(last_period);
+            } else {
+                return "";
+            }
         }
 
     protected:

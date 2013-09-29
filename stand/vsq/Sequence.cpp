@@ -22,7 +22,7 @@ namespace vconnect
     const string Sequence::OBJ_NAME_TEMPO      = "[Tempo]";
     const string Sequence::OBJ_NAME_TEMPO_LIST = "[TempoList]";
 
-    void Sequence::setParamOtoIni( string singerName, string otoIniPath, string encoding )
+    void Sequence::setParamOtoIni(string const& singerName, string const& otoIniPath, string const& encoding)
     {
         // 名前登録して
         int index = UtauDBManager::find( otoIniPath );

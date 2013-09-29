@@ -77,6 +77,7 @@ namespace vconnect
             size_t remainingInputBytes = source.size();
 
             char *buffer = new char[remainingInputBytes + 1];
+            memset(buffer, 0, sizeof(char) * (remainingInputBytes + 1));
             char *output = buffer;
             size_t remainingOutputBytes = remainingInputBytes;
             size_t outputBytes = remainingInputBytes;

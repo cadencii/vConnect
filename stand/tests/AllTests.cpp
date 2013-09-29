@@ -1,20 +1,10 @@
-﻿#include "AllTests.h"
+﻿#define BOOST_TEST_NO_LIB
+#include <boost/test/unit_test.hpp>
 
-int main( int argc, char* argv[] )
+boost::unit_test_framework::test_suite* init_unit_test_suite(int argc, char* argv[])
 {
-    CppUnit::TestResult controller;
-    CppUnit::TestResultCollector results;
-    controller.addListener( &results );
-
-    CppUnit::BriefTestProgressListener progress;
-    controller.addListener( &progress );
-
-    CppUnit::TestRunner runner;
-    runner.addTest( CppUnit::TestFactoryRegistry::getRegistry().makeTest() );
-    runner.run( controller );
-
-    CppUnit::CompilerOutputter outputter( &results, CppUnit::stdCOut() );
-    outputter.write();
-
-    return results.wasSuccessful() ? 0 : 1;
+	return BOOST_TEST_SUITE("replace output stream");
 }
+
+#define BOOST_TEST_MODULE boost_unit_test
+#include <boost/test/included/unit_test.hpp>

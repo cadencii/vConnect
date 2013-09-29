@@ -1,6 +1,6 @@
 /*
  * UtauDB.cpp
- * Copyright © 2009-2012 HAL, 2012 kbinani
+ * Copyright © 2009-2012 HAL, 2012-2013 kbinani
  *
  * This file is part of vConnect-STAND.
  *
@@ -11,129 +11,127 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+#include <iostream>
+#include <boost/filesystem.hpp>
 #include "UtauDB.h"
 #include "../TextInputStream.h"
+#include "./Oto.h"
+#include "./PrefixMap.h"
 
 namespace vconnect
 {
-    Map<string, UtauParameter *>::iterator UtauDB::begin()
+    struct UtauDB::Impl
     {
-        return mSettingMap.begin();
-    }
+        Impl(std::string const& path_oto_ini, std::string const& codepage)
+        {
+            string const path = Path::normalize(path_oto_ini);
+            string const directory = Path::getDirectoryName(path);
+            root_ = make_shared<Oto>(path, directory, codepage);
+            string const prefixmap = Path::combine(directory, "prefix.map");
+            prefixmap_ = make_shared<PrefixMap>(prefixmap, codepage);
+            mDBPath = Path::combine(Path::getDirectoryName(path), "");
 
-    Map<string, UtauParameter *>::iterator UtauDB::end()
-    {
-        return mSettingMap.end();
-    }
+            namespace fs = boost::filesystem;
+            std::for_each(fs::directory_iterator(directory), fs::directory_iterator(), [this, codepage, directory](fs::directory_entry const& dir) {
+                string oto_ini = Path::combine(dir.path().generic_string(), "oto.ini");
+                if (Path::exists(oto_ini)) {
+                    this->sub_.push_back(make_shared<Oto>(oto_ini, directory, codepage));
+                }
+            });
+        }
+
+        ~Impl()
+        {}
+
+        string doGetOtoIniPath() const
+        {
+            return mDBPath;
+        }
+
+        size_t doSize() const
+        {
+            return root_->count();
+        }
+
+        int doGetParamsByLyric(UtauParameter &parameters, string const& search, int note_number)
+        {
+            auto mapped_lyric = prefixmap_->getMappedLyric(search, note_number);
+            UtauParameter * found = findParam(mapped_lyric);
+            if (found) {
+                parameters = *found;
+                return 1;
+            } else {
+                UtauParameter * retry_found = findParam(search);
+                if (retry_found) {
+                    parameters = *retry_found;
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+
+        int doGetParamsByIndex(UtauParameter & parameters, int const index)
+        {
+            UtauParameter * found = (*root_)[index];
+            if (found) {
+                parameters = *found;
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+    private:
+        UtauParameter * findParam(string const& lyric)
+        {
+            UtauParameter * found = root_->find(lyric);
+            if (found) {
+                return found;
+            } else {
+                for (auto sub = std::begin(sub_); sub != std::end(sub_); ++sub) {
+                    UtauParameter * sub_found = (*sub)->find(lyric);
+                    if (sub_found) {
+                        return sub_found;
+                    }
+                }
+            }
+            return nullptr;
+        }
+
+        /// <summary>
+        /// oto.iniファイルのパス．
+        /// </summary>
+        string mDBPath;
+        shared_ptr<Oto> root_;
+        shared_ptr<PrefixMap> prefixmap_;
+        vector<shared_ptr<Oto>> sub_;
+    };
 
     UtauDB::~UtauDB()
+    {}
+
+    UtauDB::UtauDB(string const& path_oto_ini, string const& codepage)
+        : impl_(std::make_shared<Impl>(path_oto_ini, codepage))
+    {}
+
+    int UtauDB::getParams(UtauParameter & parameters, string const& search, int note_number)
     {
-        list<UtauParameter*>::iterator i;
-        for( i = mSettingList.begin(); i != mSettingList.end(); i++ )
-        {
-            if( (*i) )
-            {
-                delete (*i);
-            }
-        }
-    }
-
-    UtauDB::UtauDB( string path_oto_ini, string codepage )
-    {
-        int result = 2;
-
-        int index;
-        path_oto_ini = Path::normalize( path_oto_ini );
-
-        TextInputStream stream( path_oto_ini, codepage );
-
-        if( false == stream.ready() ){
-            return;
-        }
-
-        mDBPath = Path::combine( Path::getDirectoryName( path_oto_ini ), "" );
-
-        while( stream.ready() ){
-            string line = stream.readLine();
-            if( line.length() == 0 ){
-                continue;
-            }
-            UtauParameter *current = new UtauParameter( line );
-            mSettingMap.insert( make_pair( current->lyric, current ) );
-            if( current->lyric.compare( current->fileName ) != 0 ){
-                mSettingMap.insert( make_pair( current->fileName, current ) );
-            }
-            mSettingList.push_back( current );
-        }
-        if( result != 3 ){
-            result = 1;
-        }
-        stream.close();
-
-        return;
-    }
-
-    int UtauDB::getParams( UtauParameter &parameters, string search )
-    {
-        int    result = 0;
-        Map<string, UtauParameter *>::iterator i = mSettingMap.find( search );
-        if( i != mSettingMap.end() )
-        {
-            if( i->second )
-            {
-                parameters.fileName = i->second->fileName;
-                parameters.lyric = i->second->lyric;
-                parameters.msFixedLength = i->second->msFixedLength;
-                parameters.msLeftBlank = i->second->msLeftBlank;
-                parameters.msPreUtterance = i->second->msPreUtterance;
-                parameters.msRightBlank = i->second->msRightBlank;
-                parameters.msVoiceOverlap = i->second->msVoiceOverlap;
-                parameters.isWave = i->second->isWave;
-                result = 1;
-            }
-        }
-        return result;
+        return impl_->doGetParamsByLyric(parameters, search, note_number);
     }
 
     string UtauDB::getOtoIniPath()
     {
-        return this->mDBPath;
-    }
-
-    bool UtauDB::empty()
-    {
-        return mSettingMap.empty();
+        return impl_->doGetOtoIniPath();
     }
 
     int UtauDB::size()
     {
-        return mSettingList.size();
+        return impl_->doSize();
     }
 
     int UtauDB::getParams(UtauParameter &parameters, int index)
     {
-        int ret = 0;
-        list<UtauParameter*>::iterator it = mSettingList.begin();
-        for(int i = 0; i < size() && it != mSettingList.end(); i++, it++)
-        {
-            if(index == i)
-            {
-                ret = 1;
-                parameters.fileName = (*it)->fileName;
-                parameters.lyric = (*it)->lyric;
-                parameters.msFixedLength = (*it)->msFixedLength;
-                parameters.msLeftBlank = (*it)->msLeftBlank;
-                parameters.msPreUtterance = (*it)->msPreUtterance;
-                parameters.msRightBlank = (*it)->msRightBlank;
-                parameters.msVoiceOverlap = (*it)->msVoiceOverlap;
-                parameters.isWave = (*it)->isWave;
-                break;
-            }
-        }
-        if(it!= mSettingList.end())
-        {
-            parameters = *(*it);
-        }
-        return ret;
+        return impl_->doGetParamsByIndex(parameters, index);
     }
 }

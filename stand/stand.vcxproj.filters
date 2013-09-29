@@ -135,6 +135,8 @@
     <ClInclude Include="utau\UtauParameter.h">
       <Filter>utau</Filter>
     </ClInclude>
+    <ClInclude Include="utau\Oto.h" />
+    <ClInclude Include="utau\PrefixMap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vsq\BPList.cpp">
@@ -224,10 +226,7 @@
     <ClCompile Include="utau\UtauDBManager.cpp">
       <Filter>utau</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\libgcc.lib" />
-    <Library Include="..\libiconv.lib" />
-    <Library Include="..\pthreadVC2.lib" />
+    <ClCompile Include="utau\Oto.cpp" />
+    <ClCompile Include="utau\PrefixMap.cpp" />
   </ItemGroup>
 </Project>

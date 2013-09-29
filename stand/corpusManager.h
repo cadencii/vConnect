@@ -16,6 +16,7 @@
 #define __corpusManager_h__
 
 #include <list>
+#include <tuple>
 #include "stand.h"
 #include "utau/UtauDB.h"
 #include "vConnectSetting.h"
@@ -77,7 +78,7 @@ public:
     /// </summary>
     /// <param name="lyric"> 検索する音素片に対応する歌詞 </param>
     /// <returns> 検索に成功したとき該当する音素片へのポインタ，それ以外のときはNULLを返します． </returns>
-    phoneme *getPhoneme( string lyric );
+    phoneme *getPhoneme(string const& lyric, int note_number );
 
     /// <summary>
     /// 歌詞にマッチする音素片を引数で指定したリストへ追加します．
@@ -85,14 +86,14 @@ public:
     /// </summary>
     /// <param name="lyric"> 検索する音素片に対応する歌詞 </param>
     /// <param name="phonemeList"> 音素片を追加するリスト </param>
-    phoneme *getPhoneme(string lyric, list<phoneme*> &phonemeList);
+    phoneme *getPhoneme(string const& lyric, int note_number, list<phoneme*> &phonemeList);
 
     /// <summary>
     /// 今のところ分析済みファイルの読み込みを行っています．
     /// 動作が変わる可能性も．
     /// </summary>
-    /// <param name="p">解析する音素のリスト．</param>
-    void analyze( vector<string> &phonemes );
+    /// <param name="phonemes">解析する音素と音程のリスト．</param>
+    void analyze( vector<tuple<string, int>> &phonemes );
 
     void setCorpusSetting(librarySetting *setting);
 

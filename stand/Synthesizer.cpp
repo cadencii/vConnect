@@ -13,6 +13,7 @@
  */
 #include <time.h>
 #include <math.h>
+#include <tuple>
 #include <vorbis/vorbisfile.h>
 #include "stand.h"
 #include "Configuration.h"
@@ -155,9 +156,10 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
         Event *itemThis = vsq.events.eventList[i];
         Event *itemNext = (itemThis->isContinuousBack) ? vsq.events.eventList[i+1] : NULL;
         string lyric = itemThis->lyricHandle.getLyric();
+        int const note_number = itemThis->note;
         list<corpusManager::phoneme *> phonemeList;
-        corpusManager::phoneme *p;
-        managers[itemThis->singerIndex]->getPhoneme(lyric, phonemeList);
+        corpusManager::phoneme * p = nullptr;
+        managers[itemThis->singerIndex]->getPhoneme(lyric, note_number, phonemeList);
         double vel = pow(2.0, (double)(64 - itemThis->velocity) / 64);
 
         // 次の音符が今の音符にかぶる場合はそれの設定．
@@ -189,6 +191,10 @@ void calculateFrameData(vConnectFrame *dst, int frameLength, vector<vConnectPhon
             {
                 phonemes.push_back(phoneme);
             }
+        }
+
+        if (!p) {
+            continue;
         }
 
         // 音符が有効な区間に今の音素を書き込む．
@@ -320,15 +326,15 @@ void Synthesizer::run()
 
     double *wave;
 
-    vector<string> analyze_list;
     for( int i = 0; i < UtauDBManager::size(); i++ )
     {
         corpusManager *p = new corpusManager;
         p->setUtauDB( UtauDBManager::get( i ), this->option );
-        analyze_list.clear();
+        vector<tuple<string, int>> analyze_list;
         for( int j = 0; j < mVsq.events.eventList.size(); j++) {
-            if( mVsq.events.eventList[j]->singerIndex == i ) {
-                analyze_list.push_back( mVsq.events.eventList[j]->lyricHandle.getLyric() );
+            auto item = mVsq.events.eventList[j];
+            if (item->singerIndex == i) {
+                analyze_list.push_back(make_tuple(item->lyricHandle.getLyric(), item->note));
             }
         }
         p->analyze( analyze_list );
@@ -486,7 +492,7 @@ void Synthesizer::run()
     delete[] dynamics;
 }
 
-corpusManager::phoneme* Synthesizer::getPhoneme(string lyric, int singerIndex, vector<corpusManager *> *managers)
+/*corpusManager::phoneme* Synthesizer::getPhoneme(string lyric, int singerIndex, vector<corpusManager *> *managers)
 {
     corpusManager::phoneme *ret = NULL;
     if( singerIndex < managers->size() )
@@ -494,7 +500,7 @@ corpusManager::phoneme* Synthesizer::getPhoneme(string lyric, int singerIndex, v
         ret = (*managers)[singerIndex]->getPhoneme( lyric );
     }
     return ret;
-}
+}*/
 
 int getFirstItem(
     Event **p1,
@@ -516,11 +522,11 @@ int getFirstItem(
             ret = i;
             if( *p1 )
             {
-                *ph1 = managers[(*p1)->singerIndex]->getPhoneme((*p1)->lyricHandle.getLyric());
+                *ph1 = managers[(*p1)->singerIndex]->getPhoneme((*p1)->lyricHandle.getLyric(), (*p1)->note);
             }
             if( *p2 )
             {
-                *ph2 = managers[(*p2)->singerIndex]->getPhoneme((*p2)->lyricHandle.getLyric());
+                *ph2 = managers[(*p2)->singerIndex]->getPhoneme((*p2)->lyricHandle.getLyric(), (*p2)->note);
             }
             break;
         }
@@ -907,7 +913,7 @@ void Synthesizer::calculateVsqInfo( void )
         temp = itemi->lyricHandle.getLyric();
         msPreUtterance = itemi->utauSetting.msPreUtterance;
         msVoiceOverlap = itemi->utauSetting.msVoiceOverlap;
-        voiceDB->getParams( itemi->utauSetting, temp );
+        voiceDB->getParams( itemi->utauSetting, temp, itemi->note );
         itemi->utauSetting.msPreUtterance = msPreUtterance;
         itemi->utauSetting.msVoiceOverlap = msVoiceOverlap;
 

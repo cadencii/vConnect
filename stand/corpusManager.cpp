@@ -11,6 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+#include <tuple>
 #include "Configuration.h"
 #include "corpusManager.h"
 #include "vConnectPhoneme.h"
@@ -26,12 +27,13 @@ corpusManager::corpusManager()
     mFrequency = 440.0;
 }
 
-void corpusManager::analyze( vector<string> &phonemes )
+void corpusManager::analyze( vector<tuple<string, int>> &phonemes )
 {
     int size = phonemes.size();
     for( int i = 0; i < size; i++ ){
-        string lyric = phonemes[i];
-        getPhoneme( lyric );
+        string lyric = std::get<0>(phonemes[i]);
+        int note_number = std::get<1>(phonemes[i]);
+        getPhoneme(lyric, note_number);
         cout << "corpusManager::analyze; lyric=" << lyric << endl;
     }
     for( int i = 0; i < mAppendCorpus.size(); i++ ){
@@ -66,7 +68,7 @@ corpusManager::~corpusManager()
     }
 }
 
-corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
+corpusManager::phoneme *corpusManager::getPhoneme(string const& lyric, int note_number)
 {
     phoneme *ret = NULL;
     Map<string, phoneme *>::iterator i;
@@ -118,7 +120,7 @@ corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
 #endif
 
         // UTAU の原音設定が無ければ読み込みを行わない．
-        if( mUtauDB->getParams( parameters, lyric ) ){
+        if (mUtauDB->getParams(parameters, lyric, note_number)) {
             target->p = new vConnectPhoneme;
             string path = mDBPath + parameters.fileName;
             bool bResult = false;
@@ -150,12 +152,12 @@ corpusManager::phoneme *corpusManager::getPhoneme( string lyric )
 }
 
 
-corpusManager::phoneme *corpusManager::getPhoneme(string lyric, list<phoneme*> &phonemeList)
+corpusManager::phoneme *corpusManager::getPhoneme(string const& lyric, int note_number, list<phoneme*> &phonemeList)
 {
     phoneme *p = NULL;
 
     // 有効な音素なら追加する．
-    if((p = getPhoneme(lyric)) && p->isValid && p->p){
+    if((p = getPhoneme(lyric, note_number)) && p->isValid && p->p){
         p->enableBrightness = mEnableBrightness;
         p->enableFrequency = mEnableFrequency;
         phonemeList.push_back(p);
@@ -164,7 +166,7 @@ corpusManager::phoneme *corpusManager::getPhoneme(string lyric, list<phoneme*> &
     // アペンドがあるならそれを追加．
     for(int i = 0; i < mAppendCorpus.size(); i++){
         if(mAppendCorpus[i] && p){
-            p->children = mAppendCorpus[i]->getPhoneme(lyric, phonemeList);
+            p->children = mAppendCorpus[i]->getPhoneme(lyric, note_number, phonemeList);
         }
     }
     return p;
