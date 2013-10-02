@@ -16,12 +16,14 @@
 
 #include <time.h>
 #include <sstream>
+#include <boost/filesystem.hpp>
 #include "TextInputStream.h"
 #include "TextOutputStream.h"
 #include "vConnectPhoneme.h"
 #include "StringUtil.h"
 #include "Task.h"
 #include "WaveBuffer/WaveBuffer.h"
+#include "./utau/Oto.h"
 
 namespace vconnect
 {
@@ -48,34 +50,76 @@ namespace vconnect
          */
         void run()
         {
-            string otoIni = this->option.getInputPath();
-            string sourceDirectory = Path::getDirectoryName( otoIni );
-            string destinationDirectory = this->option.getOutputPath();
+            namespace fs = boost::filesystem;
+
+            string const root_oto_ini = Path::getFullPath(this->option.getInputPath());
+            string const root_oto_ini_directory = Path::getDirectoryName(root_oto_ini) + Path::getDirectorySeparator();
+            string encoding = this->option.getEncodingOtoIni();
+            std::shared_ptr<UtauDB> db = std::make_shared<UtauDB>(root_oto_ini, encoding);
+            string const destination_directory = this->option.getOutputPath();
+
+            copy(root_oto_ini_directory, destination_directory, string("prefix.map"));
+            copy(root_oto_ini_directory, destination_directory, string("character.txt"));
+
+            Oto const* const root_oto = db->getRootOto();
+            convert(root_oto, destination_directory);
+
+            for (size_t i = 0; i < db->getSubDirectorySize(); ++i) {
+                Oto const* oto = db->getSubDirectoryOto(i);
+                string const oto_ini = Path::getFullPath(oto->getOtoIniPath());
+                string const oto_ini_directory = Path::getDirectoryName(oto_ini);
+                string sub_directory_name = oto_ini_directory.find(root_oto_ini_directory) == 0
+                    ? oto_ini_directory.substr(root_oto_ini_directory.length())
+                    : "";
+                string destination_sub_directory = Path::combine(destination_directory, sub_directory_name);
+
+                boost::system::error_code error;
+                if (fs::create_directory(destination_sub_directory, error)) {
+                    convert(oto, destination_sub_directory);
+                }
+            }
+        }
+
+    private:
+        void copy(string const& source_directory, string const& destination_directory, std::string const& filename)
+        {
+            namespace fs = boost::filesystem;
+
+            boost::system::error_code error;
+            string source = Path::combine(source_directory, filename);
+            string destination = Path::combine(destination_directory, filename);
+            if (fs::is_regular_file(source, error) && !fs::is_regular_file(destination)) {
+                fs::copy_file(source, destination, error);
+            }
+        }
+
+        void convert(Oto const* const oto, string const& destination_directory)
+        {
+            string otoIni = oto->getOtoIniPath();
+            string sourceDirectory = Path::getDirectoryName(otoIni);
             int count = 0;
 
             string encoding = this->option.getEncodingOtoIni();
-            TextInputStream reader( otoIni, encoding );
-            string destinationOtoIni = Path::combine( destinationDirectory, "oto.ini" );
-            TextOutputStream writer( destinationOtoIni, encoding, "\x0D\x0A" );
-            while( reader.ready() ){
+            TextInputStream reader(otoIni, encoding);
+            string destinationOtoIni = Path::combine(destination_directory, "oto.ini");
+            TextOutputStream writer(destinationOtoIni, encoding, "\x0D\x0A");
+            while (reader.ready()) {
                 string buffer = reader.readLine();
                 if( buffer.length() == 0 ){
                     continue;
                 }
                 count++;
 
-                string line = this->processRecord( buffer, count, sourceDirectory, destinationDirectory );
+                string line = this->processRecord(buffer, count, sourceDirectory, destination_directory);
 
-                if( line.length() > 0 ){
-                    writer.writeLine( line );
+                if (line.length() > 0) {
+                    writer.writeLine(line);
                 }
             }
-
             writer.close();
             reader.close();
         }
 
-    private:
         /**
          * 変換元の oto.ini ファイルの１行分のデータを処理する
          * @param record 1 行分のデータ
