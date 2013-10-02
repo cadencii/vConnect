@@ -37,6 +37,8 @@ namespace vconnect
 
         UtauParameter * operator [] (size_t const index) const;
 
+        std::string getOtoIniPath() const;
+
     private:
         Oto(Oto const& lhs);
         Oto & operator = (Oto const& lhs);

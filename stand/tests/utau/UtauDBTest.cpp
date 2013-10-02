@@ -1,6 +1,6 @@
 ﻿#include <boost/test/unit_test.hpp>
-//#include "../AllTests.h"
 #include "../../utau/UtauDB.h"
+#include "../../utau/Oto.h"
 #include "../../Path.h"
 
 using namespace std;
@@ -47,15 +47,36 @@ BOOST_AUTO_TEST_CASE(testConstruct)
     // インデックスによるアクセス
     // インデックスによるアクセスでは、エイリアスで登録したものについてはアクセスされない
     BOOST_CHECK_EQUAL( 3, db.size() );
-    UtauParameter result;
-    ret = db.getParams( result, 0 );
-    BOOST_CHECK_EQUAL( 1, ret );
-    BOOST_CHECK_EQUAL( string( "_ああいあうえあ" ), result.fileName );
-    ret = db.getParams( result, 1 );
-    BOOST_CHECK_EQUAL( string( "あ" ), result.fileName );
+    {
+        UtauParameter result;
+        BOOST_CHECK_EQUAL(1, db.getParams(result, 0));
+        BOOST_CHECK_EQUAL(string("_ああいあうえあ"), result.fileName);
+    }
+    {
+        UtauParameter result;
+        BOOST_CHECK_EQUAL(1, db.getParams(result, 1));
+        BOOST_CHECK_EQUAL(string("あ"), result.fileName);
+    }
+    {
+        UtauParameter result;
+        BOOST_CHECK_EQUAL(1, db.getParams(result, 2));
+        BOOST_CHECK_EQUAL(string("あ↑"), result.fileName);
+    }
+    {
+        UtauParameter result;
+        BOOST_CHECK_EQUAL(0, db.getParams(result, -1));
+        BOOST_CHECK_EQUAL(0, db.getParams(result, 3));
+    }
 
-    ret = db.getParams( result, -1 );
-    BOOST_CHECK_EQUAL( 0, ret );
+    BOOST_CHECK_EQUAL(1, db.getSubDirectorySize());
+    {
+        Oto const* const oto = db.getSubDirectoryOto(0);
+        BOOST_CHECK_EQUAL(1, oto->count());
+        UtauParameter * actual = (*oto)[0];
+        BOOST_CHECK_EQUAL(string("A\\わ"), actual->fileName);
+        string const expected = Path::combine(Path::combine(Path::getDirectoryName(path), "A"), "oto.ini");
+        BOOST_CHECK_EQUAL(expected, oto->getOtoIniPath());
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -21,6 +21,8 @@
 
 namespace vconnect
 {
+    class Oto;
+
     /// <summary>
     /// UTAU音源を管理する機能を提供します．
     /// </summary>
@@ -53,6 +55,10 @@ namespace vconnect
         string getOtoIniPath();
 
         int size();
+
+        size_t getSubDirectorySize() const;
+
+        Oto const* getSubDirectoryOto(size_t const index) const;
 
     private:
         UtauDB()

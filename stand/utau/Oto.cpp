@@ -24,6 +24,7 @@ namespace vconnect
         {
             string normalized_oto_ini_path = Path::normalize(oto_ini_file);
             string normalized_db_root_directory = Path::normalize(db_root_directory);
+            oto_ini_path_ = normalized_oto_ini_path;
 
             TextInputStream stream(normalized_oto_ini_path, encoding);
 
@@ -76,8 +77,14 @@ namespace vconnect
             return parameters_[index].get();
         }
 
+        std::string doGetOtoIniPath() const
+        {
+            return oto_ini_path_;
+        }
+
     private:
         std::vector<std::shared_ptr<UtauParameter>> parameters_;
+        std::string oto_ini_path_;
     };
 
     Oto::Oto(std::string const& oto_ini_file, string const& db_root_directory, std::string const& encoding)
@@ -99,4 +106,10 @@ namespace vconnect
             return nullptr;
         }
     }
+
+    string Oto::getOtoIniPath() const
+    {
+        return impl_->doGetOtoIniPath();
+    }
 }
+
