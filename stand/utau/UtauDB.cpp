@@ -92,6 +92,11 @@ namespace vconnect
             return sub_[index].get();
         }
 
+        Oto const* doGetRootOto() const
+        {
+            return root_.get();
+        }
+
     private:
         UtauParameter * findParam(string const& lyric)
         {
@@ -153,5 +158,10 @@ namespace vconnect
     Oto const* UtauDB::getSubDirectoryOto(size_t const index) const
     {
         return impl_->doGetSubdirectoryOto(index);
+    }
+
+    Oto const* UtauDB::getRootOto() const
+    {
+        return impl_->doGetRootOto();
     }
 }

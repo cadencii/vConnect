@@ -60,6 +60,8 @@ namespace vconnect
 
         Oto const* getSubDirectoryOto(size_t const index) const;
 
+        Oto const* getRootOto() const;
+
     private:
         UtauDB()
         {}
